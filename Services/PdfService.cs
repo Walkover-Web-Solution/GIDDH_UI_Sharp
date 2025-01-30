@@ -17,7 +17,7 @@ namespace GiddhTemplate.Services
             _rendererConfig = new PdfRendererConfigService();
             _razorTemplateService = new RazorTemplateService();
 
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Tally");
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Gst");
             _styles = new Lazy<(string, string, string, string)>(() => LoadStyles(templatePath));
         }
 
@@ -75,7 +75,9 @@ namespace GiddhTemplate.Services
                     renderer.RenderingOptions.MarginLeft = 0;
                     renderer.RenderingOptions.MarginRight = 0;
                     renderer.RenderingOptions.MarginBottom = 0;
-                    return renderer.RenderHtmlAsPdf($"<style>{commonStyles}{bodyStyles}{headerStyles}</style>{header}{body}");
+                    renderer.RenderingOptions.HtmlHeader = CreateHtmlHeaderFooter($"{commonStyles}{headerStyles}", header);
+                    renderer.RenderingOptions.HtmlFooter = CreateHtmlHeaderFooter($"{commonStyles}{footerStyles}", footer);
+                    return renderer.RenderHtmlAsPdf($"<style>{commonStyles}{bodyStyles}</style>{body}");
             }
         }
 
@@ -93,7 +95,7 @@ namespace GiddhTemplate.Services
             Console.WriteLine("PDF Generation Started ...");
 
             var renderer = _rendererConfig.GetConfiguredRenderer();
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Tally");
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Gst");
             var (commonStyles, headerStyles, footerStyles, bodyStyles) = _styles.Value;
 
             string header = await RenderTemplate(Path.Combine(templatePath, "Header.cshtml"), request);
@@ -106,7 +108,7 @@ namespace GiddhTemplate.Services
             PdfDocument pdf = CreatePdfDocument(header, body, footer, commonStyles, headerStyles, footerStyles, bodyStyles, renderer, request);
 
             // Uncomment below line to save PDF file in local 
-            // GenerateLocalPdfFile(pdf);
+            GenerateLocalPdfFile(pdf);
 
             return Convert.ToBase64String(pdf.BinaryData);
         }

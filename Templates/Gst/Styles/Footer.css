@@ -1,0 +1,4 @@
+/* Footer CSS */
+footer {
+  padding: 0 var(--header-footer-body-padding, 15px);
+}
