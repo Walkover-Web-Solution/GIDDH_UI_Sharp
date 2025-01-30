@@ -111,9 +111,12 @@
                                             <tr>
                                                 <td width="50%" class="border-none border-right p-0 vertical-align-top">
                                                     <table>
+                                                        @{
+                                                            var showCompanyInfo = GetDisplayStatus("ShowLogo") || GetDisplayStatus("ShowCompanyAddress") ||
+                                                                 GetDisplayStatus("HeaderCompanyName");
+                                                        }
                                                         <tbody>
-                                                            @if (GetDisplayStatus("ShowLogo") || GetDisplayStatus("ShowCompanyAddress") ||
-                                                                 GetDisplayStatus("HeaderCompanyName"))
+                                                            @if (showCompanyInfo)
                                                             {
                                                             <tr>
                                                                 <td class="border-none">
@@ -165,7 +168,7 @@
                                                             @if (GetDisplayStatus("CustomerName"))
                                                             {
                                                             <tr>
-                                                                <td class="border-none border-top">
+                                                                <td class="border-none @(showCompanyInfo ? "border-top" : "")">
                                                                     <table>
                                                                         <tbody>
                                                                             <tr>
@@ -183,8 +186,8 @@
                                                             @if (GetDisplayStatus("ShippingAddress"))
                                                             {
                                                             <tr>
-                                                                <td class="border-none border-top">
-                                                                    <p class="font-11">@GetLabel("ShippingAddress")</p>
+                                                                <td class="border-none @(showCompanyInfo || GetDisplayStatus("CustomerName") ? "border-top" : "")">
+                                                                    <p>@GetLabel("ShippingAddress")</p>
                                                                     <p>@Model?.Shipping?.Address</p>
                                                                     <table>
                                                                         <tbody>
@@ -244,8 +247,8 @@
                                                             @if (GetDisplayStatus("BillingAddress"))
                                                             {
                                                             <tr>
-                                                                <td class="border-none border-top">
-                                                                    <p class="font-11">@GetLabel("BillingAddress")</p>
+                                                                <td class="border-none @(showCompanyInfo || GetDisplayStatus("CustomerName") || GetDisplayStatus("ShippingAddress") ? "border-top" : "")">
+                                                                    <p>@GetLabel("BillingAddress")</p>
                                                                     <p>@Model?.Billing?.Address</p>
                                                                     <table>
                                                                     @if (GetDisplayStatus("BillingTaxNumber"))
@@ -265,6 +268,16 @@
                                                                             @GetLabel("BillingStateCounty")    
                                                                         </td>
                                                                         <td class="border-none p-0">: @Model?.Billing?.StateCounty</td>
+                                                                    </tr>
+                                                                    }
+
+                                                                    @if (GetDisplayStatus("DisplayPlaceOfSupply"))
+                                                                    {
+                                                                    <tr>
+                                                                        <td class="border-none p-0" width="100px">
+                                                                            @GetLabel("DisplayPlaceOfSupply")    
+                                                                        </td>
+                                                                        <td class="border-none p-0">: @Model?.PlaceOfSupply</td>
                                                                     </tr>
                                                                     }
 
