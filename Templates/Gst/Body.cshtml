@@ -1,0 +1,491 @@
+@model InvoiceData.Root
+@using InvoiceData
+@using System;
+@using System.Collections.Generic;
+@using Microsoft.AspNetCore.Html
+@using System.Reflection
+@using System.Linq;
+
+@functions {
+    public string GetLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true ? setting.Label : string.Empty;
+    }
+
+    public bool GetDisplayStatus(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true;
+    }
+
+    public object GetCurrencyCodeOrSymbol()
+    {
+        return Model?.CurrencyFormat == "CODE"
+        ? Model?.AccountCurrency?.Code ?? ""
+        : new HtmlString(Model?.AccountCurrency?.Symbol);
+    }
+
+    public bool IsShowAmountForCompany()
+    {
+        return Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true;
+    }
+
+    private Setting? GetSetting(string settingName)
+    {
+        return Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
+    }
+}
+
+ <main>
+      <table>
+        <tbody>
+          <tr>
+            <td class="p-0" colspan="100%">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="p-0">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>Company Details:</td>
+                          </tr>
+                          <tr>
+                            <td>Company Name</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <address>Company Address</address>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Company GSTIN</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td class="p-0">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>Shipped From:</td>
+                          </tr>
+                          <tr>
+                            <td>Shipping Name ???</td>
+                          </tr>
+                          <tr>
+                            <td><address>Shipping Address</address></td>
+                          </tr>
+                          <tr>
+                            <td>Shipping GSTIN</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%">
+                      <hr class="color-grey" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Customer Name</p>
+                              <p>Divyanshu</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <strong>Billing Address</strong>
+                              <address>Madhya Pradesh</address>
+                              <p class="mr-t1">GSTIN</p>
+                              <p>23MNHBG3212A2Z1</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <strong>Shipping Address</strong>
+                              <address>Madhya Pradesh</address>
+                              <p class="mr-t1">GSTIN</p>
+                              <p>23MNHBG3212A2Z1</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Attention to Name</p>
+                              <p>Attention to email</p>
+                              <p>Attention to Mobile no</p>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Due Date</p>
+                              <p>01-01-2025</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Ship Via</p>
+                              <p>01-01-2025</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Tracking No.</p>
+                              <p>-</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Place of Supply</p>
+                              <p>-</p>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Custom Field 1</p>
+                              <p>01-01-2025</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Custom Field 2</p>
+                              <p>01-01-2025</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top">
+                              <p>Custom Field 3</p>
+                              <p>-</p>
+                            </td>
+                            <td width="25%" class="vertical-align-top"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table class="mr-b1 mr-t1">
+                        <thead>
+                          <tr class="border-top">
+                            <!-- # -->
+                            <th width="30px" class="text-center">#</th>
+                            <!-- Description -->
+                            <th width="15%"> Description</th>
+                            <!-- HSN/SAC -->
+                            <th> HSN/SAC</th>
+                            <!-- Qty -->
+                            <th> Qty.</th>
+                            <!-- Rate/Item -->
+                            <th class="text-right"> Rate/Item</th>
+                            <!-- Total Before Dis. -->
+                            <th class="text-right"> Total Before Dis.</th>
+                            <!-- Dis./ Item -->
+                            <th> Dis./ Item</th>
+                            <!-- Taxable Amt. -->
+                            <th class="text-right"> Taxable Amt.</th>
+                            <!-- SGST -->
+                            <th class="text-right"> SGST </th>
+                            <!-- CSGT -->
+                            <th class="text-right"> CSGT </th>
+                            <!-- CESS -->
+                            <th class="text-right"> CESS</th>
+                            <!-- Total -->
+                            <th class="text-right"> Total</th>
+                          </tr>
+                          <tr class="border-top">
+                            <td colspan="100%" class="text-right">
+                                Previous Due : ₹290155.00
+                            </td> 
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="vertical-align-top border-top">
+                            <!-- # -->
+                            <td class="text-center">1</td>
+                            <!-- Description -->
+                            <td>
+                              <div style="display: flex; align-items: start;">
+                                <img 
+                                    src="https://png.pngtree.com/png-vector/20241102/ourmid/pngtree-premium-black-t-shirt-mockup-png-image_14226805.png" 
+                                    width="40px" 
+                                  />
+                                  <div>
+                                    <p>KJ Tshirt-M</p>
+                                    <p class="font-size-small">06-12-2024</p>
+                                    <p class="font-size-small"> Description dsjdhsds ds  sd sdsdsdsds dsd s dsd s d</p>
+                                  </div>
+                              </div>
+                            </td>
+                             <!-- HSN/SAC -->
+                            <td>
+                              <p>994565</p>
+                              <p class="font-size-small">(S)</p>
+                            </td>
+                             <!-- Qty. -->
+                            <td class="text-right">
+                              <p>1</p>
+                              <p class="font-size-small">Nos</p>
+                            </td>
+                             <!-- Rate/Item -->
+                            <td class="text-right">₹43.00</td>
+                            <!-- Total Before Dis. -->
+                            <td class="text-right">₹43.00</td>
+                             <!-- Dis./ Item -->
+                            <td>-</td>
+                             <!-- Taxable Amt. -->
+                            <td class="text-right">₹43.00</td>
+                            <!-- SGST -->
+                            <td class="text-right">
+                              <p>₹7.74</p>
+                              <p class="font-size-small">18.00%</p>
+                            </td>
+                            <!-- CSGT -->
+                            <td class="text-right">-</td>
+                            <!-- CESS -->
+                            <td class="text-right">-</td>
+                            <!-- Total -->
+                            <td class="text-right">₹50.74</td>
+                          </tr>
+                          <tr>
+                            <!-- # -->
+                            <td></td>
+                            <!-- All columns after # -->
+                            <td colspan="100%">
+                                Description show here c sd sdsds dsdssdsdssd sdsd sdsds dsdsd sd
+                            </td>
+                          </tr>
+
+                          <tr class="vertical-align-top border-top">
+                            <!-- # -->
+                            <td class="text-center">1</td>
+                            <!-- Description -->
+                            <td>
+                              <div style="display: flex; align-items: start;">
+                                <img 
+                                    src="https://png.pngtree.com/png-vector/20241102/ourmid/pngtree-premium-black-t-shirt-mockup-png-image_14226805.png" 
+                                    width="40px" 
+                                  />
+                                  <div>
+                                    <p>KJ Tshirt-M</p>
+                                    <p class="font-size-small">06-12-2024</p>
+                                    <p class="font-size-small"> Description dsjdhsds ds  sd sdsdsdsds dsd s dsd s d</p>
+                                  </div>
+                              </div>
+                            </td>
+                             <!-- HSN/SAC -->
+                            <td>
+                              <p>994565</p>
+                              <p class="font-size-small">(S)</p>
+                            </td>
+                             <!-- Qty. -->
+                            <td class="text-right">
+                              <p>1</p>
+                              <p class="font-size-small">Nos</p>
+                            </td>
+                             <!-- Rate/Item -->
+                            <td class="text-right">₹43.00</td>
+                            <!-- Total Before Dis. -->
+                            <td class="text-right">₹43.00</td>
+                             <!-- Dis./ Item -->
+                            <td>-</td>
+                             <!-- Taxable Amt. -->
+                            <td class="text-right">₹43.00</td>
+                            <!-- SGST -->
+                            <td class="text-right">
+                              <p>₹7.74</p>
+                              <p class="font-size-small">18.00%</p>
+                            </td>
+                            <!-- CSGT -->
+                            <td class="text-right">-</td>
+                            <!-- CESS -->
+                            <td class="text-right">-</td>
+                            <!-- Total -->
+                            <td class="text-right">₹50.74</td>
+                          </tr>
+                          <tr>
+                            <!-- # -->
+                            <td></td>
+                            <!-- All columns after # -->
+                            <td colspan="100%">
+                                Description show here c sd sdsds dsdssdsdssd sdsd sdsds dsdsd sd
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="border-top">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>2</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>₹223</td>
+                            <td>₹40.14</td>
+                            <td>₹263</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table>
+                        <tbody>
+                          <tr class="border-top">
+                            <td width="50%">
+                              <figure class="m-0">
+                                <img src="qr-logo.png" height="100px">
+                              </figure>
+                            </td>
+                            <td width="50%">
+                              <table class="entry-summary">
+                                <tbody>
+                                  <tr>
+                                    <td class="p-0">Sub Total</td>
+                                    <td class="text-right p-0">2</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Total Tax*</td>
+                                    <td class="text-right p-0">2</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Round Off</td>
+                                    <td class="text-right p-0">2</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0"><strong>Invoice Total (In INR)</strong></td>
+                                    <td class="text-right p-0"><strong>₹24150000.00</strong></td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Total (In Words)</td>
+                                    <td class="text-right p-0"><u>Two Crore Forty One Lakh Fifty Thousand Only</u></td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Paid</td>
+                                    <td class="text-right p-0">₹200</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Due Amount</td>
+                                    <td class="text-right p-0">₹299</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="p-0">Total Due</td>
+                                    <td class="text-right p-0">₹299</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%" class="p-0">
+                      <table style="margin-top: 20px;">
+                        <thead>
+                          <!-- Description (HSN/Tax Rate) -->
+                          <tr class="border-bottom">
+                            <th class="text-right font-weight-500">Taxable Amt.</th>
+                          <!-- Taxes 1a -->
+                            <th class="text-right font-weight-500">CGST %</th>
+                          <!-- Taxes 1b-->
+                            <th class="text-right font-weight-500">CGST Amt.</th>
+                          <!-- Taxes 2a-->
+                            <th class="text-right font-weight-500">SGST %</th>
+                          <!-- Taxes 2b-->
+                            <th class="text-right font-weight-500">SGST Amt.</th>
+                          <!-- Total -->
+                            <th class="text-right font-weight-500">Total Amt.</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Description (HSN/Tax Rate) -->
+                          <tr>
+                            <td class="text-right">₹112</td>
+                          <!-- Taxes 1a -->
+                            <td class="text-right">₹22</td>
+                          <!-- Taxes 1b-->
+                            <td class="text-right">₹11</td>
+                          <!-- Taxes 2a-->
+                            <td class="text-right">₹11</td>
+                          <!-- Taxes 2b-->
+                            <td class="text-right">₹12.</td>
+                          <!-- Total -->
+                            <td class="text-right">₹1000</td>
+                          </tr>
+
+                           <!-- Description (HSN/Tax Rate) -->
+                           <tr>
+                            <td class="text-right">₹112</td>
+                          <!-- Taxes 1a -->
+                            <td class="text-right">₹22</td>
+                          <!-- Taxes 1b-->
+                            <td class="text-right">₹11</td>
+                          <!-- Taxes 2a-->
+                            <td class="text-right">₹11</td>
+                          <!-- Taxes 2b-->
+                            <td class="text-right">₹12.</td>
+                          <!-- Total -->
+                            <td class="text-right">₹1000</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <!-- Description (HSN/Tax Rate) -->
+                          <tr class="border-bottom border-top">
+                            <td class="text-right font-weight-500">Taxable Amt.</td>
+                          <!-- Taxes 1a -->
+                            <td class="text-right font-weight-500">CGST %</td>
+                          <!-- Taxes 1b-->
+                            <td class="text-right font-weight-500">CGST Amt.</td>
+                          <!-- Taxes 2a-->
+                            <td class="text-right font-weight-500">SGST %</td>
+                          <!-- Taxes 2b-->
+                            <td class="text-right font-weight-500">SGST Amt.</td>
+                          <!-- Total -->
+                            <td class="text-right font-weight-500">Total Amt.</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%">
+                        <table style="margin-top: 20px;">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <p>We declare that this invoice shows the actual price of the services rendered and that all particulars are true and correct.</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <p>SUPPLY MEANT FOR EXPORT UNDER BOND OR LETTER OF UNDERTAKING WITHOUT PAYMENT OF INTEGRATED TAX</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <p>Notes provided in the invoice will appear here</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </main>

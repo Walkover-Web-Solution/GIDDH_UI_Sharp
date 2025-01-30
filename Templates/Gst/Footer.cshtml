@@ -1,0 +1,118 @@
+@model InvoiceData.Root
+@using InvoiceData
+
+@functions {
+    public string GetLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true ? setting.Label : string.Empty;
+    }
+
+    public bool GetDisplayStatus(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true;
+    }
+
+    private Setting? GetSetting(string settingName)
+    {
+        return Model?.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
+    }
+}
+
+<footer>
+    <table>
+        <tbody>
+            <tr>
+                <td class="p-0" colspan="100%">
+                    @if (GetDisplayStatus("DisplayExportMessage"))
+                    {
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p>@GetLabel("DisplayExportMessage")</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td class="p-0" width="33%">
+                    <table>
+                        <tbody>
+                            @if (GetDisplayStatus("Message1"))
+                            {
+                                <tr>
+                                    <td>
+                                        <p class="font-size-small">@GetLabel("Message1")</p>
+                                    </td>
+                                </tr>
+                            }
+                            @if (GetDisplayStatus("InvoiceNotes"))
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model?.Message2))
+                                        {
+                                            <p class="font-size-small">@Model.Message2</p>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            @if (GetDisplayStatus("Thanks"))
+                            {
+                                <tr>
+                                    <td>
+                                        <strong class="color-primary">@GetLabel("Thanks")</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+                <td class="p-0 vertical-align-bottom" width="33%"></td>
+                <td class="vertical-align-bottom text-center" width="33%">
+                    @if (GetDisplayStatus("TextUnderSlogan") || GetDisplayStatus("ImageSignature"))
+                    {
+                    <div class="border-bottom" style="padding-bottom: 5px;"> @* Added class and inline style *@
+                        @if (GetDisplayStatus("TextUnderSlogan"))
+                        {
+                            <p>@GetLabel("TextUnderSlogan")</p>
+                        }
+                        @if (GetDisplayStatus("ImageSignature") && !string.IsNullOrEmpty(Model?.ImageSignature))
+                        {
+                            <figure class="m-0">
+                                <img src="@Model.ImageSignature" height="60px" width="auto" />
+                            </figure>
+                        }
+                    </div>
+                    }
+                    @if (GetDisplayStatus("TextUnderSlogan"))
+                    {
+                        <p class="text-under-signature mr-t1">@GetLabel("TextUnderSlogan")</p> @* Added class and spacing class *@
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td colspan="100%">
+                    <hr class="color-primary" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="100%" class="text-center">
+                    @if (GetDisplayStatus("FooterCompanyName"))
+                    {
+                        <p class="font-weight-500">@Model?.Company?.Name</p>
+                    }
+                    @if (GetDisplayStatus("FooterCompanyAddress"))
+                    {
+                        <address>@Model?.Company?.Address</address>
+                    }
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</footer>

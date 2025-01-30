@@ -1,0 +1,97 @@
+@model InvoiceData.Root
+@using InvoiceData
+
+@functions {
+    public string GetLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true ? setting.Label : string.Empty;
+    }
+
+    public bool GetDisplayStatus(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true;
+    }
+
+    private Setting? GetSetting(string settingName)
+    {
+        return Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
+    }
+}
+
+<header>
+    <table>
+        <tbody>
+            <tr>
+                <td class="p-0">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="p-0" width="33%">
+                                    @if (GetDisplayStatus("ShowLogo") && !string.IsNullOrEmpty(Model?.Company?.Logo?.Url))
+                                    {
+                                        <figure class="m-0">
+                                            <img src="@Model?.Company?.Logo?.Url" width="@Model?.Company?.Logo?.Size" height="auto" />
+                                        </figure>
+                                    }
+                                    @if (GetDisplayStatus("HeaderCompanyName"))
+                                    {
+                                        <p>@Model?.Company?.Name</p>
+                                    }
+                                    @if (GetDisplayStatus("CompanyTaxNumber"))
+                                    {
+                                        <p><strong>@GetLabel("CompanyTaxNumber")</strong> @Model?.Company?.TaxNumber</p>
+                                    }
+                                    @* @if (GetDisplayStatus("GstSchemeData"))  @* Example - adapt to your needs 
+                                    {
+                                        <p>@Model?.Company?.GstSchemeData</p> @* Assuming this property exists 
+                                    } *@
+                                </td>
+
+                                <td class="p-0 invoice-info vertical-align-bottom" width="33%"> @* Added classes and width *@
+                                    <table>
+                                        <tbody>
+                                            @if (GetDisplayStatus("VoucherDate"))
+                                            {
+                                                <tr>
+                                                    <td><strong>@GetLabel("VoucherDate")</strong></td>
+                                                    <td class="text-right">@Model?.VoucherDate </td>
+                                                </tr>
+                                            }
+                                            @if (GetDisplayStatus("VoucherNumber"))
+                                            {
+                                                <tr>
+                                                    <td><strong>@GetLabel("VoucherNumber")</strong></td>
+                                                    <td class="text-right">@Model?.VoucherNumber</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+
+                                <td class="qr-code vertical-align-bottom text-right" width="33%">
+                                    @if (GetDisplayStatus("ShowQrCode") && !string.IsNullOrEmpty(Model?.QRCodeBase64String))
+                                    {
+                                        <img src="data:image/png;base64,@Model?.QRCodeBase64String" class="qr-code-image" width="120" />
+                                    }
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="100%" class="text-center pb-1">
+                                    @if (GetDisplayStatus("FormNameInvoice") || GetDisplayStatus("FormNameTaxInvoice"))
+                                    {
+                                        <p class="invoice-title color-primary">
+                                            <strong>@GetLabel(GetDisplayStatus("FormNameInvoice") ? "FormNameInvoice" : "FormNameTaxInvoice")</strong>
+                                        </p>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</header>

@@ -208,19 +208,11 @@ table {
 table tr th,
 table tr td {
   font-weight: var(--font-weight-200, 200);
-  border: 1px solid currentColor;
+  border: none;
   text-align: left;
   padding: 6px 4px;
   word-break: break-word;
-}
-
-table.table-row-height tr td {
-  height: 50px;
-}
-
-table tr.border-top-none th {
-  border-top: none !important;
-}
+} 
 
 .vertical-align-top {
   vertical-align: top;

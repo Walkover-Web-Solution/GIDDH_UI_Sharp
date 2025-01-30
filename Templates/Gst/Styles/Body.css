@@ -1,0 +1,15 @@
+main {
+  padding: 0 var(--header-footer-body-padding, 15px);
+}
+
+hr {
+  border-style: solid;
+  border-color: currentColor;
+}
+hr.color-grey {
+  color: #d6d4d4 !important;
+}
+
+table.entry-summary tr td {
+  padding: 3px;
+}

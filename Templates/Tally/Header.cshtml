@@ -86,11 +86,8 @@
 
                                         @if (GetDisplayStatus("ShowQrCode") && !string.IsNullOrEmpty(Model?.QRCodeBase64String))
                                         {
-                                            <td id="qr-code-section" class="border-none text-right vertical-align-bottom">                              
-                                            @{
-                                                var qrCodeSrc = "data:image/png;base64," + Model?.QRCodeBase64String;
-                                            }
-                                                <img src="@qrCodeSrc" class="qr-code-image" width="120px" />
+                                            <td id="qr-code-section" class="border-none text-right vertical-align-bottom">
+                                                <img src="data:image/png;base64,@Model?.QRCodeBase64String" class="qr-code-image" width="120px" />
                                             </td>
                                         }
                                         </tr>
