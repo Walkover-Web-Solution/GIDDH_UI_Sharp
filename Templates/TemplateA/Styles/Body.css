@@ -1,0 +1,20 @@
+main {
+  padding-left: var(--header-footer-body-padding, 15px);
+  padding-right: var(--header-footer-body-padding, 15px);
+}
+
+hr {
+  border-style: solid;
+  border-color: currentColor;
+}
+hr.color-grey {
+  color: #d6d4d4 !important;
+}
+
+table.entry-summary tr td {
+  padding: 3px;
+}
+
+.entry-table tbody tr td > * {
+  line-height: calc(var(--font-size-default, 14px) * 1.25);
+} 
