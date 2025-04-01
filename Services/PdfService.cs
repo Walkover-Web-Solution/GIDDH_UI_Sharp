@@ -214,7 +214,7 @@ namespace GiddhTemplate.Services
         {
             string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
             Directory.CreateDirectory(rootPath);
-            string pdfName = $"{(string.IsNullOrWhiteSpace(request?.PdfRename) ? "PDF" : request.PdfRename)} {DateTimeOffset.Now:HHmmssfff}.pdf";
+            string pdfName = $"{(string.IsNullOrWhiteSpace(request?.PdfRename) ? "PDF" : request.PdfRename)}_{DateTimeOffset.Now:HHmmssfff}.pdf";
             return Path.Combine(rootPath, pdfName);
         }
 
@@ -257,7 +257,7 @@ namespace GiddhTemplate.Services
 
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
-                // Uncomment below line to save PDF file in local
+                // ###### Uncomment below line to save PDF file in local ######
                 // string pdfName = GetFileNameWithPath(request);
                 // Console.WriteLine($"PDF Downloaded, Please check -> {pdfName}");
                 // await page.PdfAsync(pdfName, _cachedPdfOptions);

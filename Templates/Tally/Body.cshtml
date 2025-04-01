@@ -622,11 +622,14 @@
                                                                     <td class="py-0 border-none border-right text-center">
                                                                         @if (Entry?.SumOfDiscounts != null && Entry.SumOfDiscounts.AmountForAccount >= 0)
                                                                         {
-                                                                            @if (IsRtlCurrency(Model?.AccountCurrency?.Code))
+                                                                            if (Model?.AccountCurrency?.Code != null)
                                                                             {
-                                                                                <span>- @Entry?.SumOfDiscounts?.AmountForAccount @GetAccountCurrencyCodeOrSymbol()</span>
-                                                                            } else {
-                                                                                <span>@GetAccountCurrencyCodeOrSymbol() - @Entry?.SumOfDiscounts?.AmountForAccount</span>
+                                                                                @if (IsRtlCurrency(Model.AccountCurrency.Code))
+                                                                                {
+                                                                                    <span>- @Entry?.SumOfDiscounts?.AmountForAccount @GetAccountCurrencyCodeOrSymbol()</span>
+                                                                                } else {
+                                                                                    <span>@GetAccountCurrencyCodeOrSymbol() - @Entry?.SumOfDiscounts?.AmountForAccount</span>
+                                                                                }
                                                                             }
                                                                         }
                                                                     </td>
@@ -954,13 +957,13 @@
                                                                 @if (TaxIsApplied == true && CgstSgstIsApplied == false)
                                                                 {
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
+                                                                        @((Bifurcation?.Iamt > 0 || Bifurcation?.Vatamt > 0) && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
                                                                     </td>
                                                                     <td class="text-center">
                                                                         @if (Bifurcation?.Iamt != null) {
                                                                             @(Bifurcation?.Iamt >= 0 ? Bifurcation?.Iamt : "")
                                                                         } else if(Bifurcation?.Vatamt != null) {
-                                                                            @(Bifurcation?.Vatamt >= 0 ? Bifurcation?.Vatamt : "") 
+                                                                            @(Bifurcation?.Vatamt > 0 ? Bifurcation?.Vatamt : "") 
                                                                         }
                                                                     </td>
                                                                 }
@@ -969,29 +972,29 @@
                                                                 @if (CgstSgstIsApplied == true)
                                                                 {
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
+                                                                        @(Bifurcation?.Camt > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.Camt >= 0 ? Bifurcation?.Camt : "")
+                                                                        @(Bifurcation?.Camt > 0 ? Bifurcation?.Camt : "")
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.Samt != null && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
+                                                                        @(Bifurcation?.Samt > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.Samt >= 0 ? Bifurcation?.Samt : "")
+                                                                        @(Bifurcation?.Samt > 0 ? Bifurcation?.Samt : "")
                                                                     </td>
                                                                 }
 
-                                                                @* SALES TAX  - Note - currently not support Sales Tax *@
-                                                                @* @if (Bifurcation?.SalesTaxAmount != null)
+                                                                @* SALES TAX *@
+                                                                @if (Bifurcation?.SalesTaxAmount != null)
                                                                 {
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.SalesTaxAmount != null && Bifurcation?.SalesTaxRate >= 0 ? $"{Bifurcation?.SalesTaxRate}%" : "") 
+                                                                        @(Bifurcation?.SalesTaxAmount > 0 && Bifurcation?.SalesTaxRate >= 0 ? $"{Bifurcation?.SalesTaxRate}%" : "") 
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        @(Bifurcation?.SalesTaxAmount >= 0 ? Bifurcation?.SalesTaxAmount : "") 
+                                                                        @(Bifurcation?.SalesTaxAmount > 0 ? Bifurcation?.SalesTaxAmount : "") 
                                                                     </td>
-                                                                } *@
+                                                                }
 
                                                                 @* CESS (It may be more then 1) *@
                                                                 @if (CessIsApplied == true)
@@ -1035,8 +1038,8 @@
                                                             </td>
                                                             }
 
-                                                            <td class="@(Model?.IsTaxesApplied == true ? "text-center" : "text-right")">
-                                                                <strong>@Model?.TaxableTotal?.AmountForAccount</strong>
+                                                            <td class="text-center">
+                                                                <strong>@Model?.TaxableTotal?.AmountForCompany</strong>
                                                             </td>
 
                                                             @if (Model?.GstTaxesTotalOnly != null && Model.GstTaxesTotalOnly.Any())
@@ -1045,7 +1048,7 @@
                                                                 {
                                                                 <td class="text-center"></td>
                                                                 <td class="text-center">
-                                                                <strong>@Tax?.Amount?.AmountForAccount</strong>
+                                                                    <strong>@Tax?.Amount?.AmountForCompany</strong>
                                                                 </td>
                                                                 }
                                                             }
@@ -1057,10 +1060,9 @@
                                                                 @foreach (var Cess in Model.CessTotal)
                                                                 { 
                                                                     <td class="text-center">
-                                                                        <strong></strong>
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <strong>@Cess?.Amount?.AmountForAccount</strong>
+                                                                        <strong>@Cess?.Amount?.AmountForCompany</strong>
                                                                     </td>
                                                                 }
                                                             }
@@ -1071,20 +1073,16 @@
                                                                 @foreach (var OtherTax in Model.OtherTotal)
                                                                 { 
                                                                     <td class="text-center">
-                                                                        <strong></strong>
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <strong>@OtherTax?.Amount?.AmountForAccount</strong>
+                                                                        <strong>@OtherTax?.Amount?.AmountForCompany</strong>
                                                                     </td>
                                                                 }
                                                             }
 
-                                                            @if (Model?.IsTaxesApplied == true)
-                                                            {
-                                                                <td class="text-right">
-                                                                    <strong>@Model?.TotalTax?.AmountForAccount</strong>
-                                                                </td>
-                                                            }
+                                                            <td class="text-right">
+                                                                <strong>@Model?.TotalTax?.AmountForCompany</strong>
+                                                            </td>
                                                         </tr>
                                                     </tfoot>
                                                 </table>
