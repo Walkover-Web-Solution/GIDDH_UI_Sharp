@@ -9,7 +9,6 @@ namespace GiddhTemplate.Services
     public class PdfService
     {
         private readonly RazorTemplateService _razorTemplateService;
-        private readonly Lazy<(string Common, string Header, string Footer, string Body, string BackgroundStyles)> _styles;
         private string _openSansFontCSS = ""; // Cache the Open Sans CSS
         private string _openRobotoFontCSS = ""; // Cache the Roboto CSS
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -67,8 +66,6 @@ namespace GiddhTemplate.Services
         public PdfService()
         {
             _razorTemplateService = new RazorTemplateService();
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Tally");
-            _styles = new Lazy<(string, string, string, string, string)>(() => LoadStyles(templatePath));
         }
 
         private string LoadFileContent(string filePath)
@@ -127,13 +124,10 @@ namespace GiddhTemplate.Services
         private async Task<string> RenderTemplate(string templatePath, Root request)
         {
             string cacheKey = $"{templatePath}-{request.GetHashCode()}";
-#pragma warning disable CS8600 // Disable null conversion warning
             if (_renderedTemplates.TryGetValue(cacheKey, out string cachedResult))
             {
-#pragma warning restore CS8600 // Restore null conversion warning
                 return cachedResult;
             }
-#pragma warning restore CS8600 // Restore null conversion warning
 
             string renderedTemplate = await _razorTemplateService.RenderTemplateAsync(templatePath, request);
             _renderedTemplates.TryAdd(cacheKey, renderedTemplate);
@@ -174,41 +168,22 @@ namespace GiddhTemplate.Services
             themeCSS.Append("}");
 
             var allStyles = $"{commonStyles}{headerStyles}{bodyStyles}{footerStyles}{themeCSS}";
-
-            if (request?.TemplateType?.ToUpper() == "TALLY")
-            {
-                bool repeatHeaderFooter = request?.ShowSectionsInline != true;
-                return $@"<html> 
-                            <head> 
-                                <style>
-                                    {allStyles}
-                                    {(repeatHeaderFooter ? backgroundStyles : string.Empty)}
-                                </style>
-                            </head> 
-                            <body class={(repeatHeaderFooter ? "repeat-header-footer" : "")}>
-                                <div style='display: flex; flex-direction: column; height: -webkit-fill-available;'>
-                                    {header}
-                                    {body}
-                                    {footer}
-                                </div>
-                            </body> 
-                        </html>";
-            }
-            else
-            {
-                return $@"<html> 
-                            <head> 
-                                <style>
-                                    {allStyles}
-                                </style>
-                            </head> 
-                            <body>
-                                {header}
-                                {body}
-                                {footer}
-                            </body> 
-                        </html>";
-            }
+            bool repeatHeaderFooter = request?.ShowSectionsInline != true;
+            return $@"<html> 
+                <head> 
+                    <style>
+                        {allStyles}
+                        {(repeatHeaderFooter ? backgroundStyles : string.Empty)}
+                    </style>
+                </head> 
+                <body class={(repeatHeaderFooter ? "repeat-header-footer" : "")}>
+                    <div style='display: flex; flex-direction: column; height: -webkit-fill-available;'>
+                        {header}
+                        {body}
+                        {footer}
+                    </div>
+                </body> 
+            </html>";
         }
 
         private string GetFileNameWithPath(Root request)
@@ -219,7 +194,7 @@ namespace GiddhTemplate.Services
             return Path.Combine(rootPath, pdfName);
         }
 
-        public async Task<string> GeneratePdfAsync(Root request)
+        public async Task<string?> GeneratePdfAsync(Root request)
         {
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
@@ -228,11 +203,13 @@ namespace GiddhTemplate.Services
             {
                 Console.WriteLine("PDF Generation Started ...");
                 Console.WriteLine("First : " + DateTime.Now.ToString("HH:mm:ss.fff"));
-
-                Console.WriteLine("Get RendererConfig " + DateTime.Now.ToString("HH:mm:ss.fff"));
-
-                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Tally");
-                var (commonStyles, headerStyles, footerStyles, bodyStyles, BackgroundStyles) = _styles.Value;
+                string templateFolderName = "TemplateA";
+                if (request?.TemplateType?.ToUpper() == "TALLY")
+                {
+                    templateFolderName = "Tally";
+                }
+                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", templateFolderName);
+                var (commonStyles, headerStyles, footerStyles, bodyStyles, BackgroundStyles) = LoadStyles(templatePath);
                 Console.WriteLine("Get Styles " + DateTime.Now.ToString("HH:mm:ss"));
 
                 // Run template rendering in parallel
@@ -242,7 +219,6 @@ namespace GiddhTemplate.Services
                     RenderTemplate(Path.Combine(templatePath, "Footer.cshtml"), request),
                     RenderTemplate(Path.Combine(templatePath, "Body.cshtml"), request)
                 };
-
                 await Task.WhenAll(renderTasks);
 
                 string header = renderTasks[0].Result;
@@ -250,7 +226,7 @@ namespace GiddhTemplate.Services
                 string body = renderTasks[2].Result;
 
                 Console.WriteLine("Get Templates " + DateTime.Now.ToString("HH:mm:ss.fff"));
-
+                
                 // Final HTML store in "template"
                 string template = CreatePdfDocument(header, body, footer, commonStyles, headerStyles, footerStyles, bodyStyles, request, BackgroundStyles);
                 Console.WriteLine("Get CreatePdfDocument " + DateTime.Now.ToString("HH:mm:ss.fff"));
@@ -266,7 +242,6 @@ namespace GiddhTemplate.Services
                 var pdfBytes = await page.PdfDataAsync(_cachedPdfOptions);
                 Console.WriteLine("pdfBytes " + DateTime.Now.ToString("HH:mm:ss.fff"));
                 return Convert.ToBase64String(pdfBytes);
-
             }
             catch (Exception ex)
             {
@@ -278,7 +253,7 @@ namespace GiddhTemplate.Services
                 await page.DisposeAsync();
                 page = null;
             }
-            return "Failed to generate PDF !";
+            return null;
         }
     }
 }

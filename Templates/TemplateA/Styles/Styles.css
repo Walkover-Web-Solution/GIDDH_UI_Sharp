@@ -1,0 +1,305 @@
+/* Global CSS Variables */
+@property --header-footer-body-padding {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 15px;
+}
+@property --font-family {
+  syntax: "<string>";
+  inherits: true;
+  initial-value: "Roboto"; /* 'Roboto' | 'Open Sans' | 'sans-serif' */
+}
+@property --font-weight-200 {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 200;
+}
+@property --font-weight-400 {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 400;
+}
+@property --font-weight-500 {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 500;
+}
+@property --font-weight-700 {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 700;
+}
+@property --font-size-default {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 14px;
+}
+@property --font-size-large {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 18px;
+}
+@property --font-size-medium {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 12px;
+}
+@property --font-size-small {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 10px;
+}
+@property --color-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #181b50;
+}
+@property --color-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+@property --color-light {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #262626;
+}
+
+:root {
+  --header-height: 0px;
+  --footer-height: 0px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box !important;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  color: inherit;
+}
+
+html,
+body {
+  color: #000000;
+  font-family: var(--font-family, "Roboto");
+  font-size: var(--font-size-default, 14px);
+  font-weight: var(--font-weight-400, 400);
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size-default, 14px);
+}
+
+/* Utility */
+.color-primary {
+  color: var(--color-primary);
+}
+
+.color-secondary {
+  color: var(--color-secondary);
+}
+
+.color-light {
+  color: var(--color-light) !important;
+}
+
+.font-size-default {
+  font-size: var(--font-size-default, 14px) !important;
+}
+
+.font-size-large {
+  font-size: var(--font-size-large, 18px) !important;
+}
+
+.font-size-medium {
+  font-size: var(--font-size-medium, 12px) !important;
+}
+.font-size-small {
+  font-size: var(--font-size-small, 10px) !important;
+}
+
+.font-weight-500 {
+  font-weight: var(--font-weight-500, 500);
+}
+
+strong {
+  font-weight: var(--font-weight-500, 500);
+}
+
+address {
+  white-space: pre-line;
+  font-style: normal;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table tr th,
+table tr td {
+  font-weight: var(--font-weight-200, 200);
+  border: none;
+  /* border: 1px solid currentColor; */
+  text-align: left;
+  padding: 2px;
+  word-break: break-word;
+}
+
+.vertical-align-top {
+  vertical-align: top;
+}
+
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+.vertical-align-bottom {
+  vertical-align: bottom;
+}
+
+.border-none {
+  border: none;
+}
+
+.border-top {
+  border-top: 1px solid currentColor !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid currentColor !important;
+}
+
+.border-left {
+  border-left: 1px solid currentColor !important;
+}
+
+.border-right {
+  border-right: 1px solid currentColor !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.m-0 {
+  margin: 0;
+}
+.my-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.mr-l1 {
+  margin-left: 10px !important;
+}
+
+.mr-r1 {
+  margin-right: 10px !important;
+}
+
+.mr-t1 {
+  margin-top: 10px !important;
+}
+
+.mr-b1 {
+  margin-bottom: 10px !important;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.py-0 {
+  /* Need to optmise this code for entry table */
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+.pd-l1 {
+  padding-left: 10px !important;
+}
+
+.pd-r1 {
+  padding-right: 10px !important;
+}
+.h-inherit {
+  height: inherit !important;
+}
+
+.h-100 {
+  height: 100% !important;
+}
+
+.text-uppercase {
+  text-transform: uppercase !important;
+}
+/* Need to correct name */
+.no-wrap {
+  white-space: nowrap !important;
+}
+/* Need to correct name */
+.word-break {
+  word-wrap: break-word !important;
+}
+/* Need to correct name */
+.capitalize {
+  text-transform: capitalize !important;
+}
+
+/* Print Media CSS */
+@media print {
+  table {
+    page-break-inside: auto;
+    page-break-after: auto;
+  }
+
+  tfoot {
+    display: table-row-group; /* Ensure it's treated as a group of rows *
+    visibility: hidden; /* Hide it by default */
+  }
+
+  table:last-of-type tfoot {
+    visibility: visible; /* Only show the footer on the last table */
+  }
+
+  table.repeated-header > thead {
+    display: table-header-group !important; /* Ensure headers repeat on each page */
+  }
+
+  table.repeated-footer > tfoot {
+    display: table-footer-group !important; /* Ensure footers repeat on each page */
+  }
+
+  table.page-break-inside-avoid {
+    page-break-inside: avoid !important; /* Prevent table from being cut between pages */
+  }
+}
+
+@page { 
+  @bottom-center {
+     content: "(" counter(page) ")"; /* counter(page) for current page  | counter(pages) for Total Page */
+     font-style: bold;
+     margin-bottom: 6px;
+  }
+}
+
+@page:first {
+  @bottom-center {
+     content: ""; /* Empty content to hide footer */
+     margin-bottom: 0;
+  }
+}
