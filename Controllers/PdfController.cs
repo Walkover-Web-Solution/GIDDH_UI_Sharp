@@ -34,14 +34,19 @@ namespace GiddhTemplate.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GeneratePdfAsync([FromBody] Root request)
+        public async Task<IActionResult> GeneratePdfAsync([FromBody] object requestObj)
         {
-            if (request == null || string.IsNullOrEmpty(request.Company?.Name))
-            {
-                return BadRequest("Invalid request data. Ensure the payload matches the expected format.");
-            }
             try
             {
+                var jsonString = JsonSerializer.Serialize(requestObj);
+                Root request = JsonSerializer.Deserialize<Root>(jsonString, new JsonSerializerOptions
+                {
+                        PropertyNameCaseInsensitive = true
+                });
+                if (request == null || string.IsNullOrEmpty(request.Company?.Name))
+                {
+                            return BadRequest("Invalid request data. Ensure the payload matches the expected format.");
+                }
                 byte[] pdfBytes = await _pdfService.GeneratePdfAsync(request);
                 if (pdfBytes == null || pdfBytes.Length == 0)
                 {
