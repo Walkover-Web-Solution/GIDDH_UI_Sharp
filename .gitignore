@@ -67,3 +67,6 @@ packages/
 *.user
 Downloads/*.pdf
 Downloads/Temp
+.qodo
+
+.fake

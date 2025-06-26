@@ -1,0 +1,58 @@
+hr {
+  border-style: solid;
+  border-color: currentColor;
+}
+
+hr.color-grey {
+  color: #d6d4d4 !important;
+}
+
+table.entry-summary tr td {
+  padding: 3px;
+}
+
+.entry-table tbody tr td>* {
+  line-height: calc(var(--font-size-default, 14px) * 1.25);
+}
+
+.entry-table thead tr th,
+.entry-table tfoot tr td,
+.tax-bifurcation-table thead tr th {
+  background-color: var(--color-secondary) !important;
+}
+
+.line-height-10 {
+  line-height: 10px;
+}
+
+.scaled-line-height {
+  line-height: calc(var(--font-size-default, 14px) * 1.35) !important;
+}
+
+.tax-bifurcation-table tbody tr td {
+  padding: 5px;
+}
+
+.tax-bifurcation-table thead tr th,
+.tax-bifurcation-table tfoot tr td {
+  padding: 7px 5px;
+}
+
+.entry-table tbody tr td {
+  padding: 3px;
+}
+
+.entry-table thead tr th,
+.entry-table tfoot tr td {
+  padding: 7px 3px;
+}
+
+.grid-view {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: start;
+}
+
+.grid-view>.grid-item {
+  margin-bottom: 10px;
+}

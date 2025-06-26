@@ -13,10 +13,6 @@ main table.remove-left-right-border tr td:last-child {
   border-right: none !important;
 }
 
-main .qr-code-image {
-  aspect-ratio: 1/1;
-}
-
 .entry-table tbody tr td > * {
   line-height: calc(var(--font-size-default, 14px) * 1.25);
 }

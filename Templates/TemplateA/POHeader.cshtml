@@ -1,0 +1,81 @@
+@model InvoiceData.Root;
+@using InvoiceData;
+@using System.Collections.Generic;
+
+<header id="header">
+    <table>
+        <tbody>
+            @* This is for copy type image work at time of Invoice Copy - (Transport, Customer etc) *@
+            @if(Model?.TypeOfCopy != null)
+            {
+            <tr>
+                <td class="p-0 text-center">
+                    <img src="@Model.TypeOfCopy" height="40px" width="auto" />
+                </td>
+            </tr>
+            }
+            <tr>
+                <td class="p-0">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="p-0 vertical-align-bottom pd-b1 pd-l1" width="40%">
+                                    @if (Model?.Settings?.ShowLogo?.Display == true &&
+                                    !string.IsNullOrEmpty(Model?.Company?.Logo?.Url))
+                                    {
+                                        <figure class="m-0">
+                                            <img src="@Model?.Company?.Logo?.Url" height="@Model?.Company?.Logo?.Size"
+                                                width="auto" />
+                                        </figure>
+                                    }
+                                </td>
+                                <td class="p-0 invoice-info vertical-align-bottom pd-b1" width="60%"> @* Added classes and
+                                    width *@
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="100%" class="text-right font-size-large"><strong>Purchase Order</strong></td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td class="text-right">
+                                                    <span>Delivery: @Model.DueDate</span>
+                                                    <span> #@Model.VoucherNumber;</span>
+                                                    <span>&nbsp; PO Date:@Model.VoucherDate</span>
+                                                </td>
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr class="invoice-title">
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</header>
+
+@* This Script is used to set header and footer height to css variable *@
+<script>
+    function setDynamicHeaderFooterHeight() {
+        const header = document.getElementById('header');
+        const footer = document.getElementById('footer');
+
+        if (header) {
+            document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+        }
+        if (footer) {
+            document.documentElement.style.setProperty('--footer-height', `${footer.offsetHeight}px`);
+        }
+    }
+
+    window.addEventListener('load', function () {
+        setDynamicHeaderFooterHeight();
+    });
+    window.addEventListener('resize', setDynamicHeaderFooterHeight);
+</script>

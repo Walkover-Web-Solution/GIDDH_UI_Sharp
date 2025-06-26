@@ -1,14 +1,8 @@
 /* Global CSS Variables */
-@property --header-footer-body-padding {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 15px;
-}
-
 @property --font-family {
   syntax: "<string>";
   inherits: true;
-  initial-value: "Roboto"; /* 'Roboto' | 'Open Sans' | 'sans-serif' */
+  initial-value: "Inter"; /* 'Roboto' | 'Open Sans' | 'Lato' | 'Inter' */
 }
 @property --font-weight-200 {
   syntax: "<integer>";
@@ -84,9 +78,12 @@
 html,
 body {
   color: #000000;
-  font-family: var(--font-family, "Roboto");
+  font-family: var(--font-family, "Inter");
   font-size: var(--font-size-default, 14px);
   font-weight: var(--font-weight-400, 400);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums; 
 }
 
 p,
@@ -133,8 +130,12 @@ h6 {
   font-weight: var(--font-weight-500, 500);
 }
 
+.font-weight-700 {
+  font-weight: var(--font-weight-700, 700);
+}
+
 strong {
-  font-weight: var(--font-weight-500, 500);
+  font-weight: var(--font-weight-700, 700);
 }
 
 address {
@@ -150,15 +151,11 @@ table {
 
 table tr th,
 table tr td {
-  font-weight: var(--font-weight-200, 200);
-  border: 1px solid currentColor;
+  border: none;
+  /* border: 1px solid currentColor; */
   text-align: left;
-  padding: 6px 4px;
+  padding: 2px;
   word-break: break-word;
-}
-
-table.table-row-height tr td {
-  height: 50px;
 }
 
 .vertical-align-top {
@@ -181,32 +178,16 @@ table.table-row-height tr td {
   border-top: 1px solid currentColor !important;
 }
 
-.border-top-none {
-  border-top: none !important;
-}
-
 .border-bottom {
   border-bottom: 1px solid currentColor !important;
-}
-
-.border-bottom-none {
-  border-bottom: none !important;
 }
 
 .border-left {
   border-left: 1px solid currentColor !important;
 }
 
-.border-left-none {
-  border-left: none !important;
-}
-
 .border-right {
   border-right: 1px solid currentColor !important;
-}
-
-.border-right-none {
-  border-right: none !important;
 }
 
 .text-center {
@@ -256,6 +237,26 @@ table.table-row-height tr td {
 .pd-r1 {
   padding-right: 10px !important;
 }
+.pd-t1 {
+  padding-top: 10px !important;
+}
+
+.pd-b1 {
+  padding-bottom: 10px !important;
+}
+
+.pd-t05 {
+  padding-top: 5px !important;
+}
+
+.pd-b05 {
+  padding-bottom: 5px !important;
+}
+
+.pd-1 {
+  padding: 10px !important;
+}
+
 .h-inherit {
   height: inherit !important;
 }
@@ -278,6 +279,16 @@ table.table-row-height tr td {
 /* Need to correct name */
 .capitalize {
   text-transform: capitalize !important;
+}
+/* Allow text to wrap within the container.*/
+.text-wrap-pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.capitalize-only-first::first-letter {
+  text-transform: uppercase;
 }
 
 .square-image {

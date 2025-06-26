@@ -79,6 +79,7 @@ namespace InvoiceData
         public Setting? PreviousDue { get; set; }
         public Setting? AmountBeforeDiscount { get; set; }
         public Setting? SkuCode { get; set; }
+        public Setting? GstSchemeData { get; set; }
 
         // Initialize all static keys dynamically
         public void InitializeStaticKeys()
@@ -106,8 +107,8 @@ namespace InvoiceData
 
     public class Setting
     {
-        public string? Label { get; set; } = string.Empty; 
-        public bool? Display { get; set; } 
+        public string? Label { get; set; } = string.Empty;
+        public bool? Display { get; set; }
     }
 
     public class EInvoiceDetails
@@ -123,7 +124,7 @@ namespace InvoiceData
         public string? Symbol { get; set; }
     }
 
-      public class Logo
+    public class Logo
     {
         public string? Url { get; set; }
         public string? Size { get; set; }
@@ -149,6 +150,8 @@ namespace InvoiceData
         public AddressDetails? Shipping { get; set; }
         public Logo? Logo { get; set; }
         public string? TaxNumber { get; set; }
+        public string? HeaderCompanyName { get; set; }
+        public string? GstSchemeData { get; set; }
     }
 
     public class Theme
@@ -216,9 +219,12 @@ namespace InvoiceData
         public bool? ConsiderInItemTotal { get; set; }
         public bool? ConsiderInVoucherTotal { get; set; }
         public bool? ShowOnVoucher { get; set; }
+        public string? AmountForAccount { get; set; }
+        public string? AccountUniqueName { get; set; }
+        public string? Key { get; set; }
     }
 
-    public class TaxBifurcation 
+    public class TaxBifurcation
     {
         public decimal? Qty { get; set; }
         public decimal? EntryTotal { get; set; }
@@ -253,6 +259,7 @@ namespace InvoiceData
     {
         public string? Name { get; set; }
         public string? ImageBase64 { get; set; }
+        public string? Value { get; set; }
     }
 
     public class Stock
@@ -271,20 +278,22 @@ namespace InvoiceData
         public List<Amount>? UnitRates { get; set; }
         public StockCustomField? CustomField1 { get; set; }
         public StockCustomField? CustomField2 { get; set; }
+        public string? SkuCodeHeading { get; set; }
 
-    }          
+    }
 
     public class StockCustomField
     {
         public string? Key { get; set; }
         public string? Value { get; set; }
-    }                                                        
+    }
 
     public class Tax
     {
         public string? AccountName { get; set; }
         public Amount? Amount { get; set; }
         public double? TaxPercent { get; set; }
+        public string? AccountUniqueName { get; set; }
     }
 
     public class Entry
@@ -303,9 +312,21 @@ namespace InvoiceData
         public Amount? SumOfDiscounts { get; set; }
         public string? Description { get; set; }
         public string? HsnNumber { get; set; }
+        public double? UsedQuantity { get; set; }
         public string? SacNumber { get; set; }
     }
-    
+
+    public class BankQRDetails
+    {
+        public string? BankQRCodeBase64 { get; set; }
+    }
+
+    public class CommonDiscountEntry
+    {
+        public string? AccountName { get; set; }
+        public double? Amount { get; set; }
+    }
+
     public class Root
     {
         public Settings? Settings { get; set; }
@@ -324,6 +345,11 @@ namespace InvoiceData
         public WarehouseDetails? WarehouseDetails { get; set; }
         public Amount? Balance { get; set; }
         public string? PlaceOfSupply { get; set; }
+        public double? ExchangeRate { get; set; }
+        public string? PlaceOfCountry { get; set; }
+        public string? LutNumber { get; set; }
+        public string? CustomerName { get; set; }
+        public Amount? TaxableAmount { get; set; }
         public Amount? GrandTotal { get; set; }
         public string? QRCodeBase64String { get; set; }
         public List<SumOfTax>? SumOfTaxes { get; set; }
@@ -340,6 +366,7 @@ namespace InvoiceData
         public string? StockQuantityWithUnit { get; set; }
         public string? DueDate { get; set; }
         public Currency? AccountCurrency { get; set; }
+        public Currency? CompanyCurrency { get; set; }
         public Amount? TotalTax { get; set; }
         public Amount? TaxableTotal { get; set; }
         public AmountAsString? TotalInWords { get; set; }
@@ -358,14 +385,29 @@ namespace InvoiceData
 
         public List<TaxBifurcation>? TaxBifurcation { get; set; }
 
-        
+
         public bool? IsTaxesApplied { get; set; }
         public bool? IsBusinessToBusinessInvoice { get; set; }
         public bool? IsMultipleCurrency { get; set; }
-        
+
         public List<Entry>? Entries { get; set; }
         public EInvoiceDetails? EInvoiceDetails { get; set; }
         public decimal? RoundOff { get; set; }
         public string? PdfRename { get; set; } = string.Empty; // This key used only in local pdf generation to Rename based on request
+        public string? ShippingDate { get; set; }
+        public string? GrandTotalInAccountsCurrency { get; set; }
+        public string? TotalInWordsInAccountsCurrency { get; set; }
+        public string? Currency { get; set; }
+        public Amount? TdsTotalTax { get; set; }
+        public string? TypeOfCopy { get; set; }
+        public string? SealPath { get; set; }
+        public bool? Reversecharge { get; set; }
+        public string? ReverseChargeMessage { get; set; }
+        public BankQRDetails? BankQRDetails { get; set; }
+        public bool? ShowBankQr { get; set; }
+        public string? formNameInvoice { get; set; }
+        public string? CompanyTaxType { get; set; }
+        public List<CommonDiscountEntry>? CommonDiscountEntries { get; set; }
+        public double? OtherDiscount { get; set; }
     }
 }

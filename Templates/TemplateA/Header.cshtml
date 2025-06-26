@@ -1,0 +1,116 @@
+@model InvoiceData.Root;
+@using InvoiceData;
+@using System.Collections.Generic;
+
+<header id="header">
+    <table>
+        <tbody>
+            @* This is for copy type image work at time of Invoice Copy - (Transport, Customer etc) *@
+            @if(Model?.TypeOfCopy != null)
+            {
+            <tr>
+                <td class="p-0 text-center">
+                    <img src="@Model.TypeOfCopy" height="40px" width="auto" />
+                </td>
+            </tr>
+            }
+            <tr>
+                <td class="p-0">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="p-0 vertical-align-bottom" width="50%">
+                                    @if (Model?.Settings?.ShowLogo?.Display == true &&
+                                    !string.IsNullOrEmpty(Model?.Company?.Logo?.Url))
+                                    {
+                                        <figure class="m-0">
+                                            <img src="@Model?.Company?.Logo?.Url" height="@Model?.Company?.Logo?.Size"
+                                                width="auto" />
+                                        </figure>
+                                    }
+                                    @if (Model?.Settings?.HeaderCompanyName?.Display == true)
+                                    {
+                                        <p class="mr-t1 color-light"><strong>@Model?.Settings?.HeaderCompanyName?.Label</strong></p>
+                                    }
+                                    @if (Model?.Settings?.CompanyTaxNumber?.Display == true)
+                                    {
+                                        <p><strong>@Model?.Settings?.CompanyTaxNumber?.Label</strong> @Model?.Company?.TaxNumber</p>
+                                    }
+                                    @if (Model?.Settings?.GstComposition?.Display == true)
+                                    {
+                                        <p>@(!string.IsNullOrEmpty(Model?.Settings?.GstComposition?.Label) ? Model.Settings.GstComposition.Label : "Registered under Composition Scheme")</p>
+                                    }
+                                </td>
+
+                                <td class="p-0 invoice-info vertical-align-bottom" width="@(Model?.Settings?.ShowQrCode?.Display == true &&
+                                                !string.IsNullOrEmpty(Model?.QRCodeBase64String) ? "30%" : "50%")">
+                                    <table>
+                                        <tbody>
+                                            @if (Model?.Settings?.VoucherDate?.Display == true)
+                                            {
+                                                <tr>
+                                                    <td><strong>@Model?.Settings?.VoucherDate?.Label</strong></td>
+                                                    <td class="text-right">@Model?.VoucherDate</td>
+                                                </tr>
+                                            }
+                                            @if (Model?.Settings?.VoucherNumber?.Display == true)
+                                            {
+                                                <tr>
+                                                    <td><strong>@Model?.Settings?.VoucherNumber?.Label</strong></td>
+                                                    <td class="text-right">@Model?.VoucherNumber</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                                @if (Model?.Settings?.ShowQrCode?.Display == true && !string.IsNullOrEmpty(Model?.QRCodeBase64String))
+                                {
+                                    <td class="vertical-align-bottom text-right" width="20%">
+                                        @if (Model?.Settings?.ShowQrCode?.Display == true &&
+                                        !string.IsNullOrEmpty(Model?.QRCodeBase64String))
+                                        {
+                                            <img src="data:image/png;base64,@Model?.QRCodeBase64String" class="square-image"
+                                                width="120" />
+                                        }
+                                    </td>
+                                }
+                            </tr>
+
+                            <tr>
+                                <td colspan="100%" class="text-center pb-1">
+                                    @if (Model?.Settings?.FormNameInvoice?.Display == true || Model?.Settings?.FormNameTaxInvoice?.Display == true)
+                                    {
+                                        <p class="invoice-title color-primary">
+                                            <strong>@(Model?.Settings?.FormNameInvoice?.Display == true ? Model?.Settings?.FormNameInvoice?.Label :
+                                                        Model?.Settings?.FormNameTaxInvoice?.Label)</strong>
+                                        </p>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</header>
+
+@* This Script is used to set header and footer height to css variable *@
+<script>
+    function setDynamicHeaderFooterHeight() {
+        const header = document.getElementById('header');
+        const footer = document.getElementById('footer');
+
+        if (header) {
+            document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+        }
+        if (footer) {
+            document.documentElement.style.setProperty('--footer-height', `${footer.offsetHeight}px`);
+        }
+    }
+
+    window.addEventListener('load', function () {
+        setDynamicHeaderFooterHeight();
+    });
+    window.addEventListener('resize', setDynamicHeaderFooterHeight);
+</script>

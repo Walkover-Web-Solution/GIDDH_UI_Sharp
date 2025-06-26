@@ -1,0 +1,796 @@
+@model InvoiceData.Root;
+@using InvoiceData;
+@using System.Net;
+@using System.Collections.Generic;
+@using System.Linq;
+@using System.Reflection;
+
+<table class="repeated-header repeated-footer pd-l1">
+    @if (Model?.ShowSectionsInline != true)
+    {
+        <thead>
+            <tr>
+                <td class="p-0 border-none hide-background-border">
+                    <div style="height: var(--header-height)"></div>
+                </td>
+            </tr>
+        </thead>
+    }
+    <tbody>
+        <tr>
+            <td class="p-0 border-none">
+                <main>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="p-0" colspan="100%">
+                                    <table>
+                                        <tbody>
+                                                <tr>
+                                                    <td class="p-0 vertical-align-top pd-l1 pd-b1 scaled-line-height" width="50%">
+                                                        <p><strong>Bill To:</strong></p>
+                                                        <p>
+                                                            @Model?.Company?.Name
+                                                        </p>
+                                                        @if(Model?.Company?.Billing?.Address != null)
+                                                        {
+                                                            <p>@Model?.Company?.Billing?.Address</p>
+                                                        }
+                                                        @if (Model?.Company?.Billing?.StateCounty != null)
+                                                        {
+                                                            <p>@Model?.Company?.Billing?.StateCounty</p>
+                                                        }
+                                                        @if (Model?.Company?.Billing?.Country != null)
+                                                        {
+                                                            <p>@Model?.Company?.Billing?.Country</p>
+                                                        }
+                                                        @if (Model?.Settings?.BillingTaxNumber?.Display == true && !string.IsNullOrEmpty(Model?.Company?.Billing?.TaxNumber))
+                                                        {
+                                                            <p>@Model?.CompanyTaxType: @Model?.Company?.Billing?.TaxNumber</p>
+                                                        }
+                                                    </td>
+                                                    <td class="p-0 vertical-align-top pd-l1 pd-b1 scaled-line-height">
+
+                                                        <p><strong>Shipped To:</strong></p>
+                                                        @if (Model?.Company?.Shipping?.Address != null)
+                                                        {
+                                                            <p>@Model?.Company?.Shipping?.Address</p>
+                                                        }
+                                                        @if (Model?.Company?.Shipping?.StateCounty != null)
+                                                        {
+                                                            <p>@Model?.Company?.Shipping?.StateCounty</p>
+                                                        }
+                                                        @if (Model?.Company?.Shipping?.Country != null)
+                                                        {
+                                                            <p>@Model?.Company?.Shipping?.Country</p>
+                                                        }
+                                                        @if (Model?.Settings?.ShippingTaxNumber?.Display == true && !string.IsNullOrEmpty(Model?.Company?.Shipping?.TaxNumber))
+                                                        {
+                                                            <p>@Model?.CompanyTaxType: @Model?.Company?.Shipping?.TaxNumber</p>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="100%">
+                                                        <hr class="color-grey" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-0 vertical-align-top pd-1 scaled-line-height" width="50%">
+                                                        <p><strong>From:</strong></p>
+                                                        <p>
+                                                            @Model?.CustomerDetails?.Name</strong>
+                                                        </p>
+                                                        @if(Model?.Billing?.Address != null)
+                                                        {
+                                                            <p>@Model?.Billing?.Address</p>
+                                                        }
+                                                        @if (Model?.Billing?.StateCounty != null)
+                                                        {
+                                                            <p>@Model?.Billing?.StateCounty</p>
+                                                        }
+                                                        @if (Model?.Billing?.Country != null)
+                                                        {
+                                                            <p>@Model?.Billing?.Country</p>
+                                                        }
+                                                        @if (Model?.Settings?.BillingTaxNumber?.Display == true && !string.IsNullOrEmpty(Model?.Billing?.TaxNumber))
+                                                        {
+                                                            <p>@Model?.Settings?.BillingTaxNumber?.Label: @Model?.Billing?.TaxNumber</p>
+                                                        }
+                                                    </td>
+                                                    <td class="p-0 vertical-align-top pd-1 scaled-line-height">
+
+                                                        <p><strong>Shipped From:</strong></p>
+                                                        @if (Model?.Shipping?.Address != null)
+                                                        {
+                                                            <p>@Model?.Shipping?.Address</p>
+                                                        }
+                                                        @if (Model?.Shipping?.StateCounty != null)
+                                                        {
+                                                            <p>@Model?.Shipping?.StateCounty</p>
+                                                        }
+                                                        @if (Model?.Shipping?.Country != null)
+                                                        {
+                                                            <p>@Model?.Shipping?.Country</p>
+                                                        }
+                                                        @if (Model?.Settings?.ShippingTaxNumber?.Display == true && !string.IsNullOrEmpty(Model?.Shipping?.TaxNumber))
+                                                        {
+                                                            <p>@Model?.Settings?.ShippingTaxNumber?.Label: @Model?.Shipping?.TaxNumber</p>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            <tr>
+                                                <td colspan="100%" class="p-0 pd-1">
+                                                    <div class="grid-view">
+                                                        @if (Model?.Settings?.ShippingDate?.Display == true && !string.IsNullOrEmpty(Model?.ShippingDate))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.ShippingDate?.Label</p>
+                                                                <p>@Model?.ShippingDate</p>
+                                                            </div>
+                                                        }
+                                                        @if (Model?.Settings?.ShippedVia?.Display == true && !string.IsNullOrEmpty(Model?.ShippedVia))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.ShippedVia?.Label</p>
+                                                                <p>@Model.ShippedVia</p>
+                                                            </div>
+                                                        }
+                                                        @if (Model?.Settings?.TrackingNumber?.Display == true && !string.IsNullOrEmpty(Model?.TrackingNumber))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.TrackingNumber?.Label</p>
+                                                                <p>@Model.TrackingNumber</p>
+                                                            </div>
+                                                        }
+                                                        @if (Model?.Settings?.CustomField1?.Display == true && !string.IsNullOrEmpty(Model?.CustomField1))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.CustomField1?.Label</p>
+                                                                <p>@Model.CustomField1</p>
+                                                            </div>
+                                                        }
+                                                        @if (Model?.Settings?.CustomField2?.Display == true && !string.IsNullOrEmpty(Model?.CustomField2))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.CustomField2?.Label</p>
+                                                                <p>@Model.CustomField2</p>
+                                                            </div>
+                                                        }
+                                                        @if (Model?.Settings?.CustomField3?.Display == true && !string.IsNullOrEmpty(Model?.CustomField3))
+                                                        {
+                                                            <div class="grid-item">
+                                                                <p>@Model?.Settings?.CustomField3?.Label</p>
+                                                                <p>@Model.CustomField3</p>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="mr-b1 mr-t1">
+                                                <td colspan="100%" class="p-0">
+                                                    <table class="entry-table">
+                                                        <thead>
+                                                            <tr>
+                                                                
+                                                                @if (Model?.Settings?.SNo?.Display == true)
+                                                                {
+                                                                    <th width="30px" class="text-center">@Model?.Settings?.SNo?.Label</th>
+                                                                }
+                                                                
+                                                                @if (Model?.Settings?.ShowVariantImage?.Display == true)
+                                                                {
+                                                                    <th width="10%">@Model?.Settings?.ShowVariantImage?.Label</th>
+                                                                }
+                                                                
+                                                                @if (Model?.Settings?.Item?.Display == true)
+                                                                {
+                                                                    <th width="15%" class="text-left">@Model?.Settings?.Item?.Label</th>
+                                                                }
+
+                                                                @if (Model?.Settings?.HsnSac?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.HsnSac?.Label</th>
+                                                                }
+                                                                @if (Model?.Settings?.Quantity?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.Quantity?.Label</th>
+                                                                }
+                                                                @if (Model?.Settings?.Rate?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.Rate?.Label</th>
+                                                                }
+
+                                                                @if (Model?.Settings?.AmountBeforeDiscount?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.AmountBeforeDiscount?.Label</th>
+                                                                }
+
+                                                                @if (Model?.Settings?.Discount?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.Discount?.Label</th>
+                                                                }
+
+                                                                @if (Model?.Settings?.TaxableValue?.Display == true)
+                                                                {
+                                                                    <th class="text-right">@Model?.Settings?.TaxableValue?.Label</th>
+                                                                }
+
+                                                                @if (Model?.Settings?.Taxes?.Display == true && Model?.GstTaxesTotal?.Any() == true)
+                                                                {
+                                                                    @foreach (var tax in Model.GstTaxesTotal)
+                                                                    {
+                                                                        <th class="text-right">@tax.AccountName</th>
+                                                                    }
+                                                                }
+                                                                <th class="text-right">
+                                                                    @if (Model?.Settings?.Total?.Display == true)
+                                                                    {
+                                                                        @Model?.Settings?.Total?.Label
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>Amount</span>
+                                                                    }
+                                                                </th>
+                                                            </tr>
+                                                            @if (Model?.Settings?.PreviousDue?.Display == true && Model?.PreviousDueAmount != null)
+                                                            {
+                                                                <tr class="border-top">
+                                                                    <td colspan="100%" class="text-right">
+                                                                        @Model?.Settings?.PreviousDue?.Label :
+                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.PreviousDueAmount?.AmountForAccount
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </thead>
+                                                        <tbody>
+                                                            @{
+                                                            var index = 0;
+                                                            }
+                                                            @if (Model?.Entries != null && Model.Entries.Any())
+                                                            {
+                                                                @foreach (var Entry in Model.Entries)
+                                                                {
+                                                                    index++;
+
+                                                                    <tr class="vertical-align-top border-top">
+                                                                        @* <!-- # --> *@
+                                                                        @if (Model?.Settings?.SNo?.Display == true)
+                                                                        {
+                                                                            <td class="text-center">
+                                                                                <span>@index</span>
+                                                                            </td>
+                                                                        }
+
+                                                                        @if (Model?.Settings?.ShowVariantImage?.Display == true)
+                                                                        {
+                                                                            <td>
+                                                                                @if (!string.IsNullOrEmpty(Entry?.Stock?.Variant?.Value))
+                                                                                {
+                                                                                    <img src="data:image/png;base64,@Entry.Stock.Variant.Value"
+                                                                                        width="40px" class="square-image"/>
+                                                                                }
+                                                                            </td>
+                                                                        }
+
+                                                                        @* <!-- Description --> *@
+                                                                        @if (Model?.Settings?.Item?.Display == true)
+                                                                        {
+                                                                            <td class="text-left">
+                                                                                <div style="display: flex; align-items: start; flex-direction: column;">
+                                                                                    
+                                                                                        @if (Entry?.Stock?.Name != null)
+                                                                                        {
+                                                                                            <p>@Entry.Stock.Name @(Entry?.Stock?.ShowVariant == true ? $"- {Entry?.Stock?.Variant?.Name}" : "")</p>
+                                                                                        }else if(Entry?.AccountName != null){
+                                                                                            <p>@Entry?.AccountName</p>
+                                                                                        }
+
+                                                                                        @if (!Model?.Settings?.ShowDescriptionInRows?.Display == true && !string.IsNullOrEmpty(Entry?.Description))
+                                                                                        {
+                                                                                            <p class="color-grey capitalize-only-first">@Entry.Description </p>
+                                                                                        }
+
+                                                                                        @if (Model?.Settings?.SkuCode?.Display == true && !string.IsNullOrEmpty(Entry?.Stock?.SkuCodeHeading) && !string.IsNullOrEmpty(Entry?.Stock?.Sku))
+                                                                                        {
+                                                                                            <p class="font-size-small">@Entry.Stock.SkuCodeHeading: @Entry.Stock.Sku</p>
+                                                                                        }
+
+                                                                                        @if (!string.IsNullOrEmpty(Entry?.Stock?.CustomField1?.Key) && !string.IsNullOrEmpty(Entry?.Stock?.CustomField1?.Value))
+                                                                                        {
+                                                                                            <p class="font-size-small">@Entry.Stock.CustomField1.Key:@Entry.Stock.CustomField1.Value</p>
+                                                                                        }
+
+                                                                                        @if (!string.IsNullOrEmpty(Entry?.Stock?.CustomField2?.Key) && !string.IsNullOrEmpty(Entry?.Stock?.CustomField2?.Value))
+                                                                                        {
+                                                                                            <p class="font-size-small">@Entry.Stock.CustomField2.Key:@Entry.Stock.CustomField2.Value</p>
+                                                                                        }
+
+                                                                                        @if (Model?.Settings?.Date?.Display == true)
+                                                                                        {
+                                                                                            <p class="font-size-small">@Entry?.Date</p>
+                                                                                        }
+                                                                                
+                                                                                </div>
+                                                                            </td>
+                                                                        }
+                                                                        @* <!-- HSN/SAC --> *@
+                                                                        @if (Model?.Settings?.HsnSac?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                @if (!string.IsNullOrEmpty(Entry?.HsnNumber))
+                                                                                {
+                                                                                    <p>@Entry?.HsnNumber</p>
+                                                                                    <p class="font-size-small">(H)</p>
+                                                                                } else if (!string.IsNullOrEmpty(Entry?.SacNumber)){
+                                                                                    <p>@Entry?.SacNumber</p>
+                                                                                    <p class="font-size-small">(S)</p>
+                                                                                }
+                                                                            </td>
+                                                                        }
+                                                                        @* <!-- Qty. --> *@
+                                                                        @if (Model?.Settings?.Quantity?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                <p>@Entry?.Stock?.Quantity</p>
+                                                                                <p class="font-size-small">@Entry?.Stock?.StockUnit?.Code</p>
+                                                                            </td>
+                                                                        }
+
+                                                                        @* <!-- Rate/Item --> *@
+                                                                        @if (Model?.Settings?.Rate?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                @if (Entry?.Stock?.Rate != null)
+                                                                                {
+                                                                                    <p>
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Entry.Stock.Rate.AmountForAccount
+                                                                                    </p>
+                                                                                    
+                                                                                    @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true && Entry.Stock.Rate?.AmountForCompany != null)
+                                                                                    {
+                                                                                        <p class="text-light pr-3 font-size-small">
+                                                                                            @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Entry.Stock.Rate.AmountForCompany
+                                                                                        </p>
+                                                                                    }
+                                                                                }
+                                                                            </td>
+                                                                        }
+
+                                                                        @* <!-- Total Before Dis. --> *@
+                                                                        @if (Model?.Settings?.AmountBeforeDiscount?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Entry?.Amount?.AmountForAccount
+                                                                            </td>
+                                                                        }
+
+                                                                        @* <!-- Dis./ Item --> *@
+                                                                        @if (Model?.Settings?.Discount?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                @if (Entry?.SumOfDiscounts != null && Entry.SumOfDiscounts.AmountForAccount >= 0)
+                                                                                {
+                                                                                    if (Model?.AccountCurrency?.Code != null)
+                                                                                    {
+                                                                                        @if (Model?.AccountCurrency?.Code == "AED")
+                                                                                        {
+                                                                                            <span>-@Entry?.SumOfDiscounts?.AmountForAccount@(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))</span>
+                                                                                        } else {
+                                                                                            <span>@(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))-@Entry?.SumOfDiscounts?.AmountForAccount</span>
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            </td>
+                                                                        }
+
+                                                                        @if (Model?.Settings?.TaxableValue?.Display == true)
+                                                                        {
+                                                                            <td class="text-right">
+                                                                                @if (Entry?.TaxableValue != null)
+                                                                                {
+                                                                                    <p>
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Entry?.TaxableValue.AmountForAccount
+                                                                                    </p>
+                                                                                    
+                                                                                    @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true && Entry?.TaxableValue?.AmountForCompany != null)
+                                                                                    {
+                                                                                        <p class="text-light pr-3 font-size-small">
+                                                                                            @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Entry?.TaxableValue?.AmountForCompany
+                                                                                        </p>
+                                                                                    }
+                                                                                }
+                                                                            </td>
+                                                                        }
+                                                                        @if (Model?.Settings?.Taxes?.Display == true && Model.GstTaxesTotal?.Any() == true)
+                                                                        {
+                                                                            @foreach (var tax in Model.GstTaxesTotal)
+                                                                            {
+                                                                                bool isTaxApplied = false;
+
+                                                                                foreach (var entryTax in Entry?.Taxes ?? Enumerable.Empty<Tax>())
+                                                                                {
+                                                                                    @if (entryTax?.AccountUniqueName == tax.AccountUniqueName)
+                                                                                    {
+                                                                                        isTaxApplied = true;
+                                                                                        <td class="text-right">
+                                                                                            <p>@(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@entryTax?.Amount?.AmountForAccount</p>
+                                                                                            <p class="font-size-small">@entryTax?.TaxPercent%</p>
+                                                                                        </td>
+                                                                                        break;
+                                                                                    }
+                                                                                }
+
+                                                                                if (!isTaxApplied)
+                                                                                {
+                                                                                    <td class="text-right"></td>
+                                                                                }
+                                                                            }
+
+                                                                        }
+                                                                        @* <!-- Total --> *@
+                                                                        <td class="text-right">
+                                                                            <p>
+                                                                                @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Entry?.EntryTotal?.AmountForAccount
+                                                                            </p>
+
+                                                                            @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true && Entry?.EntryTotal?.AmountForCompany != null)
+                                                                            {
+                                                                                <p class="text-light pr-3 font-size-small">
+                                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Entry?.TaxableValue?.AmountForCompany
+                                                                                </p>
+                                                                            }
+                                                                        </td>
+                                                                    </tr>
+                                                                    
+                                                                    @if (Model?.Settings?.ShowDescriptionInRows?.Display == true && Model?.Settings?.Item?.Display == true && !string.IsNullOrEmpty(Entry?.Description))
+                                                                    {
+                                                                        <tr>
+                                                                            <td width="25px"></td>
+                                                                            <td colspan="100%">
+                                                                                <p class="font-size-medium pd-b05 capitalize-only-first">@Entry.Description</p>
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr class="border-top border-bottom">
+
+                                                                @if (Model?.Settings?.SNo?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                                
+                                                                @if (Model?.Settings?.Item?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.ShowVariantImage?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.HsnSac?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.Quantity?.Display == true)
+                                                                {
+                                                                    <td class="text-right">@Model?.StockQuantityWithUnit</td>
+                                                                }
+
+                                                                @if (Model?.Settings?.Rate?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.AmountBeforeDiscount?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.Discount?.Display == true)
+                                                                {
+                                                                    <td></td>
+                                                                }
+
+                                                                @if (Model?.Settings?.TaxableValue?.Display == true)
+                                                                {
+                                                                    <td class="text-right">
+                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.TaxableTotal?.AmountForAccount
+                                                                    </td>
+                                                                }
+                                                                
+                                                                @if (Model?.Settings?.Taxes?.Display == true && Model.GstTaxesTotal?.Any() == true)
+                                                                {
+                                                                    @foreach (var tax in Model.GstTaxesTotal)
+                                                                    {
+                                                                        <td class="text-right">
+                                                                            @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@tax?.Amount?.AmountForAccount
+                                                                        </td>
+                                                                    }
+                                                                }
+
+                                                                <td class="text-right">
+                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.GstEntriesTotal?.AmountForAccount
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="100%" class="pd-t1">
+                                                    <table>
+                                                        <tbody>
+                                                            <tr>
+                                                                @if (Model?.ShowBankQr == true && !string.IsNullOrEmpty(Model?.BankQRDetails?.BankQRCodeBase64))
+                                                                {
+                                                                    <td width="30%">
+                                                                            <img src="data:image/png;base64,@Model.BankQRDetails.BankQRCodeBase64" class="square-image"
+                                                                                width="170" />
+                                                                    </td>
+                                                                }
+                                                                <td width="70%" style="vertical-align: top;">
+                                                                    <table class="entry-summary">
+                                                                        <tbody>
+                                                                            @if (Model?.Settings?.TaxableAmount?.Display == true && Model?.TaxableTotal != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">@Model?.Settings?.TaxableAmount?.Label</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.TaxableTotal?.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.Settings?.TotalTax?.Display == true && Model?.TotalTax != null)
+                                                                            {
+                                                                                <tr class="p-0 m-0 line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">@Model?.Settings?.TotalTax?.Label</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.TotalTax?.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.CommonDiscountEntries?.Any() == true)
+                                                                            { 
+                                                                                @foreach (var commonDiscountEntry in Model.CommonDiscountEntries) {
+                                                                                    <tr class="p-0 m-0 line-height-10">
+                                                                                        <td class="p-0 text-right" width="50%"><strong>@commonDiscountEntry.AccountName</strong></td>
+                                                                                        <td class="text-right p-0">
+                                                                                            <strong>@commonDiscountEntry.Amount</strong>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            }
+                                                                            @if (Model?.OtherDiscount != null && Model?.OtherDiscount > 0)
+                                                                            {
+                                                                                <tr class="p-0 m-0 line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">Trade Discount</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @Model?.OtherDiscount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.RoundOff != null)
+                                                                            {
+                                                                                <tr class="p-0 m-0 line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">RoundOff</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.RoundOff
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.Settings?.GrandTotal?.Display == true && Model?.GrandTotal != null)
+                                                                            {
+                                                                                <tr class="p-0 m-0 line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        <strong>@Model?.Settings?.GrandTotal?.Label
+                                                                                            @(!string.IsNullOrEmpty(Model?.AccountCurrency?.Code) ? $"(IN {Model.AccountCurrency.Code})" : "")
+                                                                                        </strong>
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol ?? ""))
+                                                                                        <strong>@Model.GrandTotal?.AmountForAccount</strong>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.Settings?.TotalInWords?.Display == true && Model?.TotalInWords != null)
+                                                                            {
+                                                                                <tr class="p-0 m-0">
+                                                                                    <td class="p-0 text-right" width="50%" style="vertical-align: top;">
+                                                                                        @Model?.Settings?.TotalInWords?.Label
+                                                                                    </td>
+                                                                                    <td class="text-right p-0" style="padding-bottom: 5px;">
+                                                                                        <span style="border-bottom: 1px solid black;">
+                                                                                            @Model.TotalInWords.AmountForAccount
+                                                                                        </span>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true)
+                                                                            {
+                                                                                @if (Model?.Settings?.GrandTotal?.Display == true && Model?.GrandTotal != null)
+                                                                                {
+                                                                                    <tr class="line-height-10">
+                                                                                        <td class="p-0 text-right" width="50%">
+                                                                                            <strong>@Model?.Settings?.GrandTotal?.Label
+                                                                                                    @(!string.IsNullOrEmpty(Model?.Company?.Currency?.Code) ? $"(IN {Model.Company.Currency.Code})" : "")
+                                                                                            </strong>
+                                                                                        </td>
+                                                                                        <td class="text-right p-0">
+                                                                                            @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : 
+                                                                                            WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))<strong>@Model?.GrandTotal.AmountForCompany</strong>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (Model?.Settings?.TotalInWords?.Display == true && Model?.TotalInWords != null)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="p-0 text-right" width="50%" style="vertical-align: top;">
+                                                                                            @Model?.Settings?.TotalInWords?.Label
+                                                                                        </td>
+                                                                                        <td class="text-right p-0" style="padding-bottom: 5px;">
+                                                                                            <span style="border-bottom: 1px solid black;">
+                                                                                                @Model.TotalInWords.AmountForCompany
+                                                                                            </span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            }
+
+                                                                            @if (Model?.PaidAmount > 0 && @Model?.Balance != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%" >Paid</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.PaidAmount
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">Due Amount</td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.Balance.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.Settings?.GrandTotalInAccountsCurrency?.Display == true && Model?.GrandTotalInAccountsCurrency != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        @Model?.Settings?.GrandTotalInAccountsCurrency?.Label
+                                                                                        @(!string.IsNullOrEmpty(Model?.Company?.Currency?.Code) ? $"(IN {Model.Company.Currency.Code})" : "")
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Model?.GrandTotalInAccountsCurrency
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                            @if (Model?.Settings?.TotalInWordsInAccountsCurrency?.Display == true && Model?.TotalInWordsInAccountsCurrency != null)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        <strong>@Model?.Settings?.TotalInWordsInAccountsCurrency?.Label
+                                                                                        </strong>
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : 
+                                                                                        WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))<strong>@Model.TotalInWordsInAccountsCurrency</strong>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.Settings?.Tcs?.Display == true && Model?.TcsTotalTax != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        @Model?.Settings?.Tcs?.Label
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.TcsTotalTax.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.Settings?.Tds?.Display == true && Model?.TdsTotalTax != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        @Model?.Settings?.Tds?.Label
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.TdsTotalTax.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.Settings?.TotalDue?.Display == true && Model?.TotalDue != null)
+                                                                            {
+                                                                                <tr class="line-height-10">
+                                                                                    <td class="p-0 text-right" width="50%">
+                                                                                        @Model?.Settings?.TotalDue?.Label
+                                                                                    </td>
+                                                                                    <td class="text-right p-0">
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.TotalDue.AmountForAccount
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="100%">
+                                                    <table style="margin-top: 20px;">
+                                                        <tbody>
+                                                            @if (Model?.Reversecharge == true)
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <p>@Model.ReverseChargeMessage</p>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                            @if (Model?.Settings?.DisplayExportMessage?.Display == true)
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <p>@Model?.Settings?.DisplayExportMessage?.Label</p>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                            @if (Model?.Settings?.ShowNotesAtLastPage?.Display == true)
+                                                            {
+                                                                @if (Model?.Settings?.Message1?.Display == true && !string.IsNullOrEmpty(Model?.Message1))
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            <p class="text-wrap-pre">@Model.Message1</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(Model?.Message2))
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            <p class="text-wrap-pre">@Model.Message2</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </main>
+            </td>
+        </tr>
+    </tbody>
+    @if (Model?.ShowSectionsInline != true)
+    {
+        <tfoot>
+            <tr>
+                <td class="p-0 border-none">
+                    <div style="height: var(--footer-height);"></div>
+                </td>
+            </tr>
+        </tfoot>
+    }
+</table>
