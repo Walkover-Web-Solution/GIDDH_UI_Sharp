@@ -438,7 +438,7 @@
                                                                             @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true && Entry?.EntryTotal?.AmountForCompany != null)
                                                                             {
                                                                                 <p class="text-light pr-3 font-size-small">
-                                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Entry?.TaxableValue?.AmountForCompany
+                                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))@Entry?.EntryTotal?.AmountForCompany
                                                                                 </p>
                                                                             }
                                                                         </td>
