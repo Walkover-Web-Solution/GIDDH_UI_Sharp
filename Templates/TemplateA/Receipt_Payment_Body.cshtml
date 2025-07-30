@@ -38,7 +38,7 @@
         </table>
         <hr />
         <br />
-        @if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue())
+        @if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue().ToLower())
         {
             <span class="font-size-large">
                 <span class="main-span2">Dear</span>
@@ -67,7 +67,7 @@
                 </span><br />
             }
         }
-        @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue())
+        @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue().ToLower())
         {
             <div id="template-footer">
                 <span class="font-size-default color-light-gray font-weight-500">@Model.Company?.Name</span><br />
@@ -84,7 +84,7 @@
 
         <br />
         <span class="font-size-default">
-            @if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue())
+            @if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue().ToLower())
             {
                 <text>
                     Thank you for your payment of
@@ -97,7 +97,7 @@
                 </text>
             }
 
-            @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue())
+            @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue().ToLower())
             {
                 <text>
                     A payment of <b>@Model.AccountCurrency?.Code @Model.PaymentTotal /-</b>
@@ -127,11 +127,11 @@
         }
 
         <br />
-        @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue())
+        @if (@Model?.VoucherType == VoucherTypeEnums.Payment.GetVoucherTypeEnumValue().ToLower())
         {
             <span class="font-size-default pd-t05 font-weight-500 mr-t05">Total Payment: @Model.PaymentTotal</span>
         }
-        else if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue())
+        else if (@Model?.VoucherType == VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue().ToLower())
         {
             <span class="font-size-default pd-t05 font-weight-500 mr-t05">Total Receipt: @Model.PaymentTotal</span>
         }
