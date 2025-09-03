@@ -10,3 +10,7 @@ body.repeat-header-footer footer {
   z-index: 9;
   width: 100%;
 }
+
+.signature-image {
+  max-width: 160px;
+}
