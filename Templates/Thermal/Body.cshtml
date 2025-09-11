@@ -264,8 +264,8 @@
                                     @if (GetDisplayStatus("TotalInWords"))
                                     {
                                         <tr>
-                                            <td width="60%" class="pd-t05 font-weight-500">@GetLabel("TotalInWords") (@GetAccountCurrencyCodeOrSymbol())</td>
-                                            <td width="40%" class="pd-t05 text-right p-0 font-weight-500">@Model?.TotalInWords?.AmountForAccount
+                                            <td width="60%" class="pd-t05 font-weight-500">@GetLabel("GrandTotal") (@GetAccountCurrencyCodeOrSymbol())</td>
+                                            <td width="40%" class="pd-t05 text-right p-0 font-weight-500">@Model?.GrandTotal?.AmountForAccount
                                             </td>
                                         </tr>
                                     }
