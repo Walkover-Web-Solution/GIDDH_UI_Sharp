@@ -805,13 +805,15 @@
                                                             {
                                                                 <td></td>
                                                             }
-                                                           
+                                                           @if (GetDisplayStatus("Quantity"))
+                                                           {
                                                         <td class="text-center">
                                                             @if (GetDisplayStatus("TotalQuantity"))
                                                             {
                                                                 <strong>@Model?.StockQuantityWithUnit</strong>
                                                             }
                                                         </td>
+                                                           }
                                                             @if (GetDisplayStatus("Rate"))
                                                             {
                                                                 <td></td>

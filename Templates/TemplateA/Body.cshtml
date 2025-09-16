@@ -602,14 +602,15 @@
                                                                     <td></td>
                                                                 }
 
-                                                              
+                                                              @if (Model?.Settings?.Quantity?.Display == true)
+                                                              {
                                                                     <td class="text-right">
                                                                       @if (Model?.Settings?.TotalQuantity?.Display == true)
                                                                 {
                                                                     @Model?.StockQuantityWithUnit
                                                                      }
                                                                     </td>
-                                                               
+                                                              }
 
                                                                 @if (Model?.Settings?.Rate?.Display == true)
                                                                 {
