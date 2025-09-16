@@ -465,16 +465,13 @@
                                                             {
                                                                 <th class="text-center">@GetLabel("Discount")</th>
                                                             }
-                                                            <th class="text-right no-wrap">
-                                                                @if (GetDisplayStatus("Total"))
-                                                                {
+                                                              @if (GetDisplayStatus("Total"))
+                                                            {
+                                                                <th class="text-right no-wrap">
                                                                     @GetLabel("Total")
-                                                                }
-                                                                else
-                                                                {
-                                                                    <span>Amount</span>
-                                                                }
-                                                            </th>
+                                                                </th>
+                                                            }
+                                                          
                                                         </tr>
                                                     </thead>
                                                     <tbody class="vertical-align-top">
@@ -634,6 +631,8 @@
                                                                         }
                                                                     </td>
                                                                 }
+                                                                  @if (GetDisplayStatus("Total"))
+                                                                  {
                                                                 <td class="py-0 border-none border-right text-right">
                                                                     @if (Entry?.TaxableValue != null)
                                                                     {
@@ -654,6 +653,7 @@
                                                                         }
                                                                     }
                                                                 </td>
+                                                                  }
                                                             </tr>
                                                         }
                                                         }
@@ -687,9 +687,12 @@
                                                             {
                                                                 <td class="border-none border-right"></td>
                                                             }
+                                                               @if (GetDisplayStatus("Total"))
+                                                                  {
                                                             <td class="border-none border-right border-top text-right">
                                                                 <strong> @Model?.TaxableTotal?.AmountForAccount</strong>
                                                             </td>
+                                                        }
                                                         </tr>
 
                                                         @if (Model?.GstTaxesTotal != null && Model.GstTaxesTotal.Any())
@@ -731,12 +734,15 @@
                                                                     {
                                                                         <td class="border-none border-right"></td>
                                                                     }
+                                                                     @if (GetDisplayStatus("Total"))
+                                                                  {
                                                                     <td class="border-none border-right text-right">
                                                                         @if (Tax?.Amount != null)
                                                                         {
                                                                             <strong>@Tax?.Amount.AmountForAccount</strong>
                                                                         }
                                                                     </td>
+                                                                  }
                                                                 </tr>
                                                             }
                                                         }
@@ -774,12 +780,15 @@
                                                             {
                                                                 <td class="border-none border-right"></td>
                                                             }
+                                                             @if (GetDisplayStatus("Total"))
+                                                                  {
                                                             <td class="border-none border-right border-top text-right">
                                                                 <strong>
                                                                     @GetAccountCurrencyCodeOrSymbol()
                                                                     @Model?.RoundOff
                                                                 </strong>
                                                             </td>
+                                                                  }
                                                         </tr>
                                                         }
 
@@ -796,15 +805,13 @@
                                                             {
                                                                 <td></td>
                                                             }
-                                                            @if (GetDisplayStatus("Quantity"))
+                                                           
+                                                        <td class="text-center">
+                                                            @if (GetDisplayStatus("TotalQuantity"))
                                                             {
-                                                                <td class="text-center">
-                                                                    @if (GetDisplayStatus("TotalQuantity"))
-                                                                    {
-                                                                        <strong>@Model?.StockQuantityWithUnit</strong>
-                                                                    }
-                                                                </td>
+                                                                <strong>@Model?.StockQuantityWithUnit</strong>
                                                             }
+                                                        </td>
                                                             @if (GetDisplayStatus("Rate"))
                                                             {
                                                                 <td></td>
@@ -816,12 +823,15 @@
                                                             {
                                                                 <td></td>
                                                             }
+                                                             @if (GetDisplayStatus("Total"))
+                                                                  {
                                                             <td class="text-right">
                                                                 <strong>
                                                                     @GetAccountCurrencyCodeOrSymbol()
                                                                     @Model?.GrandTotal?.AmountForAccount
                                                                 </strong>
                                                             </td>
+                                                                  }
                                                         </tr>
                                                     </tfoot>
                                                 </table>
