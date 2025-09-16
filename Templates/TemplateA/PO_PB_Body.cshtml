@@ -648,12 +648,12 @@
                                                                                 }
                                                                             }
 
-                                                                            @if (Model?.PaidAmount > 0 && @Model?.Balance != null)
+                                                                            @if (Model?.PaidAmount.AmountForAccount > 0 && @Model?.Balance != null)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%" >Paid</td>
                                                                                     <td class="text-right p-0">
-                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.PaidAmount
+                                                                                        @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.PaidAmount.AmountForAccount 
                                                                                     </td>
                                                                                 </tr>
                                                                                 <tr class="line-height-10">

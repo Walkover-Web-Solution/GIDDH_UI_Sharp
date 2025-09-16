@@ -1,0 +1,16 @@
+main {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding-left: var(--header-footer-body-padding, 15px);
+  padding-right: var(--header-footer-body-padding, 15px);
+}
+
+main .thermal-invoice-table {
+  max-width: 60%;
+}
+
+/* Dotted Separator */
+.dotted-separator {
+  border-top: 1px dashed var(--color-light-gray) !important; /* light grey */
+}

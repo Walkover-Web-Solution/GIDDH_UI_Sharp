@@ -79,8 +79,9 @@
                         </tr>
                         }
                         <tr>
-                            <td class="p-0 border-none @(Model?.ShowSectionsInline == true ? "border-left border-right" : "") @(Model?.EInvoiceDetails != null && !GetDisplayStatus("DisplayExportMessage") ? "border-top" : "")">
-                                @if (Model?.EInvoiceDetails != null)
+                            <td class="p-0 border-none @(Model?.ShowSectionsInline == true ? "border-left border-right" : "") @(!GetDisplayStatus("DisplayExportMessage") ? "border-top" : "")">
+                                @if (Model?.EInvoiceDetails != null || Model?.IsBusinessToCustomerInvoice == true ||
+                                            Model?.IsBusinessToBusinessInvoice == true)
                                 {
                                     <table>
                                         <tbody>

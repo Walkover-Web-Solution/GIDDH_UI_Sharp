@@ -53,7 +53,7 @@
                             @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
                             {
                                 <figure class="m-0">
-                                    <img src="@Model.ImageSignature" height="60px" width="auto" />
+                                    <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
                                 </figure>
                             } else if (Model.Settings.Slogan.Display == true && Model?.Settings?.Slogan?.Label != null)
                             {

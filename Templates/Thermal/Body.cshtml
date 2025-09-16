@@ -1,0 +1,336 @@
+@model InvoiceData.Root
+@using InvoiceData
+@using System.Net
+@using System.Collections.Generic
+@using System.Linq
+
+@functions {
+    /** Cache for settings to avoid repeated property lookups */
+    private readonly Dictionary<string, Setting> _settingCache = new Dictionary<string, Setting>();
+    /** Get label text if display = true */
+    public string GetLabel(string settingName)
+    {
+        if (!_settingCache.TryGetValue(settingName, out var setting))
+        {
+            setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
+            _settingCache[settingName] = setting ??= new Setting();
+        }
+        return setting?.Display == true ? setting?.Label ?? string.Empty : string.Empty;
+    }
+    /** Get true/false for display */
+    public bool GetDisplayStatus(string settingName)
+    {
+        if (!_settingCache.TryGetValue(settingName, out var setting))
+        {
+            setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
+            _settingCache[settingName] = setting ??= new Setting();
+        }
+        return setting?.Display == true;
+    }
+    /** Currency helpers */
+    public string GetAccountCurrencyCodeOrSymbol()
+    {
+        return Model?.CurrencyFormat == "CODE"
+        ? Model?.AccountCurrency?.Code ?? string.Empty
+        : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol) ?? string.Empty;
+    }
+    public string GetCompanyCurrencyCodeOrSymbol()
+    {
+        return Model?.CurrencyFormat == "CODE"
+        ? Model?.Company?.Currency?.Code ?? string.Empty
+        : WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol) ?? string.Empty;
+    }
+    public bool IsShowAmountForCompany()
+    {
+        return Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true;
+    }
+}
+<main>
+    <table class="thermal-invoice-table vertical-align-top">
+        <tbody>
+            <!-- Header Section -->
+            <tr>
+                <!-- invoice-header -->
+                <td class="text-center pd-15"> 
+                    @if (GetDisplayStatus("FormNameInvoice") || GetDisplayStatus("FormNameTaxInvoice"))
+                    {
+                        <p class="font-weight-500">
+                            @if (GetDisplayStatus("FormNameInvoice") && Model?.IsTaxesApplied == false)
+                            {
+                                @GetLabel("FormNameInvoice")
+                            }
+                            else
+                            {
+                                @GetLabel("FormNameTaxInvoice")
+                            }
+                        </p>
+                    }
+                    @if (GetDisplayStatus("HeaderCompanyName"))
+                    {
+                        <h1 class="font-size-large font-weight-700 mr-b05">@GetLabel("HeaderCompanyName")</h1>
+                    }
+                    @if (GetDisplayStatus("ShowCompanyAddress") && !string.IsNullOrEmpty(Model?.Company?.DefaultAddress))
+                    {
+                        <address class="mr-b05">@Model.Company.DefaultAddress</address>
+                    }
+                    @if (GetDisplayStatus("CompanyTaxNumber") && !string.IsNullOrEmpty(Model?.Company?.TaxNumber))
+                    {
+                        <p>
+                           <span class="font-weight-500">@GetLabel("CompanyTaxNumber")</span> @Model?.Company?.TaxNumber
+                        </p>
+                    }
+                </td>
+            </tr>
+            <!-- Separator -->
+            <tr>
+                <td class="dotted-separator" colspan="100%"></td>
+            </tr>
+            <!-- Customer and Voucher Details Section -->
+            <tr>
+                <td class="pd-1">
+                    <table>
+                        <tr>
+                            <td class="vertical-align-top" width="50%">
+                                @if (GetDisplayStatus("CustomerName"))
+                                {
+                                    <p class="font-weight-500">@Model?.CustomerDetails?.Name</p>
+                                }
+                                @if (@GetDisplayStatus("BillingAddress") && !string.IsNullOrEmpty(Model?.Billing?.Address))
+                                {
+                                    <address>@Model?.Billing?.Address</address>
+                                }
+                            </td>
+                            <td class="text-right vertical-align-top" width="50%">
+                                @if (GetDisplayStatus("VoucherDate"))
+                                {
+                                    <p class="mr-b05">
+                                        <span class="font-weight-500">@GetLabel("VoucherDate")</span>
+                                        <span>@Model?.VoucherDate</span>
+                                    </p>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="vertical-align-top" width="50%">
+                                @if (@GetDisplayStatus("BillingTaxNumber") && !string.IsNullOrEmpty(Model?.Billing?.TaxNumber))
+                                {
+                                    <p>@GetLabel("BillingTaxNumber"): @Model?.Billing?.TaxNumber</p>
+                                }
+                            </td>
+                            <td class="text-right vertical-align-top" width="50%">
+                                @if (GetDisplayStatus("VoucherNumber"))
+                                {
+                                    <p class="mr-b05">
+                                        <span class="font-weight-500">@GetLabel("VoucherNumber")</span>
+                                        <span>@Model?.VoucherNumber</span>
+                                    </p>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!-- Separator -->
+            <tr>
+                <td class="dotted-separator" colspan="100%"></td>
+            </tr>
+            <!-- Items Table Header -->
+            <tr>
+                <td class="pd-1">
+                    <table>
+                        <thead>
+                            <tr>
+                                @if (GetDisplayStatus("Item"))
+                                {
+                                    <th width="35%" class="p-0 word-break">@GetLabel("Item")</th>
+                                }
+                                @if (GetDisplayStatus("Quantity"))
+                                {
+                                    <th width="20%" class="p-0 text-right">@GetLabel("Quantity")</th>
+                                }
+                                @if (GetDisplayStatus("Rate"))
+                                {
+                                    <th width="20%" class="p-0 text-right word-break">@GetLabel("Rate")</th>
+                                }
+                                @if (GetDisplayStatus("Total"))
+                                {
+                                    <th width="25%" class="p-0 text-right no-wrap">@GetLabel("Total")</th>
+                                }
+                            </tr>
+                        </thead>
+                    </table>
+                </td>
+            </tr>
+            <!-- Separator -->
+            <tr>
+                <td class="dotted-separator" colspan="100%"></td>
+            </tr>
+            <!-- Items Section -->
+            @if (Model?.Entries != null && Model.Entries.Any())
+            {
+                @foreach (var entry in Model.Entries)
+                {
+                    <tr>
+                        <td class="pd-t05 pd-b05 pd-l1 pd-r1">
+                            <table>
+                                <tr>
+                                    <td width="35%" class="vertical-align-top word-break">
+                                        @entry?.Description
+                                        @if (!string.IsNullOrEmpty(entry.Stock.Variant?.Name)) {
+                                            <p class="color-light-gray font-size-small">@entry.Stock.Variant?.Name</p>
+                                        }
+                                    </td>
+                                    <td width="20%" class="vertical-align-top text-right no-wrap">
+                                        @if (entry?.Stock?.Quantity != null) {
+                                            @entry?.Stock?.Quantity?.ToString("N0") <span>@entry?.Stock?.StockUnit?.Code</span>
+                                        } else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                    <td width="20%" class="vertical-align-top text-right no-wrap">
+                                        @if (entry?.Stock?.Rate != null)
+                                        {
+                                            @entry?.Stock?.Rate?.AmountForAccount?.ToString("N2")
+                                            @if (IsShowAmountForCompany() && entry.Stock.Rate?.AmountForCompany != null)
+                                            {
+                                                <p class="color-light-gray font-size-small">
+                                                    @entry.Stock.Rate.AmountForCompany
+                                                </p>
+                                            }
+                                        } else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </td>
+                                    <td width="25%" class="vertical-align-top text-right no-wrap">
+                                        @entry?.Amount?.AmountForAccount?.ToString("N2")
+                                        @if (IsShowAmountForCompany() && entry.EntryTotal?.AmountForCompany != null)
+                                        {
+                                            <p class="color-light-gray font-size-small">
+                                                @entry?.EntryTotal?.AmountForCompany
+                                            </p>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                }
+            }
+            <!-- Separator -->
+            <tr>
+                <td class="dotted-separator" colspan="100%"></td>
+            </tr>
+            <!-- Totals Section -->
+            <tr>
+                <td class="pd-15">
+                    <table>
+                        <tr>
+                            <td class="vertical-align-top p-0" width="50%">
+                                @if (GetDisplayStatus("TotalQuantity"))
+                                {
+                                    @GetLabel("TotalQuantity") <span>@Model?.Entries?.Sum(e => e?.Stock?.Quantity ?? 0).ToString("N0")</span>
+                                }
+                            </td>
+                            <td class="vertical-align-top p-0" width="50%">
+                                <table>
+                                    @if (GetDisplayStatus("Discount"))
+                                    {
+                                        <tr>
+                                            <td width="60%">@GetLabel("Discount")</td>
+                                            <td class="text-right p-0" width="40%">@Model?.Entries?.Sum(e => e?.SumOfDiscounts?.AmountForAccount ?? 0).ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (GetDisplayStatus("TaxableAmount"))
+                                    {
+                                        <tr>
+                                            <td width="60%">@GetLabel("TaxableAmount")</td>
+                                            <td class="text-right p-0" width="40%">@Model?.TaxableAmount?.AmountForAccount?.ToString("N2")
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (GetDisplayStatus("TaxBifurcation") && Model?.GstTaxesTotal != null &&
+                                                                        Model.GstTaxesTotal.Any())
+                                    {
+                                        @foreach (var tax in Model.GstTaxesTotal)
+                                        {
+                                            <tr>
+                                                <td width="60%">@tax?.TaxType@(tax?.TaxPercent?.ToString("N0"))%</td>
+                                                <td class="text-right p-0" width="40%">@tax?.Amount?.AmountForAccount?.ToString("N2")</td>
+                                            </tr>
+                                        }
+                                    }
+                                    @if (GetDisplayStatus("TotalInWords"))
+                                    {
+                                        <tr>
+                                            <td width="60%" class="pd-t05 font-weight-500">@GetLabel("GrandTotal") (@GetAccountCurrencyCodeOrSymbol())</td>
+                                            <td width="40%" class="pd-t05 text-right p-0 font-weight-500">@Model?.GrandTotal?.AmountForAccount
+                                            </td>
+                                        </tr>
+                                    }
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!-- Amount in Words -->
+            @if (GetDisplayStatus("TotalInWords"))
+            {
+            <tr>
+                <td class="pd-1 pd-t05 font-size-large font-weight-500 text-center">
+                    @Model?.TotalInWords?.AmountForAccount
+                </td>
+            </tr>
+            }
+            <!-- Separator -->
+            <tr>
+                <td class="dotted-separator" colspan="100%"></td>
+            </tr>
+            <!-- QR Code Section -->
+            @if (GetDisplayStatus("ShowQrCode") && !string.IsNullOrEmpty(Model?.QRCodeBase64String))
+            {
+                <tr>
+                    <td class="text-center pd-15">
+                        <img src="data:image/png;base64,@Model?.QRCodeBase64String" width="140" height="140" class="square-image" />
+                    </td>
+                </tr>
+            }
+            <!-- Footer Section -->
+            <tr>
+                <td class="pd-15">
+                    <table>
+                        <tbody>
+                        @if (GetDisplayStatus("Thanks") || GetDisplayStatus("FooterCompanyName"))
+                            {
+                            <tr>
+                                <td class="pd-0 vertical-align-top font-size-small" width="50%">
+                                    @if (GetDisplayStatus("Thanks"))
+                                    {
+                                        <p>@GetLabel("Thanks")</p>
+                                    }
+                                </td>
+                                <td class="pd-0 vertical-align-top font-weight-500 text-right" width="50%">
+                                    @if (GetDisplayStatus("FooterCompanyName"))
+                                    {
+                                        <p>@GetLabel("FooterCompanyName")</p>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                            @if (GetDisplayStatus("Message1"))
+                            {
+                                <tr>
+                                    <td class="pd-0 pd-t2 vertical-align-bottom" colspan="100%">
+                                        <p>@GetLabel("Message1")</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>

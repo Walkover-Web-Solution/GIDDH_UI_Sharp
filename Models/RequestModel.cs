@@ -355,7 +355,7 @@ namespace InvoiceData
         public string? QRCodeBase64String { get; set; }
         public List<SumOfTax>? SumOfTaxes { get; set; }
         public Amount? TcsTotalTax { get; set; }
-        public double? PaidAmount { get; set; }
+        public Amount? PaidAmount { get; set; }
         public bool? IsBusinessToCustomerInvoice { get; set; }
         public bool? DisplayBaseCurrency { get; set; }
         public bool? ShowSectionsInline { get; set; }
