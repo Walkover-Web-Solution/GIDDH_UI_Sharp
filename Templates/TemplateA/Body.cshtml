@@ -346,12 +346,16 @@
                                                                         <th class="text-right">@tax.AccountName</th>
                                                                     }
                                                                 }
+                                                                <th class="text-right">
                                                                     @if (Model?.Settings?.Total?.Display == true)
                                                                     {
-                                                                        <th class="text-right">
-                                                                                @Model?.Settings?.Total?.Label
-                                                                        </th>
+                                                                        @Model?.Settings?.Total?.Label
                                                                     }
+                                                                    else
+                                                                    {
+                                                                        <span>Amount</span>
+                                                                    }
+                                                                </th>
                                                             </tr>
                                                             @if (Model?.Settings?.PreviousDue?.Display == true && Model?.PreviousDueAmount != null)
                                                             {
@@ -548,10 +552,7 @@
                                                                             }
 
                                                                         }
-                                                                        
                                                                         <!-- Total -->
-                                                                          @if (Model?.Settings?.Total?.Display == true)
-                                                                    {
                                                                         <td class="text-right">
                                                                             <p>
                                                                                 @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Entry?.EntryTotal?.AmountForAccount
@@ -564,7 +565,6 @@
                                                                                 </p>
                                                                             }
                                                                         </td>
-                                                                    }
                                                                     </tr>
 
                                                                     @if (Model?.Settings?.ShowDescriptionInRows?.Display == true && Model?.Settings?.Item?.Display == true && !string.IsNullOrEmpty(Entry?.Description))
@@ -602,14 +602,10 @@
                                                                     <td></td>
                                                                 }
 
-                                                              
-                                                                    <td class="text-right">
-                                                                      @if (Model?.Settings?.TotalQuantity?.Display == true)
+                                                                @if (Model?.Settings?.Quantity?.Display == true)
                                                                 {
-                                                                    @Model?.StockQuantityWithUnit
-                                                                     }
-                                                                    </td>
-                                                               
+                                                                    <td class="text-right">@Model?.StockQuantityWithUnit</td>
+                                                                }
 
                                                                 @if (Model?.Settings?.Rate?.Display == true)
                                                                 {
@@ -642,12 +638,10 @@
                                                                         </td>
                                                                     }
                                                                 }
-                                                                     @if (Model?.Settings?.Total?.Display == true)
-                                                                    {
+
                                                                 <td class="text-right">
                                                                     @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.GstEntriesTotal?.AmountForAccount
                                                                 </td>
-                                                                    }
                                                             </tr>
                                                         </tfoot>
                                                     </table>
