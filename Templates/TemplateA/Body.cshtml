@@ -796,7 +796,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tcs?.Display == true && Model?.TcsTotalTax != null && Model.TcsTotalTax.AmountForAccount > 0)
+                                                                            @if (Model?.Settings?.Tcs?.Display == true && Model?.TcsTotalTax != null && Model.TcsTotalTax.AmountForAccount != 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
@@ -808,7 +808,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tds?.Display == true && Model?.TdsTotalTax != null && Model.TdsTotalTax.AmountForAccount > 0)
+                                                                            @if (Model?.Settings?.Tds?.Display == true && Model?.TdsTotalTax != null && Model.TdsTotalTax.AmountForAccount != 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
