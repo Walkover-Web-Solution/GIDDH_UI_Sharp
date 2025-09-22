@@ -1,5 +1,6 @@
 using GiddhTemplate.Services;
 using GiddhTemplate.Controllers;
+using GiddhTemplate.Extensions;
 using Serilog;
 
 public class Program
@@ -7,18 +8,27 @@ public class Program
     public static async Task Main(string[] args)
     {
         // Configure Serilog early to capture startup logs
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        // Override Grafana environment label from GRAFANA_APP_ENV if set
+        var grafanaEnv = Environment.GetEnvironmentVariable("GRAFANA_APP_ENV");
+        if (!string.IsNullOrEmpty(grafanaEnv))
+        {
+            configuration["Serilog:WriteTo:2:Args:labels:1:value"] = grafanaEnv;
+        }
+
         Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build())
+            .ReadFrom.Configuration(configuration)
             .CreateLogger();
 
         try
         {
-            Log.Information("Starting GIDDH Template Service");
-
+            Log.Information("Starting GIDDH Template Service...");
+            
             var builder = WebApplication.CreateBuilder(args);
 
             // Replace default logging with Serilog
@@ -29,15 +39,15 @@ public class Program
             builder.Services.AddScoped<ISlackService, SlackService>();
             builder.Services.AddSingleton<PdfService>();
 
-            builder.Services.AddControllers();
-            builder.WebHost.ConfigureKestrel(options =>
+            builder.Services.AddControllers(options =>
             {
-                options.ListenAnyIP(5000);
+                // Add automatic logging for all controller actions
+                options.Filters.Add<AutoLoggingActionFilter>();
             });
 
             var app = builder.Build();
 
-            // Add Serilog request logging middleware
+            // Add Serilog request logging middleware for automatic HTTP logging
             app.UseSerilogRequestLogging(options =>
             {
                 options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -53,10 +63,6 @@ public class Program
                     diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
                 };
             });
-
-            Log.Information("Initializing PDF Service browser");
-            await PdfService.GetBrowserAsync();
-            Log.Information("PDF Service browser initialized successfully");
 
             app.MapControllers();
 
