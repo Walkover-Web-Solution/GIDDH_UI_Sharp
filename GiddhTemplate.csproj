@@ -36,7 +36,7 @@
     <Content Include=".platform/**" CopyToOutputDirectory="Always" />
     <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
     <Content Include="appsettings.Development.json" CopyToOutputDirectory="Always" />
-    <Content Include="appsettings.TEST.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
+
