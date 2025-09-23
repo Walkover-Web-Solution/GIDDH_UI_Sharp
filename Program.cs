@@ -58,12 +58,12 @@ public class Program
                     var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
                     var path = httpContext.Request.Path.Value ?? "";
                     
-                    // Skip health checks completely
+                    // Skip health checks by using Debug level (which is filtered out by config)
                     if (userAgent.Contains("ELB-HealthChecker") || 
                         userAgent.Contains("HealthCheck") ||
                         (path == "/" && httpContext.Request.Method == "GET"))
                     {
-                        return null; // Don't log at all
+                        return Serilog.Events.LogEventLevel.Debug; // Debug level gets filtered out
                     }
                     
                     // Log errors and business operations
@@ -74,8 +74,8 @@ public class Program
                     if (path.StartsWith("/api/") || httpContext.Request.Method != "GET")
                         return Serilog.Events.LogEventLevel.Information;
                     
-                    // Skip other simple GET requests
-                    return null;
+                    // Skip other simple GET requests by using Debug level
+                    return Serilog.Events.LogEventLevel.Debug;
                 };
                 
                 options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
