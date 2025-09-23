@@ -3,6 +3,10 @@ using System.Text;
 using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
+using Serilog;
+using System.Diagnostics;
+using System.Text.Json;
+using GiddhTemplate.Extensions;
 
 namespace GiddhTemplate.Services
 {
@@ -19,6 +23,8 @@ namespace GiddhTemplate.Services
 
         public static async Task<IBrowser> GetBrowserAsync()
         {
+            var stopwatch = Stopwatch.StartNew();
+
             if (_browser == null || !_browser.IsConnected)
             {
                 await _semaphore.WaitAsync();
@@ -26,19 +32,20 @@ namespace GiddhTemplate.Services
                 {
                     if (_browser == null || !_browser.IsConnected)
                     {
-                        _browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                        var launchOptions = new LaunchOptions
                         {
                             Headless = true,
-                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
-//                             ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
+//                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
+                             ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
-                        });
+                        };
+
+                        _browser = await Puppeteer.LaunchAsync(launchOptions);
                     }
                 }
                 catch (PuppeteerSharp.ProcessException ex)
                 {
-                    Console.WriteLine($"Error launching browser: {ex.Message}");
                     _browser = null;
                     throw;
                 }
@@ -47,6 +54,8 @@ namespace GiddhTemplate.Services
                     _semaphore.Release();
                 }
             }
+
+            stopwatch.Stop();
             return _browser!;
         }
 
@@ -60,45 +69,51 @@ namespace GiddhTemplate.Services
 
         private (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
         {
-            return (
-                LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
-            );
+            return MethodLogger.ExecuteWithLogging(() =>
+            {
+                return (
+                    Common: LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
+                    Header: LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
+                    Footer: LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
+                    Body: LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
+                    Background: LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
+                );
+            });
         }
 
         private string LoadFontCSS(string fontFamily)
         {
-            if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
+            return MethodLogger.ExecuteWithLogging(() =>
             {
-                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
-                _openSansFontCSS = BuildFontCSS("Open Sans", fontPath);
-            }
-            else if (fontFamily == "Roboto" && string.IsNullOrEmpty(_robotoFontCSS))
-            {
-                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Roboto");
-                _robotoFontCSS = BuildFontCSS("Roboto", fontPath);
-            }
-            else if (fontFamily == "Lato" && string.IsNullOrEmpty(_latoFontCSS))
-            {
-                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Lato");
-                _latoFontCSS = BuildFontCSS("Lato", fontPath);
-            }
-            else if (string.IsNullOrEmpty(_interFontCSS))
-            {
-                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Inter");
-                _interFontCSS = BuildFontCSS("Inter", fontPath);
-            }
+                if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
+                {
+                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
+                    _openSansFontCSS = BuildFontCSS("Open Sans", fontPath);
+                }
+                else if (fontFamily == "Roboto" && string.IsNullOrEmpty(_robotoFontCSS))
+                {
+                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Roboto");
+                    _robotoFontCSS = BuildFontCSS("Roboto", fontPath);
+                }
+                else if (fontFamily == "Lato" && string.IsNullOrEmpty(_latoFontCSS))
+                {
+                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Lato");
+                    _latoFontCSS = BuildFontCSS("Lato", fontPath);
+                }
+                else if (string.IsNullOrEmpty(_interFontCSS))
+                {
+                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Inter");
+                    _interFontCSS = BuildFontCSS("Inter", fontPath);
+                }
 
-            return fontFamily switch
-            {
-                "Open Sans" => _openSansFontCSS,
-                "Roboto"    => _robotoFontCSS,
-                "Lato"      => _latoFontCSS,
-                _           => _interFontCSS
-            };
+                return fontFamily switch
+                {
+                    "Open Sans" => _openSansFontCSS,
+                    "Roboto"    => _robotoFontCSS,
+                    "Lato"      => _latoFontCSS,
+                    _           => _interFontCSS
+                };
+            });
         }
 
         private string BuildFontCSS(string family, string path)
@@ -126,8 +141,10 @@ namespace GiddhTemplate.Services
 
         private async Task<string> RenderTemplate(string templatePath, Root request)
         {
-            string rendered = await _razorTemplateService.RenderTemplateAsync(templatePath, request);
-            return rendered;
+            return await MethodLogger.ExecuteWithLoggingAsync(async () =>
+            {
+                return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
+            });
         }
 
         string ConvertToBase64(string filePath) =>
@@ -192,8 +209,12 @@ namespace GiddhTemplate.Services
 
         public virtual async Task<byte[]?> GeneratePdfAsync(Root request)
         {
+
+            var overallStopwatch = Stopwatch.StartNew();
+
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
+
             var _pdfOptions = new PdfOptions
             {
                 Format = PaperFormat.A4,
@@ -210,12 +231,14 @@ namespace GiddhTemplate.Services
                 DisplayHeaderFooter = false
             };
 
+
             try
             {
                 // Console.WriteLine("PDF Generation Started ...");
                 // Console.WriteLine("First : " + DateTime.Now.ToString("HH:mm:ss.fff"));
 
                 string templateType = request?.TemplateType?.ToUpper();
+
                 string templateFolderName;
                 switch (templateType)
                 {
@@ -229,9 +252,11 @@ namespace GiddhTemplate.Services
                         templateFolderName = "TemplateA";
                         break;
                 }
+
+
                 string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", templateFolderName);
+
                 var styles = LoadStyles(templatePath);
-                // Console.WriteLine("Get Styles " + DateTime.Now.ToString("HH:mm:ss"));
 
                 string headerFile = null, bodyFile = null, footerFile = "Footer.cshtml";
                 bool isReceiptOrPayment = false;
@@ -277,7 +302,10 @@ namespace GiddhTemplate.Services
                         break;
                 }
 
+
                 // Render logic
+                var renderStopwatch = Stopwatch.StartNew();
+
                 Task<string>[] renderTasks;
                 string header = null, footer = null, body;
 
@@ -313,27 +341,35 @@ namespace GiddhTemplate.Services
                     body = renderTasks[2].Result;
                 }
 
-                // Console.WriteLine("Get Templates " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                string template = CreatePdfDocument(header, body, footer, styles.Common, styles.Header, styles.Footer, styles.Body, request, styles.Background);
-                // Console.WriteLine("Get CreatePdfDocument " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                // Console.WriteLine(template);
+                renderStopwatch.Stop();
 
+                var documentStopwatch = Stopwatch.StartNew();
+                string template = CreatePdfDocument(header, body, footer, styles.Common, styles.Header, styles.Footer, styles.Body, request, styles.Background);
+                documentStopwatch.Stop();
+
+                var pageStopwatch = Stopwatch.StartNew();
                 await page.SetContentAsync(template);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
+                pageStopwatch.Stop();
 
+                var pdfStopwatch = Stopwatch.StartNew();
+                var pdfData = await page.PdfDataAsync(_pdfOptions);
+                pdfStopwatch.Stop();
 
-                return await page.PdfDataAsync(_pdfOptions);
+                overallStopwatch.Stop();
+                
+                return pdfData;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error generating PDF: {ex.Message}");
+                overallStopwatch.Stop();
+                throw;
             }
             finally
             {
                 await page.CloseAsync();
                 await page.DisposeAsync();
             }
-            return null;
         }
     }
 }
