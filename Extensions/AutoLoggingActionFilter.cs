@@ -19,35 +19,51 @@ namespace GiddhTemplate.Extensions
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            // Skip logging for health check endpoints
+            if (IsHealthCheckRequest(context))
+            {
+                return;
+            }
+
             _stopwatch = Stopwatch.StartNew();
             
-            var controllerName = context.Controller.GetType().Name;
-            var actionName = context.ActionDescriptor.DisplayName ?? context.ActionDescriptor.RouteValues["action"];
+            var controllerName = GetCleanControllerName(context);
+            var actionName = GetCleanActionName(context);
             var parameters = GetParametersInfo(context.ActionArguments);
 
-            _logger.Information("→ Entering {ControllerName}.{ActionName} with parameters: {@Parameters}", 
-                controllerName, actionName, parameters);
+            // Only log if there are meaningful parameters or it's a business operation
+            if (IsBusinessOperation(context) || parameters.ToString() != "{}")
+            {
+                _logger.Information("→ {ControllerName}.{ActionName} started {@Parameters}",
+                    controllerName, actionName, parameters);
+            }
 
             base.OnActionExecuting(context);
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
+            // Skip logging for health check endpoints
+            if (IsHealthCheckRequest(context))
+            {
+                return;
+            }
+
             _stopwatch?.Stop();
             
-            var controllerName = context.Controller.GetType().Name;
-            var actionName = context.ActionDescriptor.DisplayName ?? context.ActionDescriptor.RouteValues["action"];
+            var controllerName = GetCleanControllerName(context);
+            var actionName = GetCleanActionName(context);
             var elapsedMs = _stopwatch?.ElapsedMilliseconds ?? 0;
 
             if (context.Exception != null)
             {
-                _logger.Error(context.Exception, "✗ Exception in {ControllerName}.{ActionName} after {ElapsedMs}ms", 
+                _logger.Error(context.Exception, "✗ {ControllerName}.{ActionName} failed after {ElapsedMs}ms",
                     controllerName, actionName, elapsedMs);
             }
-            else
+            else if (IsBusinessOperation(context) || elapsedMs > 100) // Only log if it's business operation or took significant time
             {
-                var result = GetResultInfo(context.Result);
-                _logger.Information("← Exiting {ControllerName}.{ActionName} successfully in {ElapsedMs}ms with result: {@Result}", 
+                var result = GetMeaningfulResultInfo(context.Result);
+                _logger.Information("← {ControllerName}.{ActionName} completed in {ElapsedMs}ms {Result}",
                     controllerName, actionName, elapsedMs, result);
             }
 
@@ -103,6 +119,92 @@ namespace GiddhTemplate.Extensions
             }
             
             return value;
+        }
+
+        private bool IsHealthCheckRequest(ActionExecutingContext context)
+        {
+            var httpContext = context.HttpContext;
+            var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
+            var path = httpContext.Request.Path.Value ?? "";
+            
+            // Skip ELB health checks and simple GET requests to root
+            return userAgent.Contains("ELB-HealthChecker") || 
+                   userAgent.Contains("HealthCheck") ||
+                   (path == "/" && httpContext.Request.Method == "GET");
+        }
+
+        private bool IsHealthCheckRequest(ActionExecutedContext context)
+        {
+            var httpContext = context.HttpContext;
+            var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
+            var path = httpContext.Request.Path.Value ?? "";
+            
+            // Skip ELB health checks and simple GET requests to root
+            return userAgent.Contains("ELB-HealthChecker") || 
+                   userAgent.Contains("HealthCheck") ||
+                   (path == "/" && httpContext.Request.Method == "GET");
+        }
+
+        private bool IsBusinessOperation(ActionExecutingContext context)
+        {
+            var controllerName = context.Controller.GetType().Name;
+            var path = context.HttpContext.Request.Path.Value ?? "";
+            
+            // Consider PDF generation and API operations as business operations
+            return controllerName.Contains("Pdf") || 
+                   path.StartsWith("/api/") ||
+                   context.HttpContext.Request.Method != "GET";
+        }
+
+        private bool IsBusinessOperation(ActionExecutedContext context)
+        {
+            var controllerName = context.Controller.GetType().Name;
+            var path = context.HttpContext.Request.Path.Value ?? "";
+            
+            // Consider PDF generation and API operations as business operations
+            return controllerName.Contains("Pdf") || 
+                   path.StartsWith("/api/") ||
+                   context.HttpContext.Request.Method != "GET";
+        }
+
+        private string GetCleanControllerName(ActionExecutingContext context)
+        {
+            return context.Controller.GetType().Name.Replace("Controller", "");
+        }
+
+        private string GetCleanControllerName(ActionExecutedContext context)
+        {
+            return context.Controller.GetType().Name.Replace("Controller", "");
+        }
+
+        private string GetCleanActionName(ActionExecutingContext context)
+        {
+            return context.ActionDescriptor.RouteValues["action"] ?? 
+                   context.ActionDescriptor.DisplayName?.Split('.').LastOrDefault() ?? "Unknown";
+        }
+
+        private string GetCleanActionName(ActionExecutedContext context)
+        {
+            return context.ActionDescriptor.RouteValues["action"] ?? 
+                   context.ActionDescriptor.DisplayName?.Split('.').LastOrDefault() ?? "Unknown";
+        }
+
+        private string GetMeaningfulResultInfo(object? result)
+        {
+            if (result == null) return "";
+            
+            var type = result.GetType().Name;
+            
+            // Provide meaningful result information
+            return type switch
+            {
+                "FileContentResult" => "→ PDF generated",
+                "OkObjectResult" => "→ Success",
+                "BadRequestObjectResult" => "→ Bad request",
+                "NotFoundResult" => "→ Not found",
+                "StatusCodeResult" => "→ Status code response",
+                _ => $"→ {type}"
+            };
         }
     }
 }

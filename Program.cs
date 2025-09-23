@@ -50,17 +50,44 @@ public class Program
             // Add Serilog request logging middleware for automatic HTTP logging
             app.UseSerilogRequestLogging(options =>
             {
-                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-                options.GetLevel = (httpContext, elapsed, ex) => ex != null
-                    ? Serilog.Events.LogEventLevel.Error
-                    : httpContext.Response.StatusCode > 499
-                        ? Serilog.Events.LogEventLevel.Error
-                        : Serilog.Events.LogEventLevel.Information;
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms)";
+                
+                // Filter out health check requests and only log meaningful operations
+                options.GetLevel = (httpContext, elapsed, ex) =>
+                {
+                    var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
+                    var path = httpContext.Request.Path.Value ?? "";
+                    
+                    // Skip health checks completely
+                    if (userAgent.Contains("ELB-HealthChecker") || 
+                        userAgent.Contains("HealthCheck") ||
+                        (path == "/" && httpContext.Request.Method == "GET"))
+                    {
+                        return null; // Don't log at all
+                    }
+                    
+                    // Log errors and business operations
+                    if (ex != null || httpContext.Response.StatusCode >= 400)
+                        return Serilog.Events.LogEventLevel.Error;
+                    
+                    // Log business operations (API calls, POST requests)
+                    if (path.StartsWith("/api/") || httpContext.Request.Method != "GET")
+                        return Serilog.Events.LogEventLevel.Information;
+                    
+                    // Skip other simple GET requests
+                    return null;
+                };
+                
                 options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
                 {
                     diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
-                    diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
                     diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
+                    
+                    // Add business context for meaningful requests
+                    if (httpContext.Request.Path.Value?.StartsWith("/api/") == true)
+                    {
+                        diagnosticContext.Set("BusinessOperation", true);
+                    }
                 };
             });
 
