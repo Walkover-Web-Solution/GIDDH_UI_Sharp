@@ -47,6 +47,8 @@ namespace GiddhTemplate.Controllers
                 {
                             return BadRequest("Invalid request data. Ensure the payload matches the expected format.");
                 }
+                
+                // Use ASP.NET Core's built-in ActionId for request correlation (no need to pass custom ID)
                 byte[] pdfBytes = await _pdfService.GeneratePdfAsync(request);
                 if (pdfBytes == null || pdfBytes.Length == 0)
                 {

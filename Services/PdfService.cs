@@ -13,6 +13,7 @@ namespace GiddhTemplate.Services
     public class PdfService
     {
         private readonly RazorTemplateService _razorTemplateService;
+        private PdfService? _self; // Reference to the proxy instance
         private string _openSansFontCSS = string.Empty; // Cache the Open Sans CSS
         private string _robotoFontCSS = string.Empty;   // Cache the Roboto CSS
         private string _latoFontCSS = string.Empty;     // Cache the Lato CSS
@@ -21,10 +22,9 @@ namespace GiddhTemplate.Services
         private static IBrowser? _browser;
         private int decreaseFontSize = 2;
 
-        public static async Task<IBrowser> GetBrowserAsync()
+        [LogMethod]
+        public virtual async Task<IBrowser> GetBrowserAsync()
         {
-            var stopwatch = Stopwatch.StartNew();
-
             if (_browser == null || !_browser.IsConnected)
             {
                 await _semaphore.WaitAsync();
@@ -36,7 +36,7 @@ namespace GiddhTemplate.Services
                         {
                             Headless = true,
                             ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
-//                             ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
+                            // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
                         };
@@ -44,7 +44,7 @@ namespace GiddhTemplate.Services
                         _browser = await Puppeteer.LaunchAsync(launchOptions);
                     }
                 }
-                catch (PuppeteerSharp.ProcessException ex)
+                catch (PuppeteerSharp.ProcessException)
                 {
                     _browser = null;
                     throw;
@@ -55,7 +55,6 @@ namespace GiddhTemplate.Services
                 }
             }
 
-            stopwatch.Stop();
             return _browser!;
         }
 
@@ -64,59 +63,62 @@ namespace GiddhTemplate.Services
             _razorTemplateService = new RazorTemplateService();
         }
 
+        // Method to set the proxy reference for internal calls
+        public virtual void SetProxyReference(PdfService proxyInstance)
+        {
+            _self = proxyInstance;
+        }
+
         private string LoadFileContent(string filePath) =>
             File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 
-        private (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
+        [LogMethod]
+        public virtual (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
         {
-            return MethodLogger.ExecuteWithLogging(() =>
-            {
-                return (
-                    Common: LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
-                    Header: LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
-                    Footer: LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
-                    Body: LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
-                    Background: LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
-                );
-            });
+            return (
+                Common: LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
+                Header: LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
+                Footer: LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
+                Body: LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
+                Background: LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
+            );
         }
 
-        private string LoadFontCSS(string fontFamily)
+        [LogMethod]
+        public virtual string LoadFontCSS(string fontFamily)
         {
-            return MethodLogger.ExecuteWithLogging(() =>
+            if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
             {
-                if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
-                {
-                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
-                    _openSansFontCSS = BuildFontCSS("Open Sans", fontPath);
-                }
-                else if (fontFamily == "Roboto" && string.IsNullOrEmpty(_robotoFontCSS))
-                {
-                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Roboto");
-                    _robotoFontCSS = BuildFontCSS("Roboto", fontPath);
-                }
-                else if (fontFamily == "Lato" && string.IsNullOrEmpty(_latoFontCSS))
-                {
-                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Lato");
-                    _latoFontCSS = BuildFontCSS("Lato", fontPath);
-                }
-                else if (string.IsNullOrEmpty(_interFontCSS))
-                {
-                    string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Inter");
-                    _interFontCSS = BuildFontCSS("Inter", fontPath);
-                }
+                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
+                _openSansFontCSS = BuildFontCSS("Open Sans", fontPath);
+            }
+            else if (fontFamily == "Roboto" && string.IsNullOrEmpty(_robotoFontCSS))
+            {
+                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Roboto");
+                _robotoFontCSS = BuildFontCSS("Roboto", fontPath);
+            }
+            else if (fontFamily == "Lato" && string.IsNullOrEmpty(_latoFontCSS))
+            {
+                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Lato");
+                _latoFontCSS = BuildFontCSS("Lato", fontPath);
+            }
+            else if (string.IsNullOrEmpty(_interFontCSS))
+            {
+                string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Inter");
+                _interFontCSS = BuildFontCSS("Inter", fontPath);
+            }
 
-                return fontFamily switch
-                {
-                    "Open Sans" => _openSansFontCSS,
-                    "Roboto"    => _robotoFontCSS,
-                    "Lato"      => _latoFontCSS,
-                    _           => _interFontCSS
-                };
-            });
+            return fontFamily switch
+            {
+                "Open Sans" => _openSansFontCSS,
+                "Roboto"    => _robotoFontCSS,
+                "Lato"      => _latoFontCSS,
+                _           => _interFontCSS
+            };
         }
 
-        private string BuildFontCSS(string family, string path)
+        [LogMethod]
+        public virtual string BuildFontCSS(string family, string path)
         {
             var styles = new[]
             {
@@ -139,12 +141,10 @@ namespace GiddhTemplate.Services
             return sb.ToString();
         }
 
-        private async Task<string> RenderTemplate(string templatePath, Root request)
+        [LogMethod]
+        public virtual async Task<string> RenderTemplate(string templatePath, Root request)
         {
-            return await MethodLogger.ExecuteWithLoggingAsync(async () =>
-            {
-                return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
-            });
+            return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
         }
 
         string ConvertToBase64(string filePath) =>
@@ -163,7 +163,7 @@ namespace GiddhTemplate.Services
         {
             var themeCSS = new StringBuilder();
             // Console.WriteLine("Load Font Start: " + DateTime.Now.ToString("HH:mm:ss.fff"));
-            themeCSS.Append(LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
+            themeCSS.Append((_self ?? this).LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
             // Console.WriteLine("Load Font End: " + DateTime.Now.ToString("HH:mm:ss.fff"));
 
             themeCSS.Append("html, body {");
@@ -207,11 +207,9 @@ namespace GiddhTemplate.Services
             return Path.Combine(rootPath, pdfName);
         }
 
+        [LogMethod]
         public virtual async Task<byte[]?> GeneratePdfAsync(Root request)
         {
-
-            var overallStopwatch = Stopwatch.StartNew();
-
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
 
@@ -256,7 +254,7 @@ namespace GiddhTemplate.Services
 
                 string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", templateFolderName);
 
-                var styles = LoadStyles(templatePath);
+                var styles = (_self ?? this).LoadStyles(templatePath);
 
                 string headerFile = null, bodyFile = null, footerFile = "Footer.cshtml";
                 bool isReceiptOrPayment = false;
@@ -304,8 +302,6 @@ namespace GiddhTemplate.Services
 
 
                 // Render logic
-                var renderStopwatch = Stopwatch.StartNew();
-
                 Task<string>[] renderTasks;
                 string header = null, footer = null, body;
 
@@ -313,7 +309,7 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     body = renderTasks[0].Result;
@@ -322,7 +318,7 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     body = renderTasks[0].Result;
@@ -331,9 +327,9 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, headerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, footerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, headerFile), request),
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, footerFile), request),
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     header = renderTasks[0].Result;
@@ -341,28 +337,15 @@ namespace GiddhTemplate.Services
                     body = renderTasks[2].Result;
                 }
 
-                renderStopwatch.Stop();
-
-                var documentStopwatch = Stopwatch.StartNew();
                 string template = CreatePdfDocument(header, body, footer, styles.Common, styles.Header, styles.Footer, styles.Body, request, styles.Background);
-                documentStopwatch.Stop();
-
-                var pageStopwatch = Stopwatch.StartNew();
                 await page.SetContentAsync(template);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
-                pageStopwatch.Stop();
-
-                var pdfStopwatch = Stopwatch.StartNew();
                 var pdfData = await page.PdfDataAsync(_pdfOptions);
-                pdfStopwatch.Stop();
-
-                overallStopwatch.Stop();
                 
                 return pdfData;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                overallStopwatch.Stop();
                 throw;
             }
             finally
