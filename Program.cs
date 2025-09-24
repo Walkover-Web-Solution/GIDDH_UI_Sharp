@@ -2,6 +2,7 @@ using GiddhTemplate.Services;
 using GiddhTemplate.Controllers;
 using GiddhTemplate.Extensions;
 using Serilog;
+using Castle.DynamicProxy;
 
 public class Program
 {
@@ -37,7 +38,31 @@ public class Program
             // Register services
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<ISlackService, SlackService>();
-            builder.Services.AddSingleton<PdfService>();
+            
+            // Register HTTP context accessor for ActionId extraction
+            builder.Services.AddHttpContextAccessor();
+            
+            // Register Castle.DynamicProxy components for automatic logging
+            builder.Services.AddSingleton<ProxyGenerator>();
+            builder.Services.AddScoped<LoggingInterceptor>(); // Changed to Scoped to access HttpContext
+            
+            // Register PdfService with proxy generation for automatic logging
+            builder.Services.AddScoped<PdfService>(serviceProvider =>
+            {
+                var proxyGenerator = serviceProvider.GetRequiredService<ProxyGenerator>();
+                var loggingInterceptor = serviceProvider.GetRequiredService<LoggingInterceptor>();
+                
+                // Create the actual PdfService instance
+                var pdfService = new PdfService();
+                
+                // Create a proxy that intercepts method calls for automatic logging
+                var proxy = proxyGenerator.CreateClassProxyWithTarget(pdfService, loggingInterceptor);
+                
+                // Set the proxy reference for internal method calls to go through the proxy
+                proxy.SetProxyReference(proxy);
+                
+                return proxy;
+            });
 
             builder.Services.AddControllers(options =>
             {
