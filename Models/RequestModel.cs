@@ -234,6 +234,7 @@ namespace InvoiceData
         public decimal? Iamt { get; set; }
         public decimal? Camt { get; set; }
         public decimal? Samt { get; set; }
+        public decimal? UtgstAmount { get; set; }
         public decimal? TaxableValue { get; set; }
         public decimal? GstOrVatTaxRate { get; set; }
         public decimal? CsTaxRate { get; set; }
