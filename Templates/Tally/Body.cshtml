@@ -1001,7 +1001,7 @@
                                                                             @(Bifurcation?.UtgstAmount > 0 ? Bifurcation?.UtgstAmount : "")
                                                                         </td>
                                                                           }
-                                                                         @if (Bifurcation?.Samt != null)
+                                                                        else if (Bifurcation?.Samt != null)
                                                                           {
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.Samt > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
@@ -1009,7 +1009,7 @@
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.Samt > 0 ? Bifurcation?.Samt : "")
                                                                         </td>
-                                                                    }
+                                                                        }
                                                                     }
 
                                                                     @* SALES TAX *@
