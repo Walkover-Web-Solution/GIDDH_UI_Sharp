@@ -3,12 +3,17 @@ using System.Text;
 using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
+using Serilog;
+using System.Diagnostics;
+using System.Text.Json;
+using GiddhTemplate.Extensions;
 
 namespace GiddhTemplate.Services
 {
     public class PdfService
     {
         private readonly RazorTemplateService _razorTemplateService;
+        private PdfService? _self; // Reference to the proxy instance
         private string _openSansFontCSS = string.Empty; // Cache the Open Sans CSS
         private string _robotoFontCSS = string.Empty;   // Cache the Roboto CSS
         private string _latoFontCSS = string.Empty;     // Cache the Lato CSS
@@ -17,7 +22,8 @@ namespace GiddhTemplate.Services
         private static IBrowser? _browser;
         private int decreaseFontSize = 2;
 
-        public static async Task<IBrowser> GetBrowserAsync()
+        [LogMethod]
+        public virtual async Task<IBrowser> GetBrowserAsync()
         {
             if (_browser == null || !_browser.IsConnected)
             {
@@ -26,19 +32,20 @@ namespace GiddhTemplate.Services
                 {
                     if (_browser == null || !_browser.IsConnected)
                     {
-                        _browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                        var launchOptions = new LaunchOptions
                         {
                             Headless = true,
                             ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
                             // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
-                        });
+                        };
+
+                        _browser = await Puppeteer.LaunchAsync(launchOptions);
                     }
                 }
-                catch (PuppeteerSharp.ProcessException ex)
+                catch (PuppeteerSharp.ProcessException)
                 {
-                    Console.WriteLine($"Error launching browser: {ex.Message}");
                     _browser = null;
                     throw;
                 }
@@ -47,6 +54,7 @@ namespace GiddhTemplate.Services
                     _semaphore.Release();
                 }
             }
+
             return _browser!;
         }
 
@@ -55,21 +63,29 @@ namespace GiddhTemplate.Services
             _razorTemplateService = new RazorTemplateService();
         }
 
+        // Method to set the proxy reference for internal calls
+        public virtual void SetProxyReference(PdfService proxyInstance)
+        {
+            _self = proxyInstance;
+        }
+
         private string LoadFileContent(string filePath) =>
             File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 
-        private (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
+        [LogMethod]
+        public virtual (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
         {
             return (
-                LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
+                Common: LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
+                Header: LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
+                Footer: LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
+                Body: LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
+                Background: LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
             );
         }
 
-        private string LoadFontCSS(string fontFamily)
+        [LogMethod]
+        public virtual string LoadFontCSS(string fontFamily)
         {
             if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
             {
@@ -101,7 +117,8 @@ namespace GiddhTemplate.Services
             };
         }
 
-        private string BuildFontCSS(string family, string path)
+        [LogMethod]
+        public virtual string BuildFontCSS(string family, string path)
         {
             var styles = new[]
             {
@@ -124,10 +141,10 @@ namespace GiddhTemplate.Services
             return sb.ToString();
         }
 
-        private async Task<string> RenderTemplate(string templatePath, Root request)
+        [LogMethod]
+        public virtual async Task<string> RenderTemplate(string templatePath, Root request)
         {
-            string rendered = await _razorTemplateService.RenderTemplateAsync(templatePath, request);
-            return rendered;
+            return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
         }
 
         string ConvertToBase64(string filePath) =>
@@ -146,7 +163,7 @@ namespace GiddhTemplate.Services
         {
             var themeCSS = new StringBuilder();
             // Console.WriteLine("Load Font Start: " + DateTime.Now.ToString("HH:mm:ss.fff"));
-            themeCSS.Append(LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
+            themeCSS.Append((_self ?? this).LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
             // Console.WriteLine("Load Font End: " + DateTime.Now.ToString("HH:mm:ss.fff"));
 
             themeCSS.Append("html, body {");
@@ -190,10 +207,12 @@ namespace GiddhTemplate.Services
             return Path.Combine(rootPath, pdfName);
         }
 
-        public async Task<byte[]?> GeneratePdfAsync(Root request)
+        [LogMethod]
+        public virtual async Task<byte[]?> GeneratePdfAsync(Root request)
         {
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
+
             var _pdfOptions = new PdfOptions
             {
                 Format = PaperFormat.A4,
@@ -210,12 +229,14 @@ namespace GiddhTemplate.Services
                 DisplayHeaderFooter = false
             };
 
+
             try
             {
                 // Console.WriteLine("PDF Generation Started ...");
                 // Console.WriteLine("First : " + DateTime.Now.ToString("HH:mm:ss.fff"));
 
                 string templateType = request?.TemplateType?.ToUpper();
+
                 string templateFolderName;
                 switch (templateType)
                 {
@@ -229,9 +250,11 @@ namespace GiddhTemplate.Services
                         templateFolderName = "TemplateA";
                         break;
                 }
+
+
                 string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", templateFolderName);
-                var styles = LoadStyles(templatePath);
-                // Console.WriteLine("Get Styles " + DateTime.Now.ToString("HH:mm:ss"));
+
+                var styles = (_self ?? this).LoadStyles(templatePath);
 
                 string headerFile = null, bodyFile = null, footerFile = "Footer.cshtml";
                 bool isReceiptOrPayment = false;
@@ -277,6 +300,7 @@ namespace GiddhTemplate.Services
                         break;
                 }
 
+
                 // Render logic
                 Task<string>[] renderTasks;
                 string header = null, footer = null, body;
@@ -285,7 +309,7 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     body = renderTasks[0].Result;
@@ -294,7 +318,7 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     body = renderTasks[0].Result;
@@ -303,9 +327,9 @@ namespace GiddhTemplate.Services
                 {
                     renderTasks = new[]
                     {
-                        RenderTemplate(Path.Combine(templatePath, headerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, footerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, headerFile), request),
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, footerFile), request),
+                        (_self ?? this).RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
                     await Task.WhenAll(renderTasks);
                     header = renderTasks[0].Result;
@@ -313,32 +337,22 @@ namespace GiddhTemplate.Services
                     body = renderTasks[2].Result;
                 }
 
-                // Console.WriteLine("Get Templates " + DateTime.Now.ToString("HH:mm:ss.fff"));
                 string template = CreatePdfDocument(header, body, footer, styles.Common, styles.Header, styles.Footer, styles.Body, request, styles.Background);
-                // Console.WriteLine("Get CreatePdfDocument " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                // Console.WriteLine(template);
-
                 await page.SetContentAsync(template);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
-
-                // Console.WriteLine("after both await statement " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                // ###### Uncomment below line to save PDF file in local ######
-                // string pdfName = GetFileNameWithPath(request);
-                // Console.WriteLine($"PDF Downloaded, Please check -> {pdfName}");
-                // await page.PdfAsync(pdfName, _pdfOptions);
-
-                return await page.PdfDataAsync(_pdfOptions);
+                var pdfData = await page.PdfDataAsync(_pdfOptions);
+                
+                return pdfData;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error generating PDF: {ex.Message}");
+                throw;
             }
             finally
             {
                 await page.CloseAsync();
                 await page.DisposeAsync();
             }
-            return null;
         }
     }
 }
