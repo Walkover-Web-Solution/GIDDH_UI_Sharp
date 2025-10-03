@@ -95,10 +95,6 @@
                                 {
                                     <p class="font-weight-500">@Model?.CustomerDetails?.Name</p>
                                 }
-                                @if (@GetDisplayStatus("BillingAddress") && !string.IsNullOrEmpty(Model?.Billing?.Address))
-                                {
-                                    <address>@Model?.Billing?.Address</address>
-                                }
                             </td>
                             <td class="text-right vertical-align-top" width="50%">
                                 @if (GetDisplayStatus("VoucherDate"))
