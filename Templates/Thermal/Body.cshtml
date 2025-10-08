@@ -108,10 +108,6 @@
                         </tr>
                         <tr>
                             <td class="vertical-align-top" width="50%">
-                                @if (@GetDisplayStatus("BillingTaxNumber") && !string.IsNullOrEmpty(Model?.Billing?.TaxNumber))
-                                {
-                                    <p>@GetLabel("BillingTaxNumber"): @Model?.Billing?.TaxNumber</p>
-                                }
                             </td>
                             <td class="text-right vertical-align-top" width="50%">
                                 @if (GetDisplayStatus("VoucherNumber"))
@@ -171,10 +167,17 @@
                             <table>
                                 <tr>
                                     <td width="35%" class="vertical-align-top word-break">
-                                        @entry?.Description
-                                        @if (!string.IsNullOrEmpty(entry?.Stock?.Variant?.Name)) {
-                                            <p class="color-light-gray font-size-small">@entry?.Stock?.Variant?.Name</p>
+                                     @if (!string.IsNullOrEmpty(entry?.Stock?.Name)) {
+                                            <p >@entry?.Stock?.Name</p>
                                         }
+                                      else if (!string.IsNullOrEmpty(entry?.AccountName)) {
+                                            <p >@entry?.AccountName</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(entry?.Stock?.Variant?.Name)) {
+                                            <p >@entry?.Stock?.Variant?.Name</p>
+                                        }
+                                        <p class="color-light-gray font-size-small">@entry?.Description</p>
+                                        
                                     </td>
                                     <td width="20%" class="vertical-align-top text-right no-wrap">
                                         @if (entry?.Stock?.Quantity != null) {
