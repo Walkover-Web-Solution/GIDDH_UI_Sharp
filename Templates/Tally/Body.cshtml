@@ -992,16 +992,13 @@
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.Camt > 0 ? Bifurcation?.Camt : "")
                                                                         </td>
-                                                                         @if (Bifurcation?.UtgstAmount != null)
-                                                                          {
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.UtgstAmount > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
                                                                         </td>
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.UtgstAmount > 0 ? Bifurcation?.UtgstAmount : "")
                                                                         </td>
-                                                                          }
-                                                                        else if (Bifurcation?.Samt != null)
+                                                                        @if (Bifurcation?.Samt != null)
                                                                           {
                                                                         <td class="text-center">
                                                                             @(Bifurcation?.Samt > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
