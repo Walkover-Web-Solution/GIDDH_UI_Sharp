@@ -1004,6 +1004,14 @@
                                                                         else if (Bifurcation?.Samt != null)
                                                                           {
                                                                         <td class="text-center">
+                                                                            @(Bifurcation?.UtgstAmount > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            @(Bifurcation?.UtgstAmount > 0 ? Bifurcation?.UtgstAmount : "")
+                                                                        </td>
+                                                                        @if (Bifurcation?.Samt != null)
+                                                                          {
+                                                                        <td class="text-center">
                                                                             @(Bifurcation?.Samt > 0 && Bifurcation?.GstOrVatTaxRate >= 0 ? $"{Bifurcation?.GstOrVatTaxRate}%" : "") 
                                                                         </td>
                                                                         <td class="text-center">
