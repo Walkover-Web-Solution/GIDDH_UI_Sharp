@@ -1,10 +1,7 @@
 using RazorLight;
-using Metalama.Patterns.Caching.Aspects;
-using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Services
 {
-    [Log]   // <-- Metalama automatic logging for ALL methods
     public class RazorTemplateService
     {
         private readonly RazorLightEngine _engine;

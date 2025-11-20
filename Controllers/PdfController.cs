@@ -3,7 +3,6 @@ using GiddhTemplate.Services;
 using InvoiceData;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Controllers
 {
@@ -19,7 +18,6 @@ namespace GiddhTemplate.Controllers
 
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Log]  // Metalama: logs all actions, parameters, exceptions
     public class PdfController : ControllerBase
     {
         private readonly PdfService _pdfService;

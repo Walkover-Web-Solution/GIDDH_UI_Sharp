@@ -3,14 +3,10 @@ using System.Text;
 using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
-using Serilog;
 using System.Text.Json;
-using GiddhTemplate.Extensions;
-using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Services
 {
-    [Log] // Metalama automatic logging
     public class PdfService
     {
         private readonly RazorTemplateService _razorTemplateService;
