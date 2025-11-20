@@ -5,12 +5,12 @@ ALLOY_CONF_DIR="/etc/alloy"
 sudo mkdir -p ${ALLOY_CONF_DIR}
 
 # ========= Load Environment Variables from EB =========
-GRAFANA_APP_ENV=$(/opt/elasticbeanstalk/bin/get-config environment -k ENVIRONMENT)
-SERVER_REGION=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVER_REGION)
+GRAFANA_APP_ENV=$(/opt/elasticbeanstalk/bin/get-config environment -k ENVIRONMENT 2>/dev/null || true)
+SERVER_REGION=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVER_REGION 2>/dev/null || true)
+
 
 # Fallback (optional)
 GRAFANA_APP_ENV="${GRAFANA_APP_ENV:-TEST}"
-SERVER_REGION="${SERVER_REGION:-IN}"
 
 # ============= Create endpoints.json =============
 sudo tee ${ALLOY_CONF_DIR}/endpoints.json > /dev/null <<EOF
@@ -75,6 +75,7 @@ loki.process "log_process" {
       company       = json_path(local.file.endpoints.content, ".company")[0],
       product       = json_path(local.file.endpoints.content, ".product")[0],
       service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
+      service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
       instance      = constants.hostname,
     }
   }
@@ -100,6 +101,18 @@ prometheus.scrape "metrics_scrape" {
   forward_to      = [prometheus.relabel.metrics_relabel.receiver]
 }
 
+prometheus.scrape "app_metrics_scrape" {
+  scrape_interval = "15s"
+  targets = [
+    {
+      __address__      = "127.0.0.1:5000"
+      __metrics_path__ = "/metrics"
+      job              = "giddh-template-app"
+    }
+  ]
+  forward_to = [prometheus.relabel.metrics_relabel.receiver]
+}
+
 prometheus.relabel "metrics_relabel" {
   forward_to = [prometheus.remote_write.metrics_write.receiver]
 }
@@ -118,6 +131,7 @@ prometheus.remote_write "metrics_write" {
     company       = json_path(local.file.endpoints.content, ".company")[0],
     product       = json_path(local.file.endpoints.content, ".product")[0],
     service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
+    service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
     instance      = constants.hostname,
   }
 }
