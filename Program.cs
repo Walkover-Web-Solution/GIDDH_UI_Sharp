@@ -2,26 +2,26 @@ using GiddhTemplate.Services;
 using GiddhTemplate.Controllers;
 using GiddhTemplate.Extensions;
 using Serilog;
-using Castle.DynamicProxy;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Configure Serilog early to capture startup logs
+        // Load configuration early
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
 
-        // Override Grafana environment label from GRAFANA_APP_ENV if set
+        // Override Grafana environment label if set
         var grafanaEnv = Environment.GetEnvironmentVariable("GRAFANA_APP_ENV");
         if (!string.IsNullOrEmpty(grafanaEnv))
         {
             configuration["Serilog:WriteTo:2:Args:labels:1:value"] = grafanaEnv;
         }
 
+        // Setup Serilog BEFORE the host starts
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
@@ -29,86 +29,60 @@ public class Program
         try
         {
             Log.Information("Starting GIDDH Template Service...");
-            
+
             var builder = WebApplication.CreateBuilder(args);
 
-            // Replace default logging with Serilog
+            // Replace built-in logging with Serilog
             builder.Host.UseSerilog();
 
-            // Register services
+            // Dependency injection
             builder.Services.AddHttpClient();
-            builder.Services.AddScoped<ISlackService, SlackService>();
-            
-            // Register HTTP context accessor for ActionId extraction
             builder.Services.AddHttpContextAccessor();
-            
-            // Register Castle.DynamicProxy components for automatic logging
-            builder.Services.AddSingleton<ProxyGenerator>();
-            builder.Services.AddScoped<LoggingInterceptor>(); // Changed to Scoped to access HttpContext
-            
-            // Register PdfService with proxy generation for automatic logging
-            builder.Services.AddScoped<PdfService>(serviceProvider =>
-            {
-                var proxyGenerator = serviceProvider.GetRequiredService<ProxyGenerator>();
-                var loggingInterceptor = serviceProvider.GetRequiredService<LoggingInterceptor>();
-                
-                // Create the actual PdfService instance
-                var pdfService = new PdfService();
-                
-                // Create a proxy that intercepts method calls for automatic logging
-                var proxy = proxyGenerator.CreateClassProxyWithTarget(pdfService, loggingInterceptor);
-                
-                // Set the proxy reference for internal method calls to go through the proxy
-                proxy.SetProxyReference(proxy);
-                
-                return proxy;
-            });
 
+            // Your services
+            builder.Services.AddScoped<ISlackService, SlackService>();
+            builder.Services.AddScoped<PdfService>();  // Metalama will inject logging, no proxy needed
+
+            // Add MVC controllers + automatic action logging
             builder.Services.AddControllers(options =>
             {
-                // Add automatic logging for all controller actions
                 options.Filters.Add<AutoLoggingActionFilter>();
             });
 
             var app = builder.Build();
 
-            // Add Serilog request logging middleware for automatic HTTP logging
+            // Serilog middleware for HTTP request logs
             app.UseSerilogRequestLogging(options =>
             {
                 options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms)";
-                
-                // Filter out health check requests and only log meaningful operations
+
                 options.GetLevel = (httpContext, elapsed, ex) =>
                 {
                     var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
                     var path = httpContext.Request.Path.Value ?? "";
-                    
-                    // Skip health checks by using Debug level (which is filtered out by config)
-                    if (userAgent.Contains("ELB-HealthChecker") || 
+
+                    // Skip useless logs
+                    if (userAgent.Contains("ELB-HealthChecker") ||
                         userAgent.Contains("HealthCheck") ||
                         (path == "/" && httpContext.Request.Method == "GET"))
                     {
-                        return Serilog.Events.LogEventLevel.Debug; // Debug level gets filtered out
+                        return Serilog.Events.LogEventLevel.Debug;
                     }
-                    
-                    // Log errors and business operations
+
                     if (ex != null || httpContext.Response.StatusCode >= 400)
                         return Serilog.Events.LogEventLevel.Error;
-                    
-                    // Log business operations (API calls, POST requests)
+
                     if (path.StartsWith("/api/") || httpContext.Request.Method != "GET")
                         return Serilog.Events.LogEventLevel.Information;
-                    
-                    // Skip other simple GET requests by using Debug level
+
                     return Serilog.Events.LogEventLevel.Debug;
                 };
-                
+
                 options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
                 {
                     diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
                     diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
-                    
-                    // Add business context for meaningful requests
+
                     if (httpContext.Request.Path.Value?.StartsWith("/api/") == true)
                     {
                         diagnosticContext.Set("BusinessOperation", true);
@@ -116,6 +90,7 @@ public class Program
                 };
             });
 
+            // Map controllers
             app.MapControllers();
 
             Log.Information("GIDDH Template Service started successfully on port 5000");

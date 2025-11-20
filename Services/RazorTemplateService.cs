@@ -1,7 +1,10 @@
 using RazorLight;
+using Metalama.Patterns.Caching.Aspects;
+using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Services
 {
+    [Log]   // <-- Metalama automatic logging for ALL methods
     public class RazorTemplateService
     {
         private readonly RazorLightEngine _engine;
@@ -9,8 +12,8 @@ namespace GiddhTemplate.Services
         public RazorTemplateService()
         {
             _engine = new RazorLightEngineBuilder()
-                .UseEmbeddedResourcesProject(typeof(RazorTemplateService)) // For embedded templates
-                .UseFileSystemProject(Directory.GetCurrentDirectory())    // For file-based templates
+                .UseEmbeddedResourcesProject(typeof(RazorTemplateService)) 
+                .UseFileSystemProject(Directory.GetCurrentDirectory())   
                 .UseMemoryCachingProvider()
                 .Build();
         }
@@ -23,7 +26,12 @@ namespace GiddhTemplate.Services
             }
 
             string templateContent = await File.ReadAllTextAsync(templatePath);
-            return await _engine.CompileRenderStringAsync(templatePath, templateContent, model);
+
+            return await _engine.CompileRenderStringAsync(
+                templatePath,
+                templateContent,
+                model
+            );
         }
     }
 }

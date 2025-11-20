@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using GiddhTemplate.Services;
 using InvoiceData;
-using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Controllers
 {
-
     [ApiController]
     public class MainController : ControllerBase
     {
@@ -20,6 +19,7 @@ namespace GiddhTemplate.Controllers
 
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Log]  // Metalama: logs all actions, parameters, exceptions
     public class PdfController : ControllerBase
     {
         private readonly PdfService _pdfService;
@@ -36,36 +36,33 @@ namespace GiddhTemplate.Controllers
         [HttpPost]
         public async Task<IActionResult> GeneratePdfAsync([FromBody] object requestObj)
         {
-            try
-            {
-                var jsonString = JsonSerializer.Serialize(requestObj);
-                Root request = JsonSerializer.Deserialize<Root>(jsonString, new JsonSerializerOptions
-                {
-                        PropertyNameCaseInsensitive = true
-                });
-                if (request == null || string.IsNullOrEmpty(request.Company?.Name))
-                {
-                            return BadRequest("Invalid request data. Ensure the payload matches the expected format.");
-                }
-                
-                // Use ASP.NET Core's built-in ActionId for request correlation (no need to pass custom ID)
-                byte[] pdfBytes = await _pdfService.GeneratePdfAsync(request);
-                if (pdfBytes == null || pdfBytes.Length == 0)
-                {
-                    return StatusCode(500, new { error = "Failed to generate PDF!" });
-                }
-                // Return the PDF as a file download
-                return File(pdfBytes, "application/pdf", "invoice.pdf");
-            }
-            catch (Exception ex)
-            {
-                 var url = "api/v1/pdf";
-                 var error = ex.Message;
-                 var stackTrace = ex.StackTrace ?? "No stack trace available";
-                 _ = Task.Run(async () => await _slackService.SendErrorAlertAsync(url, _environment, error, stackTrace));
+            // Deserialize request
+            var jsonString = JsonSerializer.Serialize(requestObj);
+            Root request = JsonSerializer.Deserialize<Root>(jsonString,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                return StatusCode(500, new { error = ex.Message });
+            if (request == null || string.IsNullOrEmpty(request.Company?.Name))
+            {
+                return BadRequest("Invalid request data. Ensure payload matches expected format.");
             }
+
+            // Generate PDF
+            byte[] pdfBytes = await _pdfService.GeneratePdfAsync(request);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                await _slackService.SendErrorAlertAsync(
+                    url: "api/v1/pdf",
+                    environment: _environment,
+                    error: "PDF generation returned empty result.",
+                    stackTrace: "No stacktrace (service returned empty bytes)."
+                );
+
+                return StatusCode(500, new { error = "Failed to generate PDF!" });
+            }
+
+            // Return PDF
+            return File(pdfBytes, "application/pdf", "invoice.pdf");
         }
     }
 }
