@@ -1,29 +1,46 @@
 using Metalama.Framework.Aspects;
+using Metalama.Framework.Code;
 using System;
+using System.Diagnostics;
 
 namespace GiddhTemplate.Aspects;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-public class LogAttribute : OverrideMethodAspect
+public class LogAttribute : TypeAspect
 {
-    public override dynamic? OverrideMethod()
+    public override void BuildAspect(IAspectBuilder<INamedType> builder)
     {
-        var method = meta.Target.Method;
+        // Apply logging to all public methods in the type
+        foreach (var method in builder.Target.Methods.Where(m => m.Accessibility == Accessibility.Public))
+        {
+            builder.Advice.Override(method, nameof(OverrideMethod));
+        }
+    }
+
+    [Template]
+    public dynamic? OverrideMethod()
+    {
+        var methodName = meta.Target.Method.ToDisplayString();
+        var stopwatch = Stopwatch.StartNew();
+        
+        // Use Serilog.Log at runtime (not compile-time)
+        Serilog.Log.Information("→ {MethodName} started", methodName);
 
         try
         {
-            Log.Information("→ {MethodName} started with args: {Arguments}",
-                method.ToDisplayString(),
-                meta.Target.Parameters);
-
             var result = meta.Proceed();
-
-            Log.Information("← {MethodName} completed", method.ToDisplayString());
+            
+            stopwatch.Stop();
+            Serilog.Log.Information("← {MethodName} completed in {ElapsedMs}ms", 
+                methodName, stopwatch.ElapsedMilliseconds);
+            
             return result;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "✖ Exception in {MethodName}", method.ToDisplayString());
+            stopwatch.Stop();
+            Serilog.Log.Error(ex, "✖ Exception in {MethodName} after {ElapsedMs}ms", 
+                methodName, stopwatch.ElapsedMilliseconds);
             throw;
         }
     }

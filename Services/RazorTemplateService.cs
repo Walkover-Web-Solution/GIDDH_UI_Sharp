@@ -1,6 +1,6 @@
 using RazorLight;
 using Metalama.Patterns.Caching.Aspects;
-using Metalama.Patterns.Logging;
+using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Services
 {
@@ -18,7 +18,6 @@ namespace GiddhTemplate.Services
                 .Build();
         }
 
-        [Log]   // Optional (already inherited from class-level attribute)
         public async Task<string> RenderTemplateAsync<T>(string templatePath, T model)
         {
             if (!File.Exists(templatePath))

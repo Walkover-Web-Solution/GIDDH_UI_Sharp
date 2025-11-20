@@ -6,6 +6,7 @@ using GiddhTemplate.Models.Enums;
 using Serilog;
 using System.Text.Json;
 using GiddhTemplate.Extensions;
+using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Services
 {
@@ -41,7 +42,9 @@ namespace GiddhTemplate.Services
                         var launchOptions = new LaunchOptions
                         {
                             Headless = true,
-                            ExecutablePath = "/usr/bin/google-chrome",
+//                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
+                          ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
+                         // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
                         };
 

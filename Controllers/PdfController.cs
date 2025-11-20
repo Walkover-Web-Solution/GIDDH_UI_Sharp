@@ -3,7 +3,7 @@ using GiddhTemplate.Services;
 using InvoiceData;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using Metalama.Patterns.Logging;
+using GiddhTemplate.Aspects;
 
 namespace GiddhTemplate.Controllers
 {
