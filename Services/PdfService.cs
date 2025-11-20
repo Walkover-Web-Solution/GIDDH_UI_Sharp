@@ -126,7 +126,7 @@ namespace GiddhTemplate.Services
 
             foreach (var (style, weight, fontStyle) in styles)
             {
-                string file = Path.Combine(path, $"{family.Replace(" ", "")}-{style}.ttf");
+                string file = Path.Combine(null, $"{family.Replace(" ", "")}-{style}.ttf");
                 sb.Append(
                     $"@font-face {{ font-family: '{family}'; " +
                     $"src: url('{ConvertToBase64(file)}') format('truetype'); " +
