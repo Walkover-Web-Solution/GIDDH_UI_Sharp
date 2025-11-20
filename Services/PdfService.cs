@@ -160,7 +160,8 @@ namespace GiddhTemplate.Services
         {
             var themeCSS = new StringBuilder();
 
-            themeCSS.Append(LoadFontCSS(request.Themo.Fonto.Family ?? string.Empty));
+            themeCSS.Append(LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
+
 
             themeCSS.Append("html, body {");
 
