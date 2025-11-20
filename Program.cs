@@ -77,7 +77,12 @@ public class Program
             // Replace built-in logging with Serilog
             builder.Host.UseSerilog();
 
-            var resourceBuilder = ResourceBuilder.CreateDefault()
+            // ===========================================
+            // OPENTELEMETRY SETUP (TRACES & METRICS)
+            // ===========================================
+            var openTelemetry = builder.Services.AddOpenTelemetry();
+
+            openTelemetry.ConfigureResource(resource => resource
                 .AddService(serviceName: serviceName, serviceVersion: serviceVersion, serviceInstanceId: Environment.MachineName)
                 .AddAttributes(new KeyValuePair<string, object>[]
                 {
@@ -88,14 +93,7 @@ public class Program
                     new("service.namespace", product),
                     new("service.instance.id", Environment.MachineName),
                     new("server.region", serverRegion)
-                });
-
-            // ===========================================
-            // OPENTELEMETRY SETUP (TRACES & METRICS)
-            // ===========================================
-            var openTelemetry = builder.Services.AddOpenTelemetry();
-
-            openTelemetry.ConfigureResource(rb => rb.AddResource(resourceBuilder.Build()));
+                }));
 
             openTelemetry.WithTracing(tracing =>
             {
