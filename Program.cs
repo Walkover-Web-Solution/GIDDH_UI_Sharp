@@ -108,7 +108,6 @@ public class Program
                         options.RecordException = true;
                     })
                     .AddHttpClientInstrumentation()
-                    .AddGrpcClientInstrumentation()
                     .AddSource("GiddhTemplate.*");
 
                 if (tempoEndpoint is not null)
