@@ -105,12 +105,12 @@ prometheus.scrape "app_metrics_scrape" {
   scrape_interval = "15s"
   targets = [
     {
-      __address__      = "127.0.0.1:5000"
-      __metrics_path__ = "/metrics"
-      job              = "giddh-template-app"
-    }
+      __address__      = "127.0.0.1:5000",
+      __metrics_path__ = "/metrics",
+      job              = "giddh-template-app",
+    },
   ]
-  forward_to = [prometheus.relabel.metrics_relabel.receiver]
+  forward_to = [prometheus.relabel.metrics_relabel.receiver],
 }
 
 prometheus.relabel "metrics_relabel" {
