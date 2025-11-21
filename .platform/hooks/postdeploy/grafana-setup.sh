@@ -8,8 +8,7 @@ sudo mkdir -p ${ALLOY_CONF_DIR}
 GRAFANA_APP_ENV=$(/opt/elasticbeanstalk/bin/get-config environment -k ENVIRONMENT 2>/dev/null || true)
 SERVER_REGION=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVER_REGION 2>/dev/null || true)
 
-
-# Fallback (optional)
+# Fallback
 GRAFANA_APP_ENV="${GRAFANA_APP_ENV:-TEST}"
 
 # ============= Create endpoints.json =============
@@ -53,7 +52,7 @@ local.file_match "logs" {
       job       = "application",
       namespace = "/var/log/template-logs",
       __path__  = "/var/log/template-logs/*.log",
-    },
+    }
   ]
   ignore_older_than = "24h"
   sync_period       = "10s"
@@ -67,7 +66,9 @@ loki.source.file "log_source_file" {
 
 loki.process "log_process" {
   forward_to = [loki.write.log_write.receiver]
+
   stage.decolorize {}
+
   stage.static_labels {
     values = {
       env           = json_path(local.file.endpoints.content, ".environment")[0],
@@ -75,7 +76,7 @@ loki.process "log_process" {
       company       = json_path(local.file.endpoints.content, ".company")[0],
       product       = json_path(local.file.endpoints.content, ".product")[0],
       service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-      instance      = constants.hostname,
+      instance      = constants.hostname
     }
   }
 }
@@ -84,7 +85,7 @@ loki.write "log_write" {
   endpoint {
     url = json_path(local.file.endpoints.content, ".logs.url")[0]
     headers = {
-      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0],
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
     }
     retry_on_http_429 = true
   }
@@ -106,10 +107,10 @@ prometheus.scrape "app_metrics_scrape" {
     {
       __address__      = "127.0.0.1:5000",
       __metrics_path__ = "/metrics",
-      job              = "giddh-template-app",
+      job              = "giddh-template-app"
     },
   ]
-  forward_to = [prometheus.relabel.metrics_relabel.receiver],
+  forward_to = [prometheus.relabel.metrics_relabel.receiver]
 }
 
 prometheus.relabel "metrics_relabel" {
@@ -120,7 +121,7 @@ prometheus.remote_write "metrics_write" {
   endpoint {
     url     = json_path(local.file.endpoints.content, ".metrics.url")[0]
     headers = {
-      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0],
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
     }
   }
 
@@ -130,7 +131,29 @@ prometheus.remote_write "metrics_write" {
     company       = json_path(local.file.endpoints.content, ".company")[0],
     product       = json_path(local.file.endpoints.content, ".product")[0],
     service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-    instance      = constants.hostname,
+    instance      = constants.hostname
+  }
+}
+
+otelcol.receiver.otlp "otlp_receiver" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces = [otelcol.exporter.otlp_tempo.receiver]
+  }
+}
+
+otelcol.exporter.otlp "otlp_tempo" {
+  client {
+    endpoint = json_path(local.file.endpoints.content, ".tempo.url")[0]
+    headers = {
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
+    }
   }
 }
 EOF
@@ -138,4 +161,5 @@ EOF
 echo "[INFO] Restarting alloy service..."
 sudo systemctl daemon-reexec
 sudo systemctl restart alloy
+
 echo "[INFO] Grafana Alloy configuration applied successfully."
