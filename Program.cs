@@ -17,7 +17,7 @@ public class Program
         // ===========================================
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             Log.Fatal(e.ExceptionObject as Exception, "Unhandled (domain)");
-        
+
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             Log.Error(e.Exception, "Unobserved task");
@@ -27,7 +27,9 @@ public class Program
         // Load configuration early
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
+            .AddJsonFile(
+                $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json",
+                optional: true)
             .AddEnvironmentVariables()
             .Build();
 
@@ -48,7 +50,6 @@ public class Program
         var product = Environment.GetEnvironmentVariable("GRAFANA_PRODUCT") ?? "GIDDH";
         var serverRegion = Environment.GetEnvironmentVariable("SERVER_REGION") ?? "IN";
         var orgId = Environment.GetEnvironmentVariable("GRAFANA_ORG_ID");
-        var tempoEndpoint = TryCreateUri(Environment.GetEnvironmentVariable("GRAFANA_TEMPO_URL"));
 
         // ===========================================
         // SERILOG (STRUCTURED JSON LOGS)
@@ -64,7 +65,7 @@ public class Program
             .Enrich.WithProperty("Service", serviceName)
             .Enrich.WithProperty("ServiceType", serviceType)
             .Enrich.WithProperty("Environment", environmentName)
-            .WriteTo.Console(new JsonFormatter())  
+            .WriteTo.Console(new JsonFormatter())
             .CreateLogger();
 
         try
@@ -108,20 +109,18 @@ public class Program
                         options.RecordException = true;
                     })
                     .AddHttpClientInstrumentation()
-                    .AddSource("GiddhTemplate.*");
-
-                if (tempoEndpoint is not null)
-                {
-                    tracing.AddOtlpExporter(options =>
+                    .AddSource("GiddhTemplate.*")
+                    // Export traces to Alloy → Tempo
+                    .AddOtlpExporter(options =>
                     {
-                        options.Endpoint = tempoEndpoint;
-                        options.Protocol = OtlpExportProtocol.Grpc;
+                        options.Endpoint = new Uri("http://127.0.0.1:4318/v1/traces");
+                        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+
                         if (!string.IsNullOrWhiteSpace(orgId))
                         {
                             options.Headers = $"X-Scope-OrgID={orgId}";
                         }
                     });
-                }
             });
 
             openTelemetry.WithMetrics(metrics =>
@@ -167,12 +166,10 @@ public class Program
             });
 
             app.UseSerilogRequestLogging();
-
             app.MapPrometheusScrapingEndpoint();
             app.MapControllers();
 
             Log.Information("GIDDH Template Service started successfully on port 5000");
-
             await app.RunAsync();
         }
         catch (Exception ex)
