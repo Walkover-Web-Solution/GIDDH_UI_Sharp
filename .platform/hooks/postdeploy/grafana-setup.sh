@@ -1,8 +1,9 @@
 #!/bin/bash
+
 set -e
 
 ALLOY_CONF_DIR="/etc/alloy"
-sudo mkdir -p ${ALLOY_CONF_DIR}
+sudo mkdir -p "${ALLOY_CONF_DIR}"
 
 # ========= Load Environment Variables from EB =========
 GRAFANA_APP_ENV=$(/opt/elasticbeanstalk/bin/get-config environment -k ENVIRONMENT 2>/dev/null || true)
@@ -10,9 +11,10 @@ SERVER_REGION=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVER_REGIO
 
 # Fallback
 GRAFANA_APP_ENV="${GRAFANA_APP_ENV:-TEST}"
+SERVER_REGION="${SERVER_REGION:-IN}"
 
 # ============= Create endpoints.json =============
-sudo tee ${ALLOY_CONF_DIR}/endpoints.json > /dev/null <<EOF
+sudo tee "${ALLOY_CONF_DIR}/endpoints.json" > /dev/null <<EOF
 {
   "environment": "${GRAFANA_APP_ENV}",
   "server_region": "${SERVER_REGION}",
@@ -36,7 +38,7 @@ sudo tee ${ALLOY_CONF_DIR}/endpoints.json > /dev/null <<EOF
 EOF
 
 # ============= Create config.alloy =============
-sudo tee ${ALLOY_CONF_DIR}/config.alloy > /dev/null <<'EOF'
+sudo tee "${ALLOY_CONF_DIR}/config.alloy" > /dev/null <<'EOF'
 local.file "endpoints" {
   filename = "/etc/alloy/endpoints.json"
 }
@@ -131,29 +133,33 @@ prometheus.remote_write "metrics_write" {
     company       = json_path(local.file.endpoints.content, ".company")[0],
     product       = json_path(local.file.endpoints.content, ".product")[0],
     service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-    instance      = constants.hostname
+    instance      = constants.hostname,
   }
 }
 
-otelcol.receiver.otlp "otlp_receiver" {
-  grpc {
-    endpoint = "0.0.0.0:4317"
-  }
-  http {
-    endpoint = "0.0.0.0:4318"
-  }
-
+otelcol.receiver.otlp "trace" {
+  grpc { endpoint = "0.0.0.0:4317" }
+  http { endpoint = "0.0.0.0:4318" }
   output {
-    traces = [otelcol.exporter.otlp_tempo.receiver]
+    traces = [otelcol.processor.batch.trace_batch.input]
   }
 }
-
-otelcol.exporter.otlp "otlp_tempo" {
+otelcol.processor.batch "trace_batch" {
+  timeout = "10s"
+  output {
+    traces = [otelcol.exporter.otlp.trace_write.input]
+  }
+}
+otelcol.exporter.otlp "trace_write" {
   client {
     endpoint = json_path(local.file.endpoints.content, ".tempo.url")[0]
-    headers = {
-      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
+    tls {
+      insecure = true
     }
+    headers = {
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0],
+    }
+    compression = "none"
   }
 }
 EOF
