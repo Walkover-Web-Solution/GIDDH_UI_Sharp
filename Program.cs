@@ -52,7 +52,7 @@ public class Program
         var orgId = Environment.GetEnvironmentVariable("GRAFANA_ORG_ID");
 
         // ===========================================
-        // SERILOG (STRUCTURED JSON LOGS + FILE + CONSOLE)
+        // CENTRALIZED SERILOG WITH STRUCTURED JSON LOGGING
         // ===========================================
         var logFilePath = "/var/log/template-logs/giddh-template.log";
 
@@ -62,11 +62,14 @@ public class Program
             .Enrich.WithEnvironmentName()
             .Enrich.WithProcessId()
             .Enrich.WithThreadId()
+            .Enrich.WithMachineName()
             .Enrich.WithProperty("Application", "GiddhTemplateService")
             .Enrich.WithProperty("Version", serviceVersion)
             .Enrich.WithProperty("Service", serviceName)
             .Enrich.WithProperty("ServiceType", serviceType)
             .Enrich.WithProperty("Environment", environmentName)
+            .Enrich.WithProperty("Company", company)
+            .Enrich.WithProperty("Product", product)
             .WriteTo.Console(new JsonFormatter())
             .WriteTo.File(new JsonFormatter(), logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
             .CreateLogger();
@@ -143,7 +146,7 @@ public class Program
             var app = builder.Build();
 
             // ===========================================
-            // GLOBAL EXCEPTION HANDLER WITH SLACK ALERT
+            // CENTRALIZED GLOBAL EXCEPTION HANDLER WITH RICH CONTEXT
             // ===========================================
             app.UseExceptionHandler(errorApp =>
             {
@@ -152,30 +155,51 @@ public class Program
                     var exceptionDetails = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
                     if (exceptionDetails?.Error is Exception ex)
                     {
-                        // Log locally
-                        Log.Error(ex, "Unhandled exception in {Route}", ctx.Request.Path);
+                        // Capture rich context for centralized logging
+                        var userAgent = ctx.Request.Headers["User-Agent"].FirstOrDefault() ?? "Unknown";
+                        var remoteIp = ctx.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                        var method = ctx.Request.Method;
+                        var route = ctx.Request.Path.Value ?? "unknown";
+                        var queryString = ctx.Request.QueryString.Value ?? "";
+                        
+                        // Get distributed tracing context
+                        var activity = Activity.Current;
+                        var traceId = activity?.TraceId.ToString() ?? ctx.TraceIdentifier;
+                        var spanId = activity?.SpanId.ToString() ?? "N/A";
 
-                        // Add exception to OpenTelemetry trace
-                        Activity.Current?.AddEvent(new ActivityEvent("exception", DateTimeOffset.UtcNow, new ActivityTagsCollection
+                        // Centralized structured logging with rich context
+                        Log.Error(ex, 
+                            "Unhandled exception | Route: {Route} | Method: {Method} | TraceId: {TraceId} | SpanId: {SpanId} | UserAgent: {UserAgent} | RemoteIP: {RemoteIP} | Query: {QueryString}",
+                            route, method, traceId, spanId, userAgent, remoteIp, queryString);
+
+                        // Add exception to OpenTelemetry trace with context
+                        activity?.AddEvent(new ActivityEvent("exception", DateTimeOffset.UtcNow, new ActivityTagsCollection
                         {
-                            ["exception.type"] = ex.GetType().FullName,
+                            ["exception.type"] = ex.GetType().FullName ?? "Unknown",
                             ["exception.message"] = ex.Message,
-                            ["exception.stacktrace"] = ex.ToString()
+                            ["exception.stacktrace"] = ex.ToString(),
+                            ["http.method"] = method,
+                            ["http.route"] = route,
+                            ["http.user_agent"] = userAgent,
+                            ["http.remote_ip"] = remoteIp,
+                            ["http.status_code"] = "500"
                         }));
 
-                        // Slack alert
+                        // Centralized Slack alerting with context
                         try
                         {
                             var slackService = ctx.RequestServices.GetRequiredService<ISlackService>();
+                            var errorContext = $"**Route:** {route} {method}\n**TraceId:** {traceId}\n**UserAgent:** {userAgent}\n**RemoteIP:** {remoteIp}";
+                            
                             await slackService.SendErrorAlertAsync(
-                                ctx.Request.Path.Value ?? "unknown",
+                                route,
                                 slackEnvironment,
-                                ex.Message,
+                                $"{ex.GetType().Name}: {ex.Message}\n\n{errorContext}",
                                 ex.StackTrace ?? "No stack trace available");
                         }
                         catch (Exception slackEx)
                         {
-                            Log.Warning(slackEx, "Failed to send Slack alert for {Path}", ctx.Request.Path);
+                            Log.Warning(slackEx, "Failed to send Slack alert for {Route} {Method}", route, method);
                         }
                     }
 
@@ -185,39 +209,55 @@ public class Program
                     await ctx.Response.WriteAsJsonAsync(new
                     {
                         error = "Internal Server Error",
-                        traceId = ctx.TraceIdentifier
+                        traceId = ctx.TraceIdentifier,
+                        timestamp = DateTimeOffset.UtcNow
                     });
                 });
             });
 
             // ===========================================
-            // SERILOG HTTP REQUEST LOGGING
+            // CENTRALIZED HTTP REQUEST LOGGING WITH RICH CONTEXT
             // ===========================================
             app.UseSerilogRequestLogging(options =>
             {
-                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms) [{ContentLength}b]";
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms) [{ContentLength}b] | TraceId: {TraceId}";
                 options.GetLevel = (httpContext, elapsed, ex) =>
                 {
                     if (ex != null || httpContext.Response.StatusCode >= 500)
                         return Serilog.Events.LogEventLevel.Error;
                     if (httpContext.Response.StatusCode >= 400)
                         return Serilog.Events.LogEventLevel.Warning;
+                    if (elapsed > 5000) // Log slow requests as warnings for performance monitoring
+                        return Serilog.Events.LogEventLevel.Warning;
                     return Serilog.Events.LogEventLevel.Information;
                 };
                 options.EnrichDiagnosticContext = (diagCtx, httpContext) =>
                 {
+                    // Request context
                     diagCtx.Set("RequestHost", httpContext.Request.Host.Value);
-                    diagCtx.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
-                    diagCtx.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString());
-                    diagCtx.Set("ContentLength", httpContext.Response.ContentLength ?? 0);
+                    diagCtx.Set("RequestScheme", httpContext.Request.Scheme);
+                    diagCtx.Set("QueryString", httpContext.Request.QueryString.Value);
+                    
+                    // Client context
+                    diagCtx.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "Unknown");
+                    diagCtx.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown");
                     diagCtx.Set("Referer", httpContext.Request.Headers["Referer"].FirstOrDefault());
-
+                    
+                    // Response context
+                    diagCtx.Set("ContentLength", httpContext.Response.ContentLength ?? 0);
+                    diagCtx.Set("ContentType", httpContext.Response.ContentType);
+                    
+                    // Distributed tracing context
                     var activity = Activity.Current;
                     if (activity != null)
                     {
                         diagCtx.Set("TraceId", activity.TraceId.ToString());
                         diagCtx.Set("SpanId", activity.SpanId.ToString());
+                        diagCtx.Set("ParentId", activity.ParentId);
                     }
+                    
+                    // Performance context
+                    diagCtx.Set("RequestStartTime", DateTimeOffset.UtcNow);
                 };
             });
 
