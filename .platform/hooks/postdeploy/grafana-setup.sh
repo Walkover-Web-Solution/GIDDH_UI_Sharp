@@ -121,7 +121,7 @@ prometheus.remote_write "metrics_write" {
   endpoint {
     url     = json_path(local.file.endpoints.content, ".metrics.url")[0]
     headers = {
-      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0],
     }
   }
 
