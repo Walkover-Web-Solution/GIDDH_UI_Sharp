@@ -52,8 +52,10 @@ public class Program
         var orgId = Environment.GetEnvironmentVariable("GRAFANA_ORG_ID");
 
         // ===========================================
-        // SERILOG (STRUCTURED JSON LOGS)
+        // SERILOG (STRUCTURED JSON LOGS + FILE + CONSOLE)
         // ===========================================
+        var logFilePath = "/var/log/giddh-template/giddh-template.log";
+
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext()
@@ -66,6 +68,7 @@ public class Program
             .Enrich.WithProperty("ServiceType", serviceType)
             .Enrich.WithProperty("Environment", environmentName)
             .WriteTo.Console(new JsonFormatter())
+            .WriteTo.File(new JsonFormatter(), logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
             .CreateLogger();
 
         try
@@ -76,7 +79,6 @@ public class Program
 
             // Prevent duplicate logs
             builder.Logging.ClearProviders();
-
             builder.Host.UseSerilog();
 
             // ===========================================
@@ -110,7 +112,6 @@ public class Program
                     })
                     .AddHttpClientInstrumentation()
                     .AddSource("GiddhTemplate.*")
-                    // Export traces to Alloy → Tempo
                     .AddOtlpExporter(options =>
                     {
                         options.Endpoint = new Uri("http://127.0.0.1:4318/v1/traces");
@@ -135,14 +136,15 @@ public class Program
             // Dependency injection
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
-
             builder.Services.AddScoped<ISlackService, SlackService>();
             builder.Services.AddScoped<PdfService>();
             builder.Services.AddControllers();
 
             var app = builder.Build();
 
-            // GLOBAL EXCEPTION HANDLER (unchanged)
+            // ===========================================
+            // GLOBAL EXCEPTION HANDLER WITH SLACK ALERT
+            // ===========================================
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async ctx =>
@@ -150,8 +152,31 @@ public class Program
                     var exceptionDetails = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
                     if (exceptionDetails?.Error is Exception ex)
                     {
-                        Log.Error(ex, "Unhandled Exception in {Route}", ctx.Request.Path);
-                        Activity.Current?.AddEvent(new ActivityEvent("exception"));
+                        // Log locally
+                        Log.Error(ex, "Unhandled exception in {Route}", ctx.Request.Path);
+
+                        // Add exception to OpenTelemetry trace
+                        Activity.Current?.AddEvent(new ActivityEvent("exception", DateTimeOffset.UtcNow, new ActivityTagsCollection
+                        {
+                            ["exception.type"] = ex.GetType().FullName,
+                            ["exception.message"] = ex.Message,
+                            ["exception.stacktrace"] = ex.ToString()
+                        }));
+
+                        // Slack alert
+                        try
+                        {
+                            var slackService = ctx.RequestServices.GetRequiredService<ISlackService>();
+                            await slackService.SendErrorAlertAsync(
+                                ctx.Request.Path.Value ?? "unknown",
+                                slackEnvironment,
+                                ex.Message,
+                                ex.StackTrace ?? "No stack trace available");
+                        }
+                        catch (Exception slackEx)
+                        {
+                            Log.Warning(slackEx, "Failed to send Slack alert for {Path}", ctx.Request.Path);
+                        }
                     }
 
                     ctx.Response.StatusCode = 500;
@@ -165,7 +190,37 @@ public class Program
                 });
             });
 
-            app.UseSerilogRequestLogging();
+            // ===========================================
+            // SERILOG HTTP REQUEST LOGGING
+            // ===========================================
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms) [{ContentLength}b]";
+                options.GetLevel = (httpContext, elapsed, ex) =>
+                {
+                    if (ex != null || httpContext.Response.StatusCode >= 500)
+                        return Serilog.Events.LogEventLevel.Error;
+                    if (httpContext.Response.StatusCode >= 400)
+                        return Serilog.Events.LogEventLevel.Warning;
+                    return Serilog.Events.LogEventLevel.Information;
+                };
+                options.EnrichDiagnosticContext = (diagCtx, httpContext) =>
+                {
+                    diagCtx.Set("RequestHost", httpContext.Request.Host.Value);
+                    diagCtx.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
+                    diagCtx.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString());
+                    diagCtx.Set("ContentLength", httpContext.Response.ContentLength ?? 0);
+                    diagCtx.Set("Referer", httpContext.Request.Headers["Referer"].FirstOrDefault());
+
+                    var activity = Activity.Current;
+                    if (activity != null)
+                    {
+                        diagCtx.Set("TraceId", activity.TraceId.ToString());
+                        diagCtx.Set("SpanId", activity.SpanId.ToString());
+                    }
+                };
+            });
+
             app.MapPrometheusScrapingEndpoint();
             app.MapControllers();
 
