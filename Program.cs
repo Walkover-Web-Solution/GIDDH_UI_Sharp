@@ -54,7 +54,7 @@ public class Program
         // ===========================================
         // SERILOG (STRUCTURED JSON LOGS + FILE + CONSOLE)
         // ===========================================
-        var logFilePath = "/var/log/giddh-template/giddh-template.log";
+        var logFilePath = "/var/log/template-logs/giddh-template.log";
 
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
