@@ -75,7 +75,6 @@ loki.process "log_process" {
       company       = json_path(local.file.endpoints.content, ".company")[0],
       product       = json_path(local.file.endpoints.content, ".product")[0],
       service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-      service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
       instance      = constants.hostname,
     }
   }
@@ -131,7 +130,6 @@ prometheus.remote_write "metrics_write" {
     company       = json_path(local.file.endpoints.content, ".company")[0],
     product       = json_path(local.file.endpoints.content, ".product")[0],
     service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-    service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
     instance      = constants.hostname,
   }
 }
