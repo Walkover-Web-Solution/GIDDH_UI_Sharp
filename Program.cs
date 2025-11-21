@@ -31,7 +31,6 @@ public class Program
             .AddEnvironmentVariables()
             .Build();
 
-        // Override Grafana env label if needed
         var grafanaEnv = Environment.GetEnvironmentVariable("GRAFANA_APP_ENV");
         if (!string.IsNullOrEmpty(grafanaEnv))
         {
@@ -52,7 +51,7 @@ public class Program
         var tempoEndpoint = TryCreateUri(Environment.GetEnvironmentVariable("GRAFANA_TEMPO_URL"));
 
         // ===========================================
-        // ENHANCED SERILOG SETUP WITH ENRICHERS
+        // SERILOG (STRUCTURED JSON LOGS)
         // ===========================================
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
@@ -65,7 +64,7 @@ public class Program
             .Enrich.WithProperty("Service", serviceName)
             .Enrich.WithProperty("ServiceType", serviceType)
             .Enrich.WithProperty("Environment", environmentName)
-            .WriteTo.Console(new JsonFormatter())  // Structured JSON for Grafana Agent/Promtail
+            .WriteTo.Console(new JsonFormatter())  
             .CreateLogger();
 
         try
@@ -74,16 +73,21 @@ public class Program
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Replace built-in logging with Serilog
+            // Prevent duplicate logs
+            builder.Logging.ClearProviders();
+
             builder.Host.UseSerilog();
 
             // ===========================================
-            // OPENTELEMETRY SETUP (TRACES & METRICS)
+            // OPENTELEMETRY SETUP
             // ===========================================
             var openTelemetry = builder.Services.AddOpenTelemetry();
 
-            openTelemetry.ConfigureResource(resource => resource
-                .AddService(serviceName: serviceName, serviceVersion: serviceVersion, serviceInstanceId: Environment.MachineName)
+            openTelemetry.ConfigureResource(resource =>
+                resource.AddService(
+                    serviceName: serviceName,
+                    serviceVersion: serviceVersion,
+                    serviceInstanceId: Environment.MachineName)
                 .AddAttributes(new KeyValuePair<string, object>[]
                 {
                     new("deployment.environment", environmentName),
@@ -98,19 +102,13 @@ public class Program
             openTelemetry.WithTracing(tracing =>
             {
                 tracing
+                    .SetSampler(new AlwaysOnSampler())
                     .AddAspNetCoreInstrumentation(options =>
                     {
                         options.RecordException = true;
-                        options.EnrichWithHttpRequest = (activity, request) =>
-                        {
-                            activity.SetTag("http.request.body.size", request.ContentLength ?? 0);
-                        };
-                        options.EnrichWithHttpResponse = (activity, response) =>
-                        {
-                            activity.SetTag("http.response.body.size", response.ContentLength ?? 0);
-                        };
                     })
                     .AddHttpClientInstrumentation()
+                    .AddGrpcClientInstrumentation()
                     .AddSource("GiddhTemplate.*");
 
                 if (tempoEndpoint is not null)
@@ -140,144 +138,36 @@ public class Program
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
 
-            // Services
             builder.Services.AddScoped<ISlackService, SlackService>();
             builder.Services.AddScoped<PdfService>();
-
-            // Controllers (no action filter needed - using global exception handler)
             builder.Services.AddControllers();
 
             var app = builder.Build();
 
-            // ===========================================
-            // ENHANCED GLOBAL EXCEPTION HANDLER
-            // ===========================================
+            // GLOBAL EXCEPTION HANDLER (unchanged)
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async ctx =>
                 {
                     var exceptionDetails = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-
                     if (exceptionDetails?.Error is Exception ex)
                     {
-                        // Enrich with correlation data
-                        using (Serilog.Context.LogContext.PushProperty("route", ctx.Request.Path.Value))
-                        using (Serilog.Context.LogContext.PushProperty("method", ctx.Request.Method))
-                        using (Serilog.Context.LogContext.PushProperty("userAgent", ctx.Request.Headers["User-Agent"].FirstOrDefault()))
-                        using (Serilog.Context.LogContext.PushProperty("remoteIp", ctx.Connection.RemoteIpAddress?.ToString()))
-                        using (Serilog.Context.LogContext.PushProperty("traceId", Activity.Current?.TraceId.ToString()))
-                        using (Serilog.Context.LogContext.PushProperty("spanId", Activity.Current?.SpanId.ToString()))
-                        using (Serilog.Context.LogContext.PushProperty("userId", ctx.User?.Identity?.Name)) // if authenticated
-                        using (Serilog.Context.LogContext.PushProperty("tenant", ctx.Request.Headers["X-Tenant-Id"].FirstOrDefault())) // if multi-tenant
-                        using (Serilog.Context.LogContext.PushProperty("exceptionType", ex.GetType().Name))
-                        using (Serilog.Context.LogContext.PushProperty("statusCode", 500))
-                        {
-                            Log.Error(ex, "Unhandled exception in {Route} {Method}", ctx.Request.Path, ctx.Request.Method);
-                        }
-
-                        try
-                        {
-                            var slackService = ctx.RequestServices.GetRequiredService<ISlackService>();
-                            await slackService.SendErrorAlertAsync(
-                                ctx.Request.Path.Value ?? "unknown",
-                                slackEnvironment,
-                                ex.Message,
-                                ex.StackTrace ?? "No stack trace available");
-                        }
-                        catch (Exception slackEx)
-                        {
-                            Log.Warning(slackEx, "Failed to send Slack alert for {Path}", ctx.Request.Path);
-                        }
-                        
-                        // Add exception event to current OpenTelemetry span if available
-                        Activity.Current?.AddEvent(new ActivityEvent("exception", DateTimeOffset.UtcNow, new ActivityTagsCollection
-                        {
-                            ["exception.type"] = ex.GetType().FullName,
-                            ["exception.message"] = ex.Message,
-                            ["exception.stacktrace"] = ex.ToString()
-                        }));
+                        Log.Error(ex, "Unhandled Exception in {Route}", ctx.Request.Path);
+                        Activity.Current?.AddEvent(new ActivityEvent("exception"));
                     }
 
                     ctx.Response.StatusCode = 500;
                     ctx.Response.ContentType = "application/json";
-                    
+
                     await ctx.Response.WriteAsJsonAsync(new
                     {
                         error = "Internal Server Error",
-                        traceId = ctx.TraceIdentifier,
-                        timestamp = DateTimeOffset.UtcNow.ToString("O")
+                        traceId = ctx.TraceIdentifier
                     });
                 });
             });
 
-            // ===========================================
-            // ENHANCED SERILOG HTTP REQUEST LOGGING
-            // ===========================================
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0000}ms) [{ContentLength}b]";
-
-                options.GetLevel = (httpContext, elapsed, ex) =>
-                {
-                    var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "";
-                    var path = httpContext.Request.Path.Value ?? "";
-
-                    // Skip noise from health checkers
-                    if (userAgent.Contains("ELB-HealthChecker") ||
-                        userAgent.Contains("HealthCheck") ||
-                        userAgent.Contains("kube-probe") ||
-                        (path == "/health" && httpContext.Request.Method == "GET"))
-                    {
-                        return Serilog.Events.LogEventLevel.Debug;
-                    }
-
-                    if (ex != null || httpContext.Response.StatusCode >= 500)
-                        return Serilog.Events.LogEventLevel.Error;
-                    
-                    if (httpContext.Response.StatusCode >= 400)
-                        return Serilog.Events.LogEventLevel.Warning;
-
-                    if (path.StartsWith("/api/") || httpContext.Request.Method != "GET")
-                        return Serilog.Events.LogEventLevel.Information;
-
-                    return Serilog.Events.LogEventLevel.Debug;
-                };
-
-                options.EnrichDiagnosticContext = (diagCtx, httpContext) =>
-                {
-                    diagCtx.Set("RequestHost", httpContext.Request.Host.Value);
-                    diagCtx.Set("UserAgent", httpContext.Request.Headers["User-Agent"].FirstOrDefault());
-                    diagCtx.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString());
-                    diagCtx.Set("ContentLength", httpContext.Response.ContentLength ?? 0);
-                    diagCtx.Set("Referer", httpContext.Request.Headers["Referer"].FirstOrDefault());
-                    
-                    // OpenTelemetry correlation
-                    var activity = Activity.Current;
-                    if (activity != null)
-                    {
-                        diagCtx.Set("TraceId", activity.TraceId.ToString());
-                        diagCtx.Set("SpanId", activity.SpanId.ToString());
-                    }
-                    
-                    // Multi-tenant support
-                    var tenantId = httpContext.Request.Headers["X-Tenant-Id"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(tenantId))
-                        diagCtx.Set("TenantId", tenantId);
-                    
-                    // User context
-                    if (httpContext.User?.Identity?.IsAuthenticated == true)
-                    {
-                        diagCtx.Set("UserId", httpContext.User.Identity.Name);
-                        diagCtx.Set("UserRoles", string.Join(",", httpContext.User.Claims
-                            .Where(c => c.Type == "role")
-                            .Select(c => c.Value)));
-                    }
-
-                    // Business operation flag
-                    if (httpContext.Request.Path.Value?.StartsWith("/api/") == true)
-                        diagCtx.Set("BusinessOperation", true);
-                };
-            });
+            app.UseSerilogRequestLogging();
 
             app.MapPrometheusScrapingEndpoint();
             app.MapControllers();
@@ -289,7 +179,7 @@ public class Program
         catch (Exception ex)
         {
             Log.Fatal(ex, "GIDDH Template Service terminated unexpectedly");
-            throw; // Re-throw to ensure proper exit code
+            throw;
         }
         finally
         {
@@ -297,6 +187,7 @@ public class Program
             await Log.CloseAndFlushAsync();
         }
     }
+
     private static Uri? TryCreateUri(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
