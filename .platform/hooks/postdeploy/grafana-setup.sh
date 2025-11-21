@@ -52,7 +52,7 @@ local.file_match "logs" {
       job       = "application",
       namespace = "/var/log/template-logs",
       __path__  = "/var/log/template-logs/*.log",
-    }
+    },
   ]
   ignore_older_than = "24h"
   sync_period       = "10s"
@@ -76,7 +76,7 @@ loki.process "log_process" {
       company       = json_path(local.file.endpoints.content, ".company")[0],
       product       = json_path(local.file.endpoints.content, ".product")[0],
       service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
-      instance      = constants.hostname
+      instance      = constants.hostname,
     }
   }
 }
@@ -85,7 +85,7 @@ loki.write "log_write" {
   endpoint {
     url = json_path(local.file.endpoints.content, ".logs.url")[0]
     headers = {
-      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0]
+      "X-Scope-OrgID" = json_path(local.file.endpoints.content, ".orgId")[0],
     }
     retry_on_http_429 = true
   }
@@ -107,7 +107,7 @@ prometheus.scrape "app_metrics_scrape" {
     {
       __address__      = "127.0.0.1:5000",
       __metrics_path__ = "/metrics",
-      job              = "giddh-template-app"
+      job              = "giddh-template-app",
     },
   ]
   forward_to = [prometheus.relabel.metrics_relabel.receiver]
