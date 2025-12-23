@@ -162,11 +162,11 @@ namespace GiddhTemplate.Services
             var invalidChars = Path.GetInvalidFileNameChars();
             var sanitized = new StringBuilder();
 
-            foreach (char c in fileName)
+            foreach (char character in fileName)
             {
-                if (!invalidChars.Contains(c))
+                if (!invalidChars.Contains(character))
                 {
-                    sanitized.Append(c);
+                    sanitized.Append(character);
                 }
                 else
                 {
