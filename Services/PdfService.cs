@@ -147,6 +147,36 @@ namespace GiddhTemplate.Services
             "data:font/truetype;charset=utf-8;base64," +
             Convert.ToBase64String(File.ReadAllBytes(filePath));
 
+        /// <summary>
+        /// Sanitizes a filename by removing invalid characters
+        /// </summary>
+        /// <param name="fileName">The filename to sanitize</param>
+        /// <returns>A sanitized filename safe for file system use</returns>
+        private string SanitizeFileName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return $"PDF_{DateTime.Now:yyyyMMddHHmmss}";
+            }
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var sanitized = new StringBuilder();
+
+            foreach (char c in fileName)
+            {
+                if (!invalidChars.Contains(c))
+                {
+                    sanitized.Append(c);
+                }
+                else
+                {
+                    sanitized.Append('_');
+                }
+            }
+
+            return sanitized.ToString().Trim('_');
+        }
+
         private string CreatePdfDocument(
             string header,
             string body,
@@ -338,7 +368,41 @@ namespace GiddhTemplate.Services
                 await page.SetContentAsync(html);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
-                return await page.PdfDataAsync(pdfOptions);
+                byte[] pdfBytes = await page.PdfDataAsync(pdfOptions);
+
+                // Save PDF to Downloads folder - only in local/development environment
+                string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
+                                     Environment.GetEnvironmentVariable("ENVIRONMENT");
+                
+                if (string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(environment, "Local", StringComparison.OrdinalIgnoreCase) ||
+                    string.IsNullOrWhiteSpace(environment))
+                {
+                    string fileName = !string.IsNullOrWhiteSpace(request?.PdfRename) 
+                        ? request.PdfRename 
+                        : $"PDF_{DateTime.Now:yyyyMMddHHmmss}";
+
+                    string downloadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+                    
+                    if (!Directory.Exists(downloadsPath))
+                    {
+                        Directory.CreateDirectory(downloadsPath);
+                    }
+
+                    string sanitizedFileName = SanitizeFileName(fileName);
+                    string fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}.pdf");
+                    
+                    int counter = 1;
+                    while (File.Exists(fullPath))
+                    {
+                        fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}_{counter}.pdf");
+                        counter++;
+                    }
+
+                    await File.WriteAllBytesAsync(fullPath, pdfBytes);
+                }
+
+                return pdfBytes;
             }
             finally
             {

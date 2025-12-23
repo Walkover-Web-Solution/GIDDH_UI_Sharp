@@ -1,0 +1,822 @@
+{
+  "templateType": "TALLY",
+  "pdfRename": "my pdf name for local download",
+  "voucherNumber": "B-251223-1",
+  "voucherDate": "23-12-2025",
+  "voucherType": "INVOICE",
+  "dueDate": "23-12-2025",
+  "shippingDate": "24-12-2025",
+  "customField1": "Custom F1",
+  "customField2": "Custom F2",
+  "customField3": "Custom F3",
+  "shippedVia": "Truck",
+  "stockQuantityWithUnit": "2 btl",
+  "attentionTo": "Divyanshu Ji",
+  "trackingNumber": "MP091999",
+  "placeOfSupply": "Ladakh",
+  "currencyFormat": "SYMBOL",
+  "accountCurrency": {
+    "code": "INR",
+    "symbol": "&#x20b9;"
+  },
+  "company": {
+    "name": "(trigger) New Voucher Logic Unregistered",
+    "headerCompanyName": "(trigger) New Voucher Logic Unregistered",
+    "footerCompanyName": "(trigger) New Voucher Logic Unregistered",
+    "address": "New address",
+    "defaultAddress": "New address",
+    "contactNumber": "91-9864531232",
+    "email": "",
+    "taxNumber": "29MNBHJ3232A3Z3",
+    "logo": {
+      "url": "https://apitest.giddh.com/company/newvouin16255749585340xoofk/image/gog835inhp1766467964943",
+      "size": "50px"
+    },
+    "currency": {
+      "code": "INR",
+      "symbol": "&#x20b9;"
+    },
+    "billing": {
+      "country": "India",
+      "address": "New address",
+      "taxNumber": "29MNBHJ3232A3Z3",
+      "stateCounty": "Karnataka"
+    },
+    "shipping": {
+      "country": "India",
+      "address": "New address",
+      "taxNumber": "29MNBHJ3232A3Z3"
+    }
+  },
+  "customerDetails": {
+    "name": "Ankit Dubey",
+    "contactNumber": "919111525164",
+    "email": "divyanshu@walkover.in"
+  },
+  "customerName": "Ankit Dubey",
+  "customerEmail": "divyanshu@walkover.in",
+  "customerMobileNumber": "919111525164",
+  "billing": {
+    "country": "India",
+    "address": "",
+    "taxNumber": "",
+    "stateCounty": "Ladakh"
+  },
+  "shipping": {
+    "country": "India",
+    "address": "",
+    "taxNumber": "",
+    "stateCounty": "Ladakh"
+  },
+  "warehouseDetails": {
+    "name": "Branch 1 warehouse",
+    "address": ""
+  },
+  "theme": {
+    "marginEnable": true,
+    "margin": {
+      "top": 20.0,
+      "right": 20.0,
+      "bottom": 0.0,
+      "left": 20.0
+    },
+    "primaryColor": "#f63407",
+    "secondaryColor": "#ffffff",
+    "font": {
+      "family": "Roboto",
+      "fontSizeDefault": 14,
+      "fontSizeMedium": 12,
+      "fontSizeSmall": 10
+    }
+  },
+  "entries": [
+    {
+      "date": "23-12-2025",
+      "accountName": "Sales",
+      "description": "Particular description at time voucher creation",
+      "amount": {
+        "amountForAccount": 1000.000,
+        "amountForCompany": 1000.000
+      },
+      "taxableValue": {
+        "amountForAccount": 500.000,
+        "amountForCompany": 500.000
+      },
+      "subTotal": {
+        "amountForAccount": 1000.000,
+        "amountForCompany": 1000.000
+      },
+      "discounts": [
+        {
+          "calculationMethod": "PERCENTAGE",
+          "accountName": "Discount",
+          "accountUniqueName": "discount",
+          "amount": {
+            "amountForAccount": 500.000,
+            "amountForCompany": 500.000
+          },
+          "discountValue": 50
+        }
+      ],
+      "discountTotal": {
+        "amountForAccount": 500.000,
+        "amountForCompany": 500.000
+      },
+      "taxes": [
+        {
+          "taxType": "gst",
+          "calculationMethod": "OnTaxableAmount",
+          "accountName": "IGST",
+          "accountUniqueName": "igst",
+          "taxAccountUniqueName": "igst",
+          "uniqueName": "gst12",
+          "amount": {
+            "amountForAccount": 60.000,
+            "amountForCompany": 60.000
+          },
+          "taxPercent": 12.00,
+          "considerInItemTotal": true,
+          "considerInVoucherTotal": true,
+          "showOnVoucher": true
+        }
+      ],
+      "taxTotal": {
+        "amountForAccount": 60.000,
+        "amountForCompany": 60.000
+      },
+      "entryTotal": {
+        "amountForAccount": 560.000,
+        "amountForCompany": 560.000
+      },
+      "grandTotal": {
+        "amountForAccount": 560.000,
+        "amountForCompany": 560.000
+      },
+      "sumOfDiscounts": {
+        "amountForCompany": 500.000,
+        "amountForAccount": 500.000
+      },
+      "salesPerson": {
+        "name": "Saurabh",
+        "uniqueName": "divyanshuarchived",
+        "email": "",
+        "mobileNumber": "919111525164"
+      },
+      "usedQuantity": 0,
+      "stock": null
+    },
+    {
+      "date": "23-12-2025",
+      "accountName": "Sales",
+      "hsnNumber": "232323",
+      "amount": {
+        "amountForAccount": 100.000,
+        "amountForCompany": 100.000
+      },
+      "taxableValue": {
+        "amountForAccount": 100.000,
+        "amountForCompany": 100.000
+      },
+      "subTotal": {
+        "amountForAccount": 100.000,
+        "amountForCompany": 100.000
+      },
+      "discounts": [],
+      "taxes": [
+        {
+          "taxType": "gst",
+          "calculationMethod": "OnTaxableAmount",
+          "accountName": "IGST",
+          "accountUniqueName": "igst",
+          "taxAccountUniqueName": "igst2",
+          "uniqueName": "gst28",
+          "amount": {
+            "amountForAccount": 28.000,
+            "amountForCompany": 28.000
+          },
+          "taxPercent": 28.00,
+          "considerInItemTotal": true,
+          "considerInVoucherTotal": true,
+          "showOnVoucher": true
+        },
+        {
+          "taxType": "tdspay",
+          "calculationMethod": "OnTaxableAmount",
+          "accountName": "TDSPAY",
+          "accountUniqueName": "tdspay",
+          "taxAccountUniqueName": "tdspayable",
+          "uniqueName": "tds10",
+          "amount": {
+            "amountForAccount": 10.000,
+            "amountForCompany": 10.000
+          },
+          "taxPercent": 10.00,
+          "considerInItemTotal": true,
+          "considerInVoucherTotal": true,
+          "showOnVoucher": true
+        }
+      ],
+      "taxTotal": {
+        "amountForAccount": 28.000,
+        "amountForCompany": 28.000
+      },
+      "otherTaxTotal": {
+        "amountForAccount": -10.000,
+        "amountForCompany": -10.000
+      },
+      "entryTotal": {
+        "amountForAccount": 128.000,
+        "amountForCompany": 128.000
+      },
+      "grandTotal": {
+        "amountForAccount": 118.000,
+        "amountForCompany": 118.000
+      },
+      "salesPerson": {
+        "name": "Saurabh",
+        "uniqueName": "divyanshuarchived",
+        "email": "",
+        "mobileNumber": "919111525164"
+      },
+      "usedQuantity": 0,
+      "stock": {
+        "name": "Testing Stock Btl",
+        "uniqueName": "testingstockbtl",
+        "stockUnit": {
+          "name": "Bottles",
+          "code": "btl",
+          "uniqueName": "sfym9qopxMjpORX9FTYU"
+        },
+        "variant": {
+          "name": "Testing Stock Btl / v2 / v3",
+          "uniqueName": "testingstockbtlv2v31757423803676aqxijse035"
+        },
+        "skuCodeHeading": "SKU Code",
+        "customField1": {
+          "key": "Custom Field 1",
+          "value": null
+        },
+        "customField2": {
+          "key": "Custom Field 2",
+          "value": null
+        },
+        "quantity": 1,
+        "rate": {
+          "amountForAccount": 100.000,
+          "amountForCompany": 100.000
+        },
+        "type": "PRODUCT",
+        "taxInclusive": false,
+        "showVariant": true,
+        "hasVariants": false,
+        "unitRates": []
+      }
+    },
+    {
+      "date": "23-12-2025",
+      "accountName": "Sales",
+      "description": "Particular description at time voucher creation 2",
+      "hsnNumber": "232323",
+      "amount": {
+        "amountForAccount": 120.000,
+        "amountForCompany": 120.000
+      },
+      "taxableValue": {
+        "amountForAccount": 120.000,
+        "amountForCompany": 120.000
+      },
+      "subTotal": {
+        "amountForAccount": 120.000,
+        "amountForCompany": 120.000
+      },
+      "discounts": [],
+      "taxes": [
+        {
+          "taxType": "gst",
+          "calculationMethod": "OnTaxableAmount",
+          "accountName": "IGST",
+          "accountUniqueName": "igst",
+          "taxAccountUniqueName": "igst2",
+          "uniqueName": "gst28",
+          "amount": {
+            "amountForAccount": 33.600,
+            "amountForCompany": 33.600
+          },
+          "taxPercent": 28.00,
+          "considerInItemTotal": true,
+          "considerInVoucherTotal": true,
+          "showOnVoucher": true
+        }
+      ],
+      "taxTotal": {
+        "amountForAccount": 33.600,
+        "amountForCompany": 33.600
+      },
+      "entryTotal": {
+        "amountForAccount": 153.600,
+        "amountForCompany": 153.600
+      },
+      "grandTotal": {
+        "amountForAccount": 153.600,
+        "amountForCompany": 153.600
+      },
+      "salesPerson": {
+        "name": "Saurabh",
+        "uniqueName": "divyanshuarchived",
+        "email": "",
+        "mobileNumber": "919111525164"
+      },
+      "usedQuantity": 0,
+      "stock": {
+        "name": "Bottle Stock",
+        "uniqueName": "bottlestock",
+        "stockUnit": {
+          "name": "Bottles",
+          "code": "btl",
+          "uniqueName": "sfym9qopxMjpORX9FTYU"
+        },
+        "variant": {
+          "name": "Bottle Stock",
+          "uniqueName": "bottlestock1757158790246bmmylexozc"
+        },
+        "skuCodeHeading": "SKU Code",
+        "customField1": {
+          "key": "Custom Field 1",
+          "value": null
+        },
+        "customField2": {
+          "key": "Custom Field 2",
+          "value": null
+        },
+        "quantity": 1,
+        "rate": {
+          "amountForAccount": 120.000,
+          "amountForCompany": 120.000
+        },
+        "type": "PRODUCT",
+        "taxInclusive": false,
+        "showVariant": false,
+        "hasVariants": false,
+        "unitRates": []
+      }
+    }
+  ],
+  "taxableAmount": {
+    "amountForAccount": 1220.000,
+    "amountForCompany": 1220.000
+  },
+  "taxableTotal": {
+    "amountForAccount": 720.000,
+    "amountForCompany": 720.000
+  },
+  "totalTax": {
+    "amountForAccount": 121.600,
+    "amountForCompany": 121.600
+  },
+  "grandTotal": {
+    "amountForAccount": 832.000,
+    "amountForCompany": 832.000
+  },
+  "totalDue": {
+    "amountForAccount": 0.00,
+    "amountForCompany": 0.00
+  },
+  "paidAmount": {
+    "amountForAccount": 832.00,
+    "amountForCompany": 0
+  },
+  "balance": {
+    "amountForAccount": 0.00,
+    "amountForCompany": 0.00
+  },
+  "roundOff": "0.400",
+  "totalInWords": {
+    "amountForAccount": "Eight Hundred Forty Two Only",
+    "amountForCompany": "Eight Hundred Forty Two Only"
+  },
+  "gstTaxesTotal": [
+    {
+      "taxType": "gst",
+      "accountName": "IGST",
+      "accountUniqueName": "igst",
+      "amount": {
+        "amountForAccount": 121.600,
+        "amountForCompany": 121.600
+      },
+      "taxPercent": 12.00,
+      "considerInItemTotal": true,
+      "considerInVoucherTotal": true,
+      "showOnVoucher": true,
+      "key": "iamt"
+    }
+  ],
+  "gstTaxesTotalOnly": [
+    {
+      "taxType": "gst",
+      "accountName": "IGST",
+      "accountUniqueName": "igst",
+      "amount": {
+        "amountForAccount": 121.600,
+        "amountForCompany": 121.600
+      },
+      "taxPercent": 12.00,
+      "considerInItemTotal": true,
+      "considerInVoucherTotal": true,
+      "showOnVoucher": true,
+      "key": "iamt"
+    }
+  ],
+  "taxBifurcation": [
+    {
+      "gstOrVatTaxRate": 12.00,
+      "salesTaxRate": 0,
+      "taxName": null,
+      "taxableValue": 500.00,
+      "iamt": 60.00,
+      "camt": null,
+      "samt": null,
+      "utgstAmount": null,
+      "vatamt": null,
+      "tcsamt": 0,
+      "tdsamt": 0,
+      "salesTaxAmount": null,
+      "entryTotal": 560.00,
+      "csTaxRate": 0,
+      "othTaxRate": 0,
+      "csAmountList": [],
+      "othAmountList": []
+    },
+    {
+      "gstOrVatTaxRate": 28.00,
+      "salesTaxRate": 0,
+      "taxName": null,
+      "taxableValue": 220.00,
+      "iamt": 61.60,
+      "camt": null,
+      "samt": null,
+      "utgstAmount": null,
+      "vatamt": null,
+      "tcsamt": 0,
+      "tdsamt": 0,
+      "salesTaxAmount": null,
+      "entryTotal": 281.60,
+      "csTaxRate": 0,
+      "othTaxRate": 0,
+      "csAmountList": [],
+      "othAmountList": []
+    }
+  ],
+  "taxBifurcationEntryTotal": {
+    "amountForAccount": 841.60,
+    "amountForCompany": 841.60
+  },
+  "sumOfTaxes": [
+    {
+      "amountForAccount": 121.600,
+      "amountForCompany": 121.600
+    }
+  ],
+  "tdsTotalTax": {
+    "amountForAccount": 10.000,
+    "amountForCompany": 10.000
+  },
+  "tcsTotalTax": {
+    "amountForAccount": 0.000,
+    "amountForCompany": 0.000
+  },
+  "tcsTaxes": "",
+  "tdsTaxes": "",
+  "otherTotal": [],
+  "cessTotal": [],
+  "gstEntriesTotal": {
+    "amountForAccount": 842.000,
+    "amountForCompany": 842.000
+  },
+  "total": {
+    "amountForAccount": 832.000,
+    "amountForCompany": 832.000
+  },
+  "QRCodeBase64String": "iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAQAAAABRBrPYAAADgElEQVR4Xu2ZTa6bShCFy/KAIUtgJ2ZjlrDExmAnLMFDBojK+aq5jk2e9DKsVtzSRRg+Rzquv9Md879ZTzs/+c/1xU7ri53WFzut9Nhi",
+  "bankQRDetails": {
+    "bankQRCodeBase64": "iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQAAAACoxAthAAADXUlEQVR4Xu3XQW7bMBAFUBpaeKkj6Cg6mnU0Aj1IfQQvvRDC8v9PUqrjxBzHKYpgCEGgh/8xtTSW3ZDMI9wWHo8QQx1DyvN5DXMur6XS"
+  },
+  "showBankQR": true,
+  "imageSignature": "https://apitest.giddh.com/company/newvouin16255749585340xoofk/image/1766488068067s62euw0eao",
+  "sealPath": "https://apitest.giddh.com/seal/paid",
+  "message1": "This is note which created at time to template create or update.",
+  "message2": "This note written at time of voucher creation",
+  "isTaxesApplied": true,
+  "isBusinessToCustomerInvoice": true,
+  "isBusinessToBusinessInvoice": false,
+  "isMultipleCurrency": false,
+  "displayBaseCurrency": true,
+  "displayPlaceOfSupply": true,
+  "showSectionsInline": false,
+  "showVariantImage": false,
+  "showSplittedDate": true,
+  "showDueDate": true,
+  "showDueMonth": null,
+  "reversecharge": false,
+  "companyTaxType": "GSTIN",
+  "accountTaxType": "GSTIN",
+  "billingCountyOrStateLabel": "state",
+  "shippingCountyOrStateLabel": "state",
+  "settings": {
+    "showlogo": {
+      "label": "",
+      "display": true
+    },
+    "taxableAmount": {
+      "label": "Taxable Amount",
+      "display": true
+    },
+    "showNotesAtLastPage": {
+      "label": "",
+      "display": true
+    },
+    "tds": {
+      "label": "TDS",
+      "display": true
+    },
+    "imageSignature": {
+      "label": "1766488068067s62euw0eao",
+      "display": true
+    },
+    "showMessage2": {
+      "label": "This note written at time of voucher creation",
+      "display": true
+    },
+    "tcs": {
+      "label": "TCS",
+      "display": true
+    },
+    "grandTotal": {
+      "label": "Invoice Total",
+      "display": true
+    },
+    "totalDue": {
+      "label": "Total Due",
+      "display": true
+    },
+    "headerCompanyName": {
+      "label": "(trigger) New Voucher Logic Unregistered",
+      "display": true
+    },
+    "footerCompanyName": {
+      "label": "(trigger) New Voucher Logic Unregistered",
+      "display": true
+    },
+    "displayExportMessage": {
+      "label": "",
+      "display": false
+    },
+    "grandTotalInAccountsCurrency": {
+      "label": "Invoice Total",
+      "display": true
+    },
+    "totalInWordsInAccountsCurrency": {
+      "label": "Invoice Total (In words)",
+      "display": true
+    },
+    "totalTax": {
+      "label": "Total Tax*",
+      "display": true
+    },
+    "thanks": {
+      "label": "Thank Message from template",
+      "display": true
+    },
+    "taxBifurcation": {
+      "label": "taxRateBifurcation",
+      "display": true
+    },
+    "totalInWords": {
+      "label": "Invoice Total (In words)",
+      "display": true
+    },
+    "companyAddress": {
+      "label": "Jabalpur, M.P",
+      "display": true
+    },
+    "textUnderSlogan": {
+      "label": "Any text under signature line",
+      "display": true
+    },
+    "slogan": {
+      "label": "New Voucher Logic Unregistered",
+      "display": false
+    },
+    "message1": {
+      "label": "This is note which created at time to template create or update.",
+      "display": true
+    },
+    "warehouseAddress": {
+      "label": "",
+      "display": true
+    },
+    "shippingDate": {
+      "label": "Ship Date",
+      "display": true
+    },
+    "customField1": {
+      "label": "Custom Field 1",
+      "display": true
+    },
+    "customField2": {
+      "label": "Custom Field 2",
+      "display": true
+    },
+    "customField3": {
+      "label": "Custom Field 3",
+      "display": true
+    },
+    "shippedVia": {
+      "label": "Ship Via",
+      "display": true
+    },
+    "dueDate": {
+      "label": "Due Date",
+      "display": true
+    },
+    "displayExchangeRate": {
+      "label": "Exchange/Conversion Rate",
+      "display": true
+    },
+    "displayPlaceOfSupply": {
+      "label": "Place Of Supply",
+      "display": true
+    },
+    "displayPlaceOfCountry": {
+      "label": "Country of Supply",
+      "display": true
+    },
+    "companyTaxNumber": {
+      "label": "GSTIN",
+      "display": true
+    },
+    "shippingTaxNumber": {
+      "label": "GSTIN",
+      "display": true
+    },
+    "billingTaxNumber": {
+      "label": "GSTIN",
+      "display": true
+    },
+    "voucherNumber": {
+      "label": "Invoice No.",
+      "display": true
+    },
+    "voucherDate": {
+      "label": "Invoice Date",
+      "display": true
+    },
+    "customerName": {
+      "label": "Customer Name",
+      "display": true
+    },
+    "customerEmail": {
+      "label": "email",
+      "display": true
+    },
+    "customerContactNumber": {
+      "label": "contact",
+      "display": true
+    },
+    "attentionTo": {
+      "label": "Attention To",
+      "display": true
+    },
+    "trackingNumber": {
+      "label": "Tracking No.",
+      "display": true
+    },
+    "showQrCode": {
+      "label": "",
+      "display": true
+    },
+    "showEInvoiceDetails": {
+      "label": "",
+      "display": true
+    },
+    "displayLutNumber": {
+      "label": "LUT Number",
+      "display": true
+    },
+    "showCompanyAddress": {
+      "label": "",
+      "display": true
+    },
+    "pan": {
+      "label": "PAN",
+      "display": true
+    },
+    "formNameInvoice": {
+      "label": "INVOICE",
+      "display": true
+    },
+    "formNameTaxInvoice": {
+      "label": "TAX INVOICE",
+      "display": true
+    },
+    "address": {
+      "label": "",
+      "display": true
+    },
+    "billingAddress": {
+      "label": "Billing Address",
+      "display": true
+    },
+    "billingStateCounty": {
+      "label": "state",
+      "display": true
+    },
+    "shippingAddress": {
+      "label": "Shipping Address",
+      "display": true
+    },
+    "shippingStateCounty": {
+      "label": "state",
+      "display": true
+    },
+    "gstComposition": {
+      "label": "Registered under Composition Scheme",
+      "display": true
+    },
+    "displayBaseCurrency": {
+      "label": "",
+      "display": true
+    },
+    "sNo": {
+      "label": "#",
+      "display": true
+    },
+    "item": {
+      "label": "Description",
+      "display": true
+    },
+    "description": {
+      "label": "Some label",
+      "display": true
+    },
+    "showDescriptionInRows": {
+      "label": "",
+      "display": true
+    },
+    "date": {
+      "label": "Date",
+      "display": true
+    },
+    "hsnSac": {
+      "label": "HSN/SAC",
+      "display": true
+    },
+    "quantity": {
+      "label": "Qty.",
+      "display": true
+    },
+    "rate": {
+      "label": "Rate/ Item",
+      "display": true
+    },
+    "discount": {
+      "label": "Dis./ Item",
+      "display": true
+    },
+    "taxes": {
+      "label": "Taxes",
+      "display": true
+    },
+    "total": {
+      "label": "Total",
+      "display": true
+    },
+    "totalQuantity": {
+      "label": "totalQuantity",
+      "display": true
+    },
+    "showVariantImage": {
+      "label": "Image",
+      "display": false
+    },
+    "taxableValue": {
+      "label": "Taxable Amount",
+      "display": true
+    },
+    "previousDue": {
+      "label": "Previous Due",
+      "display": true
+    },
+    "amountBeforeDiscount": {
+      "label": "Total Before Dis.",
+      "display": true
+    },
+    "skuCode": {
+      "label": null,
+      "display": true
+    },
+    "otherTaxBifurcation": {
+      "label": "Tax",
+      "display": true
+    }
+  }
+}
