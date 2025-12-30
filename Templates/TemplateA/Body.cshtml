@@ -288,6 +288,19 @@
                                                             </div>
                                                         }
                                                     </div>
+
+                                                    @if (Model?.AccountCustomFields != null && Model.AccountCustomFields.Any())
+                                                    {
+                                                        <div class="grid-view pd-t1">
+                                                            @foreach (var customField in Model.AccountCustomFields)
+                                                            {
+                                                                <div class="grid-item">
+                                                                    <p>@customField.Label</p>
+                                                                    <p>@customField.Value</p>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    }
                                                 </td>
                                             </tr>
                                             <tr class="mr-b1 mr-t1">
