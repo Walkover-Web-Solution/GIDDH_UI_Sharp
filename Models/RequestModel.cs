@@ -115,7 +115,7 @@ namespace InvoiceData
     public class LabelValue
     {
         public string? Label { get; set; } = string.Empty;
-        public object? Value { get; set; } = null;
+        public string? Value { get; set; } = string.Empty;
     }
 
     public class EInvoiceDetails
