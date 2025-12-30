@@ -112,6 +112,12 @@ namespace InvoiceData
         public bool? Display { get; set; }
     }
 
+    public class LabelValue
+    {
+        public string? Label { get; set; } = string.Empty;
+        public string? Value { get; set; } = string.Empty;
+    }
+
     public class EInvoiceDetails
     {
         public string? IrnNumber { get; set; } = string.Empty;
@@ -415,5 +421,6 @@ namespace InvoiceData
         public VoucherTypeEnums VoucherTypeEnums { get; set; }
         public double? PaymentTotal { get; set; }
         public string? ChequeNumber { get; set; }
+        public List<LabelValue>? AccountCustomFields { get; set; }
     }
 }
