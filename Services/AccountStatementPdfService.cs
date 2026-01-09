@@ -57,8 +57,6 @@ namespace GiddhTemplate.Services
                     commonStyles,
                     bodyStyles,
                     request);
-                // Debug: Log HTML content length instead of full content
-                Console.WriteLine($"HTML content generated: {htmlContent.Length} characters");
                 await page.SetContentAsync(htmlContent);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
@@ -128,16 +126,7 @@ namespace GiddhTemplate.Services
                     if (fontCSS.StartsWith("@font-face") && fontCSS.Contains("font-family"))
                     {
                         themeCSS.Append(fontCSS);
-                        Console.WriteLine($"Font CSS loaded successfully: {fontCSS.Length} characters");
                     }
-                    else
-                    {
-                        Console.WriteLine("Invalid font CSS format, skipping font loading");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Font CSS is empty, using system fonts");
                 }
             }
             catch (Exception ex)

@@ -32,10 +32,7 @@ namespace GiddhTemplate.Controllers
             var jsonString = JsonSerializer.Serialize(requestObj);
             GiddhTemplate.Models.Root request = JsonSerializer.Deserialize<GiddhTemplate.Models.Root>(jsonString,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            // Debug logging
-            Console.WriteLine($"JSON: {jsonString}");
-
+                
             if (request == null || string.IsNullOrEmpty(request.AccountName))
             {
                 return BadRequest("Invalid request data. Ensure payload matches expected format.");
