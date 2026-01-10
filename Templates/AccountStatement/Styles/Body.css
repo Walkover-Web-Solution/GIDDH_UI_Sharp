@@ -1,8 +1,3 @@
-main {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
 /* Header Section */
 .header-section {
   margin-bottom: 30px;
@@ -23,7 +18,6 @@ main {
 .address-details p, .company-details p {
   margin: 2px 0;
   color: #666;
-  font-size: 12px;
 }
 
 /* Statement Title Section */
@@ -34,7 +28,7 @@ main {
 
 .title-container {
   display: inline-block;
-  text-align: center;
+  width: 300px;
 }
 
 .statement-title {
@@ -83,32 +77,29 @@ main {
   border: 1px solid #ddd;
 }
 
+.summary-label, .summary-value, .summary-total-label, .summary-total-value {
+  border: 1px solid #ddd;
+  font-weight: bold;
+}
+
 .summary-label {
   padding: 6px 8px;
-  border: 1px solid #ddd;
   color: #666;
+  font-weight: normal;
 }
 
 .summary-value {
   padding: 6px 8px;
-  border: 1px solid #ddd;
   text-align: right;
-  font-weight: bold;
 }
 
-.summary-total-label {
+.summary-total-label, .summary-total-value {
   padding: 8px;
-  border: 1px solid #ddd;
-  font-weight: bold;
   color: #000;
 }
 
 .summary-total-value {
-  padding: 8px;
-  border: 1px solid #ddd;
   text-align: right;
-  font-weight: bold;
-  color: #000;
 }
 
 /* Transaction Table */
@@ -134,166 +125,26 @@ main {
   border: 1px solid #ddd;
 }
 
-.main-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Utilities */
-.w-100 { width: 100%; }
-.text-left { text-align: left; }
-.bg-light { background-color: #f9f9f9; }
-
-/* Header Section */
+/* Header Table */
 .header-table {
-    margin-bottom: 30px;
-    border-collapse: collapse;
+  margin-bottom: 30px;
+  border-collapse: collapse;
 }
 
-.address-block h2 {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0 0 5px 0;
-}
-
-.address-details p {
-    margin: 2px 0;
-    color: #777;
-    font-size: 14px;
-}
-
-/* Statement Title & Divider Section */
-.statement-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-bottom: 20px;
-}
-
-.statement-header .title {
-    font-size: 26px;
-    margin: 0 0 5px 0;
-    font-weight: bold;
-}
-
-.header-divider {
-    border-top: 2px solid #000;
-    width: 350px; /* Matches the width of the summary table */
-    margin: 5px 0;
-}
-
-.date-range {
-    color: #666;
-    font-size: 16px;
-    margin: 5px 0;
-    text-align: right;
-    width: 350px;
-}
-
-/* Account Summary Table (Right Side) */
-.summary-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 40px;
-}
-
-.summary-table {
-    width: 350px;
-    background-color: #e6e6e6; /* Grey header bg */
-    border-collapse: collapse;
-}
-
-.summary-table thead th {
-    background-color: #e0e0e0;
-    color: #666;
-    text-align: left;
-    padding: 8px 10px;
-    font-weight: bold;
-    font-size: 15px;
-}
-
-.summary-table tbody tr {
-    background-color: #f2f2f2; /* Light grey body bg */
-}
-
-.summary-table td {
-    padding: 8px 10px;
-    font-size: 15px;
-}
-
-.summary-table .label {
-    color: #666;
-}
-
-.summary-table .value {
-    text-align: right;
-    font-weight: bold;
-}
-
-.summary-table tfoot {
-    background-color: #f2f2f2;
-}
-
-.summary-table .divider {
-    border-top: 2px solid #000;
-    margin: 5px 0;
-}
-
-.summary-table .label-total {
-    color: #666;
-    font-weight: normal;
-}
-
-.summary-table .value-total {
-    text-align: right;
-    font-weight: bold;
-}
-
-/* Main Transactions Table */
-.main-table {
-    border-collapse: collapse;
-}
-
-.main-table thead {
-    background-color: #222; /* Black header */
-    color: #fff;
-}
-
-.main-table th {
-    padding: 12px 10px;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.main-table td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-}
-
-/* Footer Total Section */
-.transaction-section {
-    border-bottom: 1px solid #ddd;
-}
-
+/* Footer Section */
 .table-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 10px;
-    border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
 }
 
 .footer-row {
-    display: flex;
-    gap: 50px; /* Space between label and value */
-    align-items: center;
+  display: flex;
+  gap: 50px;
+  align-items: center;
 }
 
-.footer-label {
-    font-weight: bold;
-    font-size: 15px;
-}
-
-.footer-value {
-    font-weight: bold;
-    font-size: 15px;
+.footer-label, .footer-value {
+  font-weight: 600;
 }

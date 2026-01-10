@@ -107,19 +107,19 @@
                     <tbody>
                         <tr>
                             <td class="summary-label">Opening Balance</td>
-                            <td class="summary-value">
+                            <td class="summary-value font-tabular-nums">
                                 @(Model.AccountAddress.Currency?.Symbol ?? "")@(Model.AccountSummary.OpeningBalance?.Amount ?? 0.0m)
                             </td>
                         </tr>
                         <tr>
                             <td class="summary-label">Invoiced Amount</td>
-                            <td class="summary-value">
+                            <td class="summary-value font-tabular-nums">
                                 @(Model.AccountAddress.Currency?.Symbol ?? "")@Model.AccountSummary.DebitTotal
                             </td>
                         </tr>
                         <tr>
                             <td class="summary-label">Amount Paid</td>
-                            <td class="summary-value">
+                            <td class="summary-value font-tabular-nums">
                                 @(Model.AccountAddress.Currency?.Symbol ?? "")@Model.AccountSummary.CreditTotal
                             </td>
                         </tr>
@@ -127,7 +127,7 @@
                     <tfoot>
                         <tr>
                             <td class="summary-total-label">Balance Due</td>
-                            <td class="summary-total-value">
+                            <td class="summary-total-value font-tabular-nums">
                                 @if (Model.AccountSummary.ClosingBalance?.Amount >= 0)
                                 {
                                     @((Model.AccountSummary.ClosingBalance?.Type == "CREDIT" ? "-" : "") + 
@@ -161,10 +161,10 @@
                     {
                         var transaction = Model.TransactionDetailList[i];
                         <tr class="@(i % 2 == 1 ? "bg-light" : "")">
-                            <td>@(transaction.Date ?? "-")</td>
+                            <td class="font-tabular-nums">@(transaction.Date ?? "-")</td>
                             <td>@(transaction.VoucherType ?? "-")</td>
                             <td class="word-break">@(transaction.VoucherNumber ?? "-")</td>
-                            <td class="text-right">
+                            <td class="text-right font-tabular-nums">
                                 @if (transaction.VoucherAmount?.Type == "DEBIT")
                                 {
                                     @transaction.VoucherAmount.Amount
@@ -174,7 +174,7 @@
                                     <span>-</span>
                                 }
                             </td>
-                            <td class="text-right">
+                            <td class="text-right font-tabular-nums">
                                 @if (transaction.VoucherAmount?.Type != "DEBIT")
                                 {
                                     @transaction.VoucherAmount?.Amount
@@ -184,7 +184,7 @@
                                     <span>-</span>
                                 }
                             </td>
-                            <td class="text-right">
+                            <td class="text-right font-tabular-nums">
                                 @if (transaction.ClosingBalance?.Amount >= 0)
                                 {
                                     @((transaction.ClosingBalance?.Type == "CREDIT" ? "-" : "") + transaction.ClosingBalance.Amount)
@@ -205,7 +205,7 @@
         <div class="table-footer">
             <div class="footer-row">
                 <span class="footer-label">Balance Due</span>
-                <span class="footer-value">
+                <span class="footer-value font-tabular-nums">
                     @if (Model?.AccountSummary?.ClosingBalance?.Amount >= 0)
                     {
                         @((Model.AccountSummary.ClosingBalance?.Type == "CREDIT" ? "-" : "") + 
