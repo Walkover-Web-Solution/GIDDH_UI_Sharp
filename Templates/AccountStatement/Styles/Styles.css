@@ -1,0 +1,110 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  color: inherit;
+}
+
+html, body {
+  color: #000;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+/* Base Elements */
+strong {
+  font-weight: 700;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table tr th, table tr td {
+  border: none;
+  text-align: left;
+  padding: 2px;
+  word-break: break-word;
+}
+
+/* Utility Classes */
+.font-tabular-nums {
+  font-variant-numeric: tabular-nums; 
+}
+
+.vertical-align-top {
+  vertical-align: top;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.word-break {
+  word-wrap: break-word;
+}
+
+.w-100 { 
+  width: 100%; 
+}
+
+.bg-light { 
+  background-color: #f9f9f9; 
+}
+
+.bg-black {
+  background-color: #333;
+}
+
+.text-white {
+  color: white;
+}
+
+/* Print Media CSS */
+@media print {
+  table {
+    page-break-inside: auto;
+    page-break-after: auto;
+  }
+}
+
+@page { 
+  @bottom-center {
+     content: "Page " counter(page) " of " counter(pages); /* Show page X of Y format */
+     font-style: bold;
+     font-size: 12px;
+     margin-bottom: 6px;
+  }
+}
+
+@page:first {
+  @bottom-center {
+     content: ""; /* Empty content to hide footer */
+     margin-bottom: 0;
+  }
+}
+@page {
+  size: A4;
+}

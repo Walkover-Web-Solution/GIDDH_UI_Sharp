@@ -141,6 +141,7 @@ public class Program
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ISlackService, SlackService>();
             builder.Services.AddScoped<PdfService>();
+            builder.Services.AddScoped<AccountStatementPdfService>();
             builder.Services.AddControllers();
 
             var app = builder.Build();
