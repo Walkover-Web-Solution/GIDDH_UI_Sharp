@@ -9,6 +9,7 @@ namespace GiddhTemplate.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Route("api/v1/account-statement")]
     public class AccountStatementController : ControllerBase
     {
         private readonly AccountStatementPdfService _accountStatementPdfService;
