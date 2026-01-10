@@ -32,10 +32,10 @@ namespace GiddhTemplate.Services
                 DisplayHeaderFooter = false,
                 MarginOptions = new MarginOptions
                 {
-                    Top = "15px",
-                    Bottom = "20px",
-                    Left = "0px",
-                    Right = "0px"
+                    Top = "20px",
+                    Bottom = "25px",
+                    Left = "20px",
+                    Right = "20px"
                 }
             };
 
@@ -57,6 +57,7 @@ namespace GiddhTemplate.Services
                     commonStyles,
                     bodyStyles,
                     request);
+                Console.WriteLine(htmlContent);
                 await page.SetContentAsync(htmlContent);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
@@ -134,18 +135,7 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"Font loading failed: {ex.Message}");
             }
 
-            // Add default theme variables for account statements
-            themeCSS.Append("html, body {");
-            themeCSS.Append("font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;");
-            themeCSS.Append("--font-size-default: 12px;");
-            themeCSS.Append("--font-size-large: 14px;");
-            themeCSS.Append("--font-size-small: 10px;");
-            themeCSS.Append("--font-size-medium: 11px;");
-            themeCSS.Append("--color-primary: #000000;");
-            themeCSS.Append("--color-secondary: #666666;");
-            themeCSS.Append("}");
-
-            var allStyles = $"{commonStyles}{bodyStyles}{themeCSS}";
+            var allStyles = $"{themeCSS} {commonStyles} {bodyStyles}";
 
             return $@"
             <!DOCTYPE html>
