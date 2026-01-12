@@ -215,7 +215,7 @@
                                                                                     <table>
                                                                                         <tbody>
                                                                                             <tr>
-                                                                                                <td class="border-none p-0"
+                                                                                                <td class="border-none p-0 capitalize"
                                                                                                     width="120px">
                                                                                                     @GetLabel("CustomerName")
                                                                                                 </td>
@@ -292,7 +292,7 @@
                                                                             @if (GetDisplayStatus("BillingStateCounty"))
                                                                             {
                                                                                 <tr>
-                                                                                    <td class="border-none p-0" width="120px">
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("BillingStateCounty")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
@@ -303,7 +303,7 @@
                                                                             @if (GetDisplayStatus("DisplayPlaceOfSupply"))
                                                                             {
                                                                                 <tr>
-                                                                                    <td class="border-none p-0" width="120px">
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("DisplayPlaceOfSupply")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
@@ -314,7 +314,7 @@
                                                                             @if (GetDisplayStatus("AttentionTo"))
                                                                             {
                                                                                 <tr>
-                                                                                    <td class="border-none p-0" width="120px">
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("AttentionTo")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
@@ -325,7 +325,7 @@
                                                                             @if (GetDisplayStatus("CustomerEmail"))
                                                                             {
                                                                                 <tr>
-                                                                                    <td class="border-none p-0" width="120px">
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("CustomerEmail")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
@@ -336,7 +336,7 @@
                                                                             @if (GetDisplayStatus("CustomerContactNumber"))
                                                                             {
                                                                                 <tr>
-                                                                                    <td class="border-none p-0" width="120px">
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("CustomerContactNumber")</td>
                                                                                     <td class="border-none p-0">:
                                                                                         @Model?.CustomerDetails?.ContactNumber
@@ -369,7 +369,7 @@
                                                                             (GetDisplayStatus("ShippingStateCounty"))
                                                                                 {
                                                                                     <tr>
-                                                                                        <td class="border-none p-0"
+                                                                                        <td class="border-none p-0 capitalize"
                                                                                             width="120px">
                                                                                             @GetLabel("ShippingStateCounty")
                                                                                         </td>
@@ -381,7 +381,7 @@
                                                                                 @if (GetDisplayStatus("AttentionTo"))
                                                                                 {
                                                                                     <tr>
-                                                                                        <td class="border-none p-0"
+                                                                                        <td class="border-none p-0 capitalize"
                                                                                             width="120px">
                                                                                             @GetLabel("AttentionTo")
                                                                                         </td>
@@ -393,7 +393,7 @@
                                                                                 @if (GetDisplayStatus("CustomerEmail"))
                                                                                 {
                                                                                     <tr>
-                                                                                        <td class="border-none p-0"
+                                                                                        <td class="border-none p-0 capitalize"
                                                                                             width="120px">
                                                                                             @GetLabel("CustomerEmail")
                                                                                         </td>
@@ -406,12 +406,79 @@
                                                                             (GetDisplayStatus("CustomerContactNumber"))
                                                                                 {
                                                                                     <tr>
-                                                                                        <td class="border-none p-0"
+                                                                                        <td class="border-none p-0 capitalize"
                                                                                             width="120px">
                                                                                             @GetLabel("CustomerContactNumber")
                                                                                         </td>
                                                                                         <td class="border-none p-0">:
                                                                                             @Model?.CustomerDetails?.ContactNumber
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="50%" class="border-none border-top border-right vertical-align-top">
+                                                                    @if (Model?.Billing != null)
+                                                                    {
+                                                                        <p>Bill To</p>
+                                                                        <p>@Model?.Billing?.Address</p>
+                                                                        <table>
+                                                                            @if (Model?.Billing?.TaxNumber != null)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td class="border-none p-0" width="120px">
+                                                                                        @GetLabel("BillingTaxNumber")
+                                                                                    </td>
+                                                                                    <td class="border-none p-0">:
+                                                                                        @Model?.Billing?.TaxNumber</td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (Model?.Billing?.StateCounty != null)
+                                                                            {
+                                                                                <tr>
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
+                                                                                        @GetLabel("BillingStateCounty")
+                                                                                    </td>
+                                                                                    <td class="border-none p-0">:
+                                                                                        @Model?.Billing?.StateCounty</td>
+                                                                                </tr>
+                                                                            }
+                                                                        </table>
+                                                                    }
+                                                                </td>
+                                                                <td width="50%" class="border-none border-top border-left vertical-align-top">
+                                                                    @if (Model?.Shipping != null)
+                                                                    {
+                                                                        <p>Ship To</p>
+                                                                        <p>@Model?.Shipping?.Address</p>
+                                                                        <table>
+                                                                            <tbody>
+                                                                                @if (Model?.Shipping?.TaxNumber != null)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="border-none p-0"
+                                                                                            width="120px">
+                                                                                            @GetLabel("ShippingTaxNumber")
+                                                                                        </td>
+                                                                                        <td class="border-none p-0">:
+                                                                                            @Model?.Shipping?.TaxNumber</td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                                @if (Model?.Shipping?.StateCounty != null)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="border-none p-0 capitalize"
+                                                                                            width="120px">
+                                                                                            @GetLabel("ShippingStateCounty")
+                                                                                        </td>
+                                                                                        <td class="border-none p-0">:
+                                                                                            @Model?.Shipping?.StateCounty
                                                                                         </td>
                                                                                     </tr>
                                                                                 }
