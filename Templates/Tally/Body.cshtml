@@ -1,8 +1,11 @@
 @model InvoiceData.Root;
 @using InvoiceData;
+@using System;
 @using System.Net;
 @using System.Collections.Generic;
 @using System.Linq;
+@using GiddhTemplate.Models.Enums;
+@using System.Text;
 
 @functions {
     private readonly Dictionary<string, Setting> _settingCache = new Dictionary<string, Setting>();
@@ -420,45 +423,48 @@
                                                                     }
                                                                 </td>
                                                             </tr>
+                                                            @if (string.Equals(Model?.VoucherType, VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase) ||
+                                                                string.Equals(Model?.VoucherType, VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase)) 
+                                                            {
                                                             <tr>
                                                                 <td width="50%" class="border-none border-top border-right vertical-align-top">
-                                                                    @if (Model?.Billing != null)
+                                                                    @if (Model?.Company?.Billing != null)
                                                                     {
                                                                         <p>Bill To</p>
-                                                                        <p>@Model?.Billing?.Address</p>
+                                                                        <p>@Model?.Company?.Billing?.Address</p>
                                                                         <table>
-                                                                            @if (Model?.Billing?.TaxNumber != null)
+                                                                            @if (Model?.Company?.Billing?.TaxNumber != null)
                                                                             {
                                                                                 <tr>
                                                                                     <td class="border-none p-0" width="120px">
                                                                                         @GetLabel("BillingTaxNumber")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
-                                                                                        @Model?.Billing?.TaxNumber</td>
+                                                                                        @Model?.Company?.Billing?.TaxNumber</td>
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Billing?.StateCounty != null)
+                                                                            @if (Model?.Company?.Billing?.StateCounty != null)
                                                                             {
                                                                                 <tr>
                                                                                     <td class="border-none p-0 capitalize" width="120px">
                                                                                         @GetLabel("BillingStateCounty")
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
-                                                                                        @Model?.Billing?.StateCounty</td>
+                                                                                        @Model?.Company?.Billing?.StateCounty</td>
                                                                                 </tr>
                                                                             }
                                                                         </table>
                                                                     }
                                                                 </td>
                                                                 <td width="50%" class="border-none border-top border-left vertical-align-top">
-                                                                    @if (Model?.Shipping != null)
+                                                                    @if (Model?.Company?.Shipping != null)
                                                                     {
                                                                         <p>Ship To</p>
-                                                                        <p>@Model?.Shipping?.Address</p>
+                                                                        <p>@Model?.Company?.Shipping?.Address</p>
                                                                         <table>
                                                                             <tbody>
-                                                                                @if (Model?.Shipping?.TaxNumber != null)
+                                                                                @if (Model?.Company?.Shipping?.TaxNumber != null)
                                                                                 {
                                                                                     <tr>
                                                                                         <td class="border-none p-0"
@@ -466,11 +472,11 @@
                                                                                             @GetLabel("ShippingTaxNumber")
                                                                                         </td>
                                                                                         <td class="border-none p-0">:
-                                                                                            @Model?.Shipping?.TaxNumber</td>
+                                                                                            @Model?.Company?.Shipping?.TaxNumber</td>
                                                                                     </tr>
                                                                                 }
 
-                                                                                @if (Model?.Shipping?.StateCounty != null)
+                                                                                @if (Model?.Company?.Shipping?.StateCounty != null)
                                                                                 {
                                                                                     <tr>
                                                                                         <td class="border-none p-0 capitalize"
@@ -478,7 +484,7 @@
                                                                                             @GetLabel("ShippingStateCounty")
                                                                                         </td>
                                                                                         <td class="border-none p-0">:
-                                                                                            @Model?.Shipping?.StateCounty
+                                                                                            @Model?.Company?.Shipping?.StateCounty
                                                                                         </td>
                                                                                     </tr>
                                                                                 }
@@ -487,6 +493,7 @@
                                                                     }
                                                                 </td>
                                                             </tr>
+                                                            }
                                                         </tbody>
                                                     </table>
                                                 }
