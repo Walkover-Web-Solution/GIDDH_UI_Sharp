@@ -27,6 +27,10 @@
                                     {
                                         <p>@Model.AccountAddress.CountryName</p>
                                     }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.PinCode))
+                                    {
+                                        <p>@Model.AccountAddress.PinCode</p>
+                                    }
                                     @if (!string.IsNullOrEmpty(Model.AccountAddress.TaxNumber))
                                     {
                                         <p>@Model.AccountAddress.TaxType : @Model.AccountAddress.TaxNumber</p>
