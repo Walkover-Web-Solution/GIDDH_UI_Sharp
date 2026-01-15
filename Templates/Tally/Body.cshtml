@@ -423,14 +423,13 @@
                                                                     }
                                                                 </td>
                                                             </tr>
-                                                            @if (string.Equals(Model?.VoucherType, VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase) ||
-                                                                string.Equals(Model?.VoucherType, VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase)) 
+                                                            @if (GetDisplayStatus("BillTo") || GetDisplayStatus("ShipTo")) 
                                                             {
                                                             <tr>
                                                                 <td width="50%" class="border-none border-top border-right vertical-align-top">
-                                                                    @if (Model?.Company?.Billing != null)
+                                                                    @if (@GetDisplayStatus("BillTo") && Model?.Company?.Billing != null)
                                                                     {
-                                                                        <p>Bill To</p>
+                                                                        <p>@GetLabel("BillTo")</p>
                                                                         <p>@Model?.Company?.Billing?.Address</p>
                                                                         <table>
                                                                             @if (Model?.Company?.Billing?.TaxNumber != null)
@@ -458,9 +457,9 @@
                                                                     }
                                                                 </td>
                                                                 <td width="50%" class="border-none border-top border-left vertical-align-top">
-                                                                    @if (Model?.Company?.Shipping != null)
+                                                                    @if (GetDisplayStatus("ShipTo") && Model?.Company?.Shipping != null)
                                                                     {
-                                                                        <p>Ship To</p>
+                                                                        <p>@GetLabel("ShipTo")</p>
                                                                         <p>@Model?.Company?.Shipping?.Address</p>
                                                                         <table>
                                                                             <tbody>
