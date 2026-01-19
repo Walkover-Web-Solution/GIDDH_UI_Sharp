@@ -1,0 +1,223 @@
+@model GiddhTemplate.Models.Root
+@using System
+@using System.Linq
+
+<main class="account-statement">
+    <!-- Header Section -->
+    <div class="header-section">
+        <table class="w-100 header-table">
+            <tr>
+                <td width="65%" class="vertical-align-top">
+                    @if (!string.IsNullOrEmpty(Model?.AccountName))
+                    {
+                        <div class="account-info">
+                            <h2 class="account-name">@Model.AccountName</h2>
+                            @if (Model?.AccountAddress != null)
+                            {
+                                <div class="address-details">
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.AddressLine))
+                                    {
+                                        <p>Address : @Model.AccountAddress.AddressLine</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.StateName))
+                                    {
+                                        <p>@Model.AccountAddress.StateName</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.CountryName))
+                                    {
+                                        <p>@Model.AccountAddress.CountryName</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.PinCode))
+                                    {
+                                        <p>@Model.AccountAddress.PinCode</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.TaxNumber))
+                                    {
+                                        <p>@Model.AccountAddress.TaxType : @Model.AccountAddress.TaxNumber</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.AccountAddress.Email))
+                                    {
+                                        <p>Email : @Model.AccountAddress.Email</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </td>
+                <td width="35%" class="vertical-align-top text-right">
+                    @if (!string.IsNullOrEmpty(Model?.CompanyName))
+                    {
+                        <div class="company-info">
+                            <h2 class="company-name">@Model.CompanyName</h2>
+                            @if (Model?.CompanyGstAddress != null)
+                            {
+                                <div class="company-details">
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.AddressLine))
+                                    {
+                                        <p>Address : @Model.CompanyGstAddress.AddressLine</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.StateName))
+                                    {
+                                        <p>@Model.CompanyGstAddress.StateName</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.CountryName))
+                                    {
+                                        <p>@Model.CompanyGstAddress.CountryName</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.PinCode))
+                                    {
+                                        <p>@Model.CompanyGstAddress.PinCode</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.TaxNumber))
+                                    {
+                                        <p>@Model.CompanyGstAddress.TaxType : @Model.CompanyGstAddress.TaxNumber</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CompanyGstAddress.MobileNo))
+                                    {
+                                        <p>Mobile No. : @Model.CompanyGstAddress.MobileNo</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Statement Title Section -->
+    <div class="statement-title-section">
+        <div class="title-container">
+            <h1 class="statement-title">Statement of Accounts</h1>
+            <hr class="title-divider">
+            <p class="date-range">
+                @(Model?.FromDate ?? DateTime.Now.ToString("dd-MM-yyyy")) - @(Model?.ToDate ?? DateTime.Now.ToString("dd-MM-yyyy"))
+            </p>
+            <hr class="title-divider">
+        </div>
+    </div>
+
+    <!-- Account Summary Section -->
+    @if (Model?.AccountSummary != null && Model?.AccountAddress != null)
+    {
+        <div class="summary-section">
+            <div class="summary-container">
+                <table class="account-summary-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="summary-header">Account Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="summary-label">Opening Balance</td>
+                            <td class="summary-value font-tabular-nums">
+                                @(Model.AccountAddress.Currency?.Symbol ?? "")@(Model.AccountSummary.OpeningBalance?.Amount ?? 0.0m)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Invoiced Amount</td>
+                            <td class="summary-value font-tabular-nums">
+                                @(Model.AccountAddress.Currency?.Symbol ?? "")@Model.AccountSummary.DebitTotal
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="summary-label">Amount Paid</td>
+                            <td class="summary-value font-tabular-nums">
+                                @(Model.AccountAddress.Currency?.Symbol ?? "")@Model.AccountSummary.CreditTotal
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="summary-total-label">Balance Due</td>
+                            <td class="summary-total-value font-tabular-nums">
+                                @if (Model.AccountSummary.ClosingBalance?.Amount >= 0)
+                                {
+                                    @((Model.AccountSummary.ClosingBalance?.Type == "CREDIT" ? "-" : "") + 
+                                      (Model.AccountAddress.Currency?.Symbol ?? "") + 
+                                      Model.AccountSummary.ClosingBalance.Amount)
+                                }
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="transaction-section">
+        <table class="main-table w-100">
+            <thead>
+                <tr>
+                    <th class="text-left bg-black text-white">Date</th>
+                    <th class="text-left bg-black text-white">Transactions</th>
+                    <th class="text-left bg-black text-white">Details</th>
+                    <th class="text-right bg-black text-white">Amount</th>
+                    <th class="text-right bg-black text-white">Payments</th>
+                    <th class="text-right bg-black text-white">Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.TransactionDetailList != null && Model.TransactionDetailList.Any())
+                {
+                    @for (int i = 0; i < Model.TransactionDetailList.Count; i++)
+                    {
+                        var transaction = Model.TransactionDetailList[i];
+                        <tr class="@(i % 2 == 1 ? "bg-light" : "")">
+                            <td class="font-tabular-nums">@(transaction.Date ?? "-")</td>
+                            <td>@(transaction.VoucherType ?? "-")</td>
+                            <td class="word-break">@(transaction.VoucherNumber ?? "-")</td>
+                            <td class="text-right font-tabular-nums">
+                                @if (transaction.VoucherAmount?.Type == "DEBIT")
+                                {
+                                    @transaction.VoucherAmount.Amount
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="text-right font-tabular-nums">
+                                @if (transaction.VoucherAmount?.Type != "DEBIT")
+                                {
+                                    @transaction.VoucherAmount?.Amount
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="text-right font-tabular-nums">
+                                @if (transaction.ClosingBalance?.Amount >= 0)
+                                {
+                                    @((transaction.ClosingBalance?.Type == "CREDIT" ? "-" : "") + transaction.ClosingBalance.Amount)
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No account statements found for the given criteria.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+        <div class="table-footer">
+            <div class="footer-row">
+                <span class="footer-label">Balance Due</span>
+                <span class="footer-value font-tabular-nums">
+                    @if (Model?.AccountSummary?.ClosingBalance?.Amount >= 0)
+                    {
+                        @((Model.AccountSummary.ClosingBalance?.Type == "CREDIT" ? "-" : "") + 
+                          (Model.AccountAddress?.Currency?.Symbol ?? "") + 
+                          Model.AccountSummary.ClosingBalance.Amount)
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+</main>

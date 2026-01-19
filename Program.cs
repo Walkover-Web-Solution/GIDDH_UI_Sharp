@@ -11,6 +11,7 @@ public class Program
         builder.Services.AddHttpClient();
         builder.Services.AddScoped<ISlackService, SlackService>();
         builder.Services.AddSingleton<PdfService>();
+        builder.Services.AddScoped<AccountStatementPdfService>();
 
         builder.Services.AddControllers();
         builder.WebHost.ConfigureKestrel(options =>

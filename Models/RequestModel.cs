@@ -57,8 +57,10 @@ namespace InvoiceData
         public Setting? CustomerName { get; set; }
         public Setting? FormNameTaxInvoice { get; set; }
         public Setting? ShippingAddress { get; set; }
+        public Setting? ShipTo { get; set; }
         public Setting? ShippingStateCounty { get; set; }
         public Setting? BillingAddress { get; set; }
+        public Setting? BillTo { get; set; }
         public Setting? BillingCounty { get; set; }
         public Setting? GstComposition { get; set; }
         public Setting? DisplayBaseCurrency { get; set; }
