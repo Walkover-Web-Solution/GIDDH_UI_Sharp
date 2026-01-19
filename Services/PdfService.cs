@@ -69,7 +69,7 @@ namespace GiddhTemplate.Services
             );
         }
 
-        private string LoadFontCSS(string fontFamily)
+        public string LoadFontCSS(string fontFamily)
         {
             if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
             {
@@ -224,7 +224,7 @@ namespace GiddhTemplate.Services
         {
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
-            var _pdfOptions = new PdfOptions
+            var pdfOptions = new PdfOptions
             {
                 Format = PaperFormat.A4,
                 Landscape = false,

@@ -20,7 +20,7 @@ namespace GiddhTemplate.Services
 
         public async Task<byte[]> GenerateAccountStatementPdfAsync(Root request)
         {
-            var browser = await _pdfService.GetBrowserAsync();
+            var browser = await PdfService.GetBrowserAsync();
             var page = await browser.NewPageAsync();
 
             var pdfOptions = new PdfOptions
