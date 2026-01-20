@@ -171,7 +171,7 @@
                                                             @if (Model?.Settings?.BillingAddress?.Display == true)
                                                             {
                                                                 <strong>@Model?.Settings?.BillingAddress?.Label</strong>
-                                                                <address>@Model?.Billing?.Address</address>
+                                                                <address>@Model?.Billing?.Address@(!string.IsNullOrEmpty(Model?.Billing?.PinCode) ? ", " + Model?.Billing?.PinCode : "")</address>
                                                                 <p>@Model?.Billing?.StateCounty</p>
                                                                 <p>@Model?.Billing?.Country</p>
 
@@ -186,7 +186,7 @@
                                                             @if (Model?.Settings?.ShippingAddress?.Display == true)
                                                             {
                                                                 <strong>@Model?.Settings?.ShippingAddress?.Label</strong>
-                                                                <address>@Model?.Shipping?.Address</address>
+                                                                <address>@Model?.Shipping?.Address@(!string.IsNullOrEmpty(Model?.Shipping?.PinCode) ? ", " + Model?.Shipping?.PinCode : "")</address>
                                                                 <p>@Model?.Shipping?.StateCounty</p>
                                                                 <p>@Model?.Shipping?.Country</p>
 

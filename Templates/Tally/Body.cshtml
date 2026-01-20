@@ -279,7 +279,7 @@
                                                                     @if (GetDisplayStatus("BillingAddress"))
                                                                     {
                                                                         <p>@GetLabel("BillingAddress")</p>
-                                                                        <p>@Model?.Billing?.Address</p>
+                                                                        <p>@Model?.Billing?.Address@(!string.IsNullOrEmpty(Model?.Billing?.PinCode) ? ", " + Model?.Billing?.PinCode : "")</p>
                                                                         <table>
                                                                             @if (GetDisplayStatus("BillingTaxNumber"))
                                                                             {
@@ -353,7 +353,7 @@
                                                                     @if (GetDisplayStatus("ShippingAddress"))
                                                                     {
                                                                         <p>@GetLabel("ShippingAddress")</p>
-                                                                        <p>@Model?.Shipping?.Address</p>
+                                                                        <p>@Model?.Shipping?.Address@(!string.IsNullOrEmpty(Model?.Shipping?.PinCode) ? ", " + Model?.Shipping?.PinCode : "")</p>
                                                                         <table>
                                                                             <tbody>
                                                                                 @if (GetDisplayStatus("ShippingTaxNumber"))

@@ -145,6 +145,7 @@ namespace InvoiceData
         public string? Country { get; set; }
         public string? Address { get; set; }
         public string? TaxNumber { get; set; }
+        public string? PinCode { get; set; }
     }
 
     public class Company
