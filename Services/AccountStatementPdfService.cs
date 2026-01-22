@@ -11,14 +11,14 @@ namespace GiddhTemplate.Services
         private readonly PdfService _pdfService;
         private readonly string _templateBasePath;
 
-        public AccountStatementPdfService(PdfService pdfService)
+        public AccountStatementPdfService(PdfService pdfService, RazorTemplateService razorTemplateService)
         {
-            _razorTemplateService = new RazorTemplateService();
+            _razorTemplateService = razorTemplateService;
             _pdfService = pdfService;
             _templateBasePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates");
         }
 
-        public async Task<byte[]> GenerateAccountStatementPdfAsync(Root request)
+        public async Task<string> GenerateAccountStatementPdfToFileAsync(Root request)
         {
             var browser = await _pdfService.GetBrowserAsync();
             var page = await browser.NewPageAsync();
@@ -48,11 +48,17 @@ namespace GiddhTemplate.Services
                     Path.Combine(templatePath, "body.cshtml"), request);
 
                 // Load only the required CSS files
-                string commonStyles = LoadFileContent(Path.Combine(templatePath, "Styles", "Styles.css"));
-                string bodyStyles = LoadFileContent(Path.Combine(templatePath, "Styles", "Body.css"));
+                var stylesTasks = new[]
+                {
+                    LoadFileContentAsync(Path.Combine(templatePath, "Styles", "Styles.css")),
+                    LoadFileContentAsync(Path.Combine(templatePath, "Styles", "Body.css"))
+                };
+                await Task.WhenAll(stylesTasks);
+                string commonStyles = stylesTasks[0].Result;
+                string bodyStyles = stylesTasks[1].Result;
 
                 // Create the complete PDF document
-                string htmlContent = CreateAccountStatementDocument(
+                string htmlContent = await CreateAccountStatementDocumentAsync(
                     body,
                     commonStyles,
                     bodyStyles,
@@ -61,9 +67,20 @@ namespace GiddhTemplate.Services
                 await page.SetContentAsync(htmlContent);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
-                var pdfBytes = await page.PdfDataAsync(pdfOptions);
+                // Generate temporary file path
+                string tempPath = Path.Combine(Path.GetTempPath(), "GiddhPdfs");
+                Directory.CreateDirectory(tempPath);
+                
+                string fileName = !string.IsNullOrWhiteSpace(request?.AccountName) 
+                    ? SanitizeFileName($"AccountStatement_{request.AccountName}_{DateTime.Now:yyyyMMddHHmmss}")
+                    : $"AccountStatement_{DateTime.Now:yyyyMMddHHmmss}";
+                
+                string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
-                // Save PDF to Downloads folder - only in local/development environment
+                // Write PDF directly to disk using streaming to minimize memory usage
+                await page.PdfAsync(tempFilePath, pdfOptions);
+
+                // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
                                      Environment.GetEnvironmentVariable("ENVIRONMENT");
                 
@@ -71,32 +88,22 @@ namespace GiddhTemplate.Services
                     string.Equals(environment, "Local", StringComparison.OrdinalIgnoreCase) ||
                     string.IsNullOrWhiteSpace(environment))
                 {
-                    string fileName = !string.IsNullOrWhiteSpace(request?.AccountName) 
-                        ? $"AccountStatement_{request.AccountName}_{DateTime.Now:yyyyMMddHHmmss}"
-                        : $"AccountStatement_{DateTime.Now:yyyyMMddHHmmss}";
-
                     string downloadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+                    Directory.CreateDirectory(downloadsPath);
                     
-                    if (!Directory.Exists(downloadsPath))
-                    {
-                        Directory.CreateDirectory(downloadsPath);
-                    }
-
-                    string sanitizedFileName = SanitizeFileName(fileName);
-                    string fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}.pdf");
-                    
+                    string downloadFilePath = Path.Combine(downloadsPath, $"{fileName}.pdf");
                     int counter = 1;
-                    while (File.Exists(fullPath))
+                    while (File.Exists(downloadFilePath))
                     {
-                        fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}_{counter}.pdf");
+                        downloadFilePath = Path.Combine(downloadsPath, $"{fileName}_{counter}.pdf");
                         counter++;
                     }
-
-                    await File.WriteAllBytesAsync(fullPath, pdfBytes);
-                    Console.WriteLine($"PDF saved to: {fullPath}");
+                    
+                    File.Copy(tempFilePath, downloadFilePath, overwrite: false);
+                    Console.WriteLine($"PDF saved to: {downloadFilePath}");
                 }
 
-                return pdfBytes;
+                return tempFilePath;
             }
             finally
             {
@@ -105,10 +112,10 @@ namespace GiddhTemplate.Services
             }
         }
 
-        private string LoadFileContent(string filePath) =>
-            File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+        private async Task<string> LoadFileContentAsync(string filePath) =>
+            File.Exists(filePath) ? await File.ReadAllTextAsync(filePath) : string.Empty;
 
-        private string CreateAccountStatementDocument(
+        private async Task<string> CreateAccountStatementDocumentAsync(
             string body,
             string commonStyles,
             string bodyStyles,
@@ -119,7 +126,7 @@ namespace GiddhTemplate.Services
             // Load font CSS using PdfService method with proper validation
             try
             {
-                string fontCSS = _pdfService.LoadFontCSS("Inter");
+                string fontCSS = await _pdfService.LoadFontCSSAsync("Inter");
                 if (!string.IsNullOrEmpty(fontCSS))
                 {
                     // Ensure the font CSS is properly formatted and doesn't contain invalid characters
@@ -135,7 +142,12 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"Font loading failed: {ex.Message}");
             }
 
-            var allStyles = $"{themeCSS} {commonStyles} {bodyStyles}";
+            var allStylesBuilder = new StringBuilder();
+            allStylesBuilder.Append(themeCSS)
+                           .Append(" ")
+                           .Append(commonStyles)
+                           .Append(" ")
+                           .Append(bodyStyles);
 
             return $@"
             <!DOCTYPE html>
@@ -143,7 +155,7 @@ namespace GiddhTemplate.Services
                 <head>
                     <meta charset='UTF-8'>
                     <style>
-                        {allStyles}
+                        {allStylesBuilder}
                     </style>
                 </head>
                 <body>
