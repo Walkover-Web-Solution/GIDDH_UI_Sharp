@@ -42,9 +42,11 @@
     <Content Include="Templates/**" CopyToOutputDirectory="Always" />
     <Content Include=".ebextensions/**" CopyToOutputDirectory="Always" />
     <Content Include=".platform/**" CopyToOutputDirectory="Always" />
+    <Content Include="runtimeconfig.template.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
     <Content Include="appsettings.Development.json" CopyToOutputDirectory="Always" />
+    <Content Include="appsettings.Production.json" CopyToOutputDirectory="Always" />
+    <Content Include="appsettings.Test.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
-

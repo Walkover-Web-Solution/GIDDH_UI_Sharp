@@ -140,11 +140,25 @@ public class Program
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ISlackService, SlackService>();
-            builder.Services.AddScoped<PdfService>();
+            builder.Services.AddSingleton<RazorTemplateService>();
+            builder.Services.AddSingleton<PdfService>();
             builder.Services.AddScoped<AccountStatementPdfService>();
+            builder.Services.AddHostedService<MemoryReservationService>();
+            builder.Services.AddHostedService<PdfCleanupService>();
             builder.Services.AddControllers();
 
             var app = builder.Build();
+
+            // Pre-warm browser on startup
+            var pdfService = app.Services.GetRequiredService<PdfService>();
+            await pdfService.GetBrowserAsync();
+
+            // Register browser disposal on shutdown
+            var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                PdfService.DisposeBrowserAsync().GetAwaiter().GetResult();
+            });
 
             // ===========================================
             // CENTRALIZED GLOBAL EXCEPTION HANDLER WITH RICH CONTEXT
