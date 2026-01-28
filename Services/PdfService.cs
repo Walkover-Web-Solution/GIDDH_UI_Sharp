@@ -39,8 +39,8 @@ namespace GiddhTemplate.Services
                         {
                             Headless = true,
                             // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
-                          ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
-                         // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
+                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
+                            // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
                         };
 
@@ -290,7 +290,6 @@ namespace GiddhTemplate.Services
         {
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
-
             var pdfOptions = new PdfOptions
             {
                 Format = PaperFormat.A4,
