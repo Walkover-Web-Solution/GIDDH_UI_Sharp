@@ -3,21 +3,30 @@ using System.Text;
 using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
+using System.Text.Json;
 
 namespace GiddhTemplate.Services
 {
     public class PdfService
     {
         private readonly RazorTemplateService _razorTemplateService;
-        private string _openSansFontCSS = string.Empty; // Cache the Open Sans CSS
-        private string _robotoFontCSS = string.Empty;   // Cache the Roboto CSS
-        private string _latoFontCSS = string.Empty;     // Cache the Lato CSS
-        private string _interFontCSS = string.Empty;    // Cache the Inter CSS
+
+        private string _openSansFontCSS = string.Empty;
+        private string _robotoFontCSS = string.Empty;
+        private string _latoFontCSS = string.Empty;
+        private string _interFontCSS = string.Empty;
+
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
         private static IBrowser? _browser;
-        private int decreaseFontSize = 2;
 
-        public static async Task<IBrowser> GetBrowserAsync()
+        private readonly int decreaseFontSize = 2;
+
+        public PdfService(RazorTemplateService razorTemplateService)
+        {
+            _razorTemplateService = razorTemplateService;
+        }
+
+        public async Task<IBrowser> GetBrowserAsync()
         {
             if (_browser == null || !_browser.IsConnected)
             {
@@ -26,19 +35,20 @@ namespace GiddhTemplate.Services
                 {
                     if (_browser == null || !_browser.IsConnected)
                     {
-                        _browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                        var launchOptions = new LaunchOptions
                         {
                             Headless = true,
                             // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
                             ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
-                        });
+                        };
+
+                        _browser = await Puppeteer.LaunchAsync(launchOptions);
                     }
                 }
-                catch (PuppeteerSharp.ProcessException ex)
+                catch (PuppeteerSharp.ProcessException)
                 {
-                    Console.WriteLine($"Error launching browser: {ex.Message}");
                     _browser = null;
                     throw;
                 }
@@ -47,49 +57,82 @@ namespace GiddhTemplate.Services
                     _semaphore.Release();
                 }
             }
+
             return _browser!;
         }
 
-        public PdfService()
+        public static async Task DisposeBrowserAsync()
         {
-            _razorTemplateService = new RazorTemplateService();
+            if (_browser != null)
+            {
+                await _semaphore.WaitAsync();
+                try
+                {
+                    if (_browser != null)
+                    {
+                        await _browser.CloseAsync();
+                        await _browser.DisposeAsync();
+                        _browser = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error disposing browser: {ex.Message}");
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
         }
 
-        private string LoadFileContent(string filePath) =>
-            File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+        private async Task<string> LoadFileContentAsync(string filePath) =>
+            File.Exists(filePath) ? await File.ReadAllTextAsync(filePath) : string.Empty;
 
-        private (string Common, string Header, string Footer, string Body, string Background) LoadStyles(string basePath)
+        public async Task<(string Common, string Header, string Footer, string Body, string Background)>
+            LoadStylesAsync(string basePath)
         {
+            var tasks = new[]
+            {
+                LoadFileContentAsync(Path.Combine(basePath, "Styles", "Styles.css")),
+                LoadFileContentAsync(Path.Combine(basePath, "Styles", "Header.css")),
+                LoadFileContentAsync(Path.Combine(basePath, "Styles", "Footer.css")),
+                LoadFileContentAsync(Path.Combine(basePath, "Styles", "Body.css")),
+                LoadFileContentAsync(Path.Combine(basePath, "Styles", "Background.css"))
+            };
+
+            await Task.WhenAll(tasks);
+
             return (
-                LoadFileContent(Path.Combine(basePath, "Styles", "Styles.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Header.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Footer.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Body.css")),
-                LoadFileContent(Path.Combine(basePath, "Styles", "Background.css"))
+                Common: tasks[0].Result,
+                Header: tasks[1].Result,
+                Footer: tasks[2].Result,
+                Body: tasks[3].Result,
+                Background: tasks[4].Result
             );
         }
 
-        public string LoadFontCSS(string fontFamily)
+        public async Task<string> LoadFontCSSAsync(string fontFamily)
         {
             if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
             {
                 string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
-                _openSansFontCSS = BuildFontCSS("Open Sans", fontPath);
+                _openSansFontCSS = await BuildFontCSSAsync("Open Sans", fontPath);
             }
             else if (fontFamily == "Roboto" && string.IsNullOrEmpty(_robotoFontCSS))
             {
                 string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Roboto");
-                _robotoFontCSS = BuildFontCSS("Roboto", fontPath);
+                _robotoFontCSS = await BuildFontCSSAsync("Roboto", fontPath);
             }
             else if (fontFamily == "Lato" && string.IsNullOrEmpty(_latoFontCSS))
             {
                 string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Lato");
-                _latoFontCSS = BuildFontCSS("Lato", fontPath);
+                _latoFontCSS = await BuildFontCSSAsync("Lato", fontPath);
             }
             else if (string.IsNullOrEmpty(_interFontCSS))
             {
                 string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "Inter");
-                _interFontCSS = BuildFontCSS("Inter", fontPath);
+                _interFontCSS = await BuildFontCSSAsync("Inter", fontPath);
             }
 
             return fontFamily switch
@@ -101,7 +144,7 @@ namespace GiddhTemplate.Services
             };
         }
 
-        private string BuildFontCSS(string family, string path)
+        public async Task<string> BuildFontCSSAsync(string family, string path)
         {
             var styles = new[]
             {
@@ -114,24 +157,42 @@ namespace GiddhTemplate.Services
                 ("Bold", 700, "normal"),
                 ("BoldItalic", 700, "italic")
             };
+
             var sb = new StringBuilder();
+            var tasks = new List<Task<string>>();
+
             foreach (var (style, weight, fontStyle) in styles)
             {
+                string file = Path.Combine(path, $"{family.Replace(" ", "")}-{style}.ttf");
+                tasks.Add(ConvertToBase64Async(file));
+            }
+
+            var base64Results = await Task.WhenAll(tasks);
+
+            for (int i = 0; i < styles.Length; i++)
+            {
+                var (style, weight, fontStyle) = styles[i];
                 sb.Append(
-                    $"@font-face {{ font-family: '{family}'; src: url('{ConvertToBase64(Path.Combine(path, $"{family.Replace(" ", "")}-{style}.ttf"))}') format('truetype'); font-weight: {weight}; font-style: {fontStyle}; unicode-range: U+0020-007E, U+00A0-00FF; }}\n"
+                    $"@font-face {{ font-family: '{family}'; " +
+                    $"src: url('{base64Results[i]}') format('truetype'); " +
+                    $"font-weight: {weight}; font-style: {fontStyle}; " +
+                    $"unicode-range: U+0020-007E, U+00A0-00FF; }}\n"
                 );
             }
+
             return sb.ToString();
         }
 
-        private async Task<string> RenderTemplate(string templatePath, Root request)
+        public async Task<string> RenderTemplate(string templatePath, Root request)
         {
-            string rendered = await _razorTemplateService.RenderTemplateAsync(templatePath, request);
-            return rendered;
+            return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
         }
 
-        string ConvertToBase64(string filePath) =>
-            "data:font/truetype;charset=utf-8;base64," + Convert.ToBase64String(File.ReadAllBytes(filePath));
+        private async Task<string> ConvertToBase64Async(string filePath)
+        {
+            byte[] fileBytes = await File.ReadAllBytesAsync(filePath);
+            return "data:font/truetype;charset=utf-8;base64," + Convert.ToBase64String(fileBytes);
+        }
 
         /// <summary>
         /// Sanitizes a filename by removing invalid characters
@@ -163,7 +224,7 @@ namespace GiddhTemplate.Services
             return sanitized.ToString().Trim('_');
         }
 
-        private string CreatePdfDocument(
+        private async Task<string> CreatePdfDocumentAsync(
             string header,
             string body,
             string footer,
@@ -175,15 +236,20 @@ namespace GiddhTemplate.Services
             string backgroundStyles)
         {
             var themeCSS = new StringBuilder();
-            // Console.WriteLine("Load Font Start: " + DateTime.Now.ToString("HH:mm:ss.fff"));
-            themeCSS.Append(LoadFontCSS(request?.Theme?.Font?.Family ?? string.Empty));
-            // Console.WriteLine("Load Font End: " + DateTime.Now.ToString("HH:mm:ss.fff"));
+
+            themeCSS.Append(await LoadFontCSSAsync(request?.Theme?.Font?.Family ?? string.Empty));
+
 
             themeCSS.Append("html, body {");
-            var fontFamily =
-                request?.Theme?.Font?.Family == "Open Sans" ? "Open Sans" :
-                request?.Theme?.Font?.Family == "Lato"      ? "Lato" :
-                request?.Theme?.Font?.Family == "Roboto"    ? "Roboto" : "Inter";
+
+            var fontFamily = request?.Theme?.Font?.Family switch
+            {
+                "Open Sans" => "Open Sans",
+                "Lato"      => "Lato",
+                "Roboto"    => "Roboto",
+                _           => "Inter"
+            };
+
             themeCSS.Append($"--font-family: \"{fontFamily}\";");
             themeCSS.Append($"--font-size-default: {request?.Theme?.Font?.FontSizeDefault - decreaseFontSize}px;");
             themeCSS.Append($"--font-size-large: {request?.Theme?.Font?.FontSizeDefault}px;");
@@ -193,34 +259,34 @@ namespace GiddhTemplate.Services
             themeCSS.Append($"--color-secondary: {request?.Theme?.SecondaryColor};");
             themeCSS.Append("}");
 
-            var allStyles = $"{commonStyles}{headerStyles}{bodyStyles}{footerStyles}{themeCSS}";
+            var allStylesBuilder = new StringBuilder();
+            allStylesBuilder.Append(commonStyles)
+                           .Append(headerStyles)
+                           .Append(bodyStyles)
+                           .Append(footerStyles)
+                           .Append(themeCSS);
+
             bool repeatHeaderFooter = request?.ShowSectionsInline != true;
-            return $@"<html> 
-                <head> 
+
+            return $@"
+            <html>
+                <head>
                     <style>
-                        {allStyles}
+                        {allStylesBuilder}
                         {(repeatHeaderFooter ? backgroundStyles : string.Empty)}
                     </style>
-                </head> 
-                <body class={(repeatHeaderFooter ? "repeat-header-footer" : "")}>
+                </head>
+                <body class='{(repeatHeaderFooter ? "repeat-header-footer" : "")}'>
                     <div style='display: flex; flex-direction: column; height: -webkit-fill-available;'>
                         {header}
                         {body}
                         {footer}
                     </div>
-                </body> 
+                </body>
             </html>";
         }
 
-        private string GetFileNameWithPath(Root request)
-        {
-            string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
-            Directory.CreateDirectory(rootPath);
-            string pdfName = $"{(string.IsNullOrWhiteSpace(request?.PdfRename) ? "PDF" : request.PdfRename)}_{DateTimeOffset.Now:HHmmssfff}.pdf";
-            return Path.Combine(rootPath, pdfName);
-        }
-
-        public async Task<byte[]?> GeneratePdfAsync(Root request)
+        public async Task<string> GeneratePdfToFileAsync(Root request)
         {
             var browser = await GetBrowserAsync();
             var page = await browser.NewPageAsync();
@@ -228,44 +294,43 @@ namespace GiddhTemplate.Services
             {
                 Format = PaperFormat.A4,
                 Landscape = false,
-                MarginOptions = new MarginOptions
-                {
-                    Top    = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
-                    Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
-                    Left   = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
-                    Right  = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
-                },
                 PrintBackground = true,
                 PreferCSSPageSize = true,
-                DisplayHeaderFooter = false
+                DisplayHeaderFooter = false,
+                MarginOptions = new MarginOptions
+                {
+                    Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
+                    Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
+                    Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
+                    Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
+                }
             };
 
             try
             {
-                // Console.WriteLine("PDF Generation Started ...");
-                // Console.WriteLine("First : " + DateTime.Now.ToString("HH:mm:ss.fff"));
-
                 string templateType = request?.TemplateType?.ToUpper();
-                string templateFolderName;
-                switch (templateType)
-                {
-                    case "TALLY":
-                        templateFolderName = "Tally";
-                        break;
-                    case "THERMAL":
-                        templateFolderName = "Thermal";
-                        break;
-                    default:
-                        templateFolderName = "TemplateA";
-                        break;
-                }
-                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", templateFolderName);
-                var styles = LoadStyles(templatePath);
-                // Console.WriteLine("Get Styles " + DateTime.Now.ToString("HH:mm:ss"));
 
-                string headerFile = null, bodyFile = null, footerFile = "Footer.cshtml";
+                string templateFolderName = templateType switch
+                {
+                    "TALLY" => "Tally",
+                    "THERMAL" => "Thermal",
+                    _ => "TemplateA"
+                };
+
+                string templatePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "Templates",
+                    templateFolderName
+                );
+
+                var styles = await LoadStylesAsync(templatePath);
+
+                string headerFile = null;
+                string bodyFile = null;
+                string footerFile = "Footer.cshtml";
+
                 bool isReceiptOrPayment = false;
-                bool isThermal = false;
+                bool isThermal = templateFolderName == "Thermal";
 
                 switch (templateFolderName)
                 {
@@ -274,18 +339,27 @@ namespace GiddhTemplate.Services
                         bodyFile = "Body.cshtml";
                         footerFile = "Footer.cshtml";
                         break;
+
                     case "TemplateA":
-                        if (
-                            string.Equals(request?.VoucherType, VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase) ||
-                            string.Equals(request?.VoucherType, VoucherTypeEnums.Payment.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase)
-                        )
+                        if (string.Equals(request?.VoucherType,
+                                VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue(),
+                                StringComparison.OrdinalIgnoreCase)
+                            ||
+                            string.Equals(request?.VoucherType,
+                                VoucherTypeEnums.Payment.GetVoucherTypeEnumValue(),
+                                StringComparison.OrdinalIgnoreCase))
                         {
-                            headerFile = null;
-                            bodyFile = "Receipt_Payment_Body.cshtml";
                             isReceiptOrPayment = true;
+                            bodyFile = "Receipt_Payment_Body.cshtml";
                         }
-                        else if (string.Equals(request?.VoucherType, VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase) ||
-                                 string.Equals(request?.VoucherType, VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(), StringComparison.OrdinalIgnoreCase))
+                        else if (
+                            string.Equals(request?.VoucherType,
+                                VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(),
+                                StringComparison.OrdinalIgnoreCase)
+                            ||
+                            string.Equals(request?.VoucherType,
+                                VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(),
+                                StringComparison.OrdinalIgnoreCase))
                         {
                             headerFile = "PO_PB_Header.cshtml";
                             bodyFile = "PO_PB_Body.cshtml";
@@ -295,65 +369,70 @@ namespace GiddhTemplate.Services
                             headerFile = "Header.cshtml";
                             bodyFile = "Body.cshtml";
                         }
+
                         break;
+
                     case "Thermal":
                         bodyFile = "Body.cshtml";
-                        isThermal = true;
                         break;
+
                     default:
                         headerFile = "Header.cshtml";
                         bodyFile = "Body.cshtml";
-                        footerFile = "Footer.cshtml";
                         break;
                 }
 
-                // Render logic
-                Task<string>[] renderTasks;
                 string header = null, footer = null, body;
 
-                if (isReceiptOrPayment)
+                if (isReceiptOrPayment || isThermal)
                 {
-                    renderTasks = new[]
-                    {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
-                    };
-                    await Task.WhenAll(renderTasks);
-                    body = renderTasks[0].Result;
-                }
-                else if (isThermal)
-                {
-                    renderTasks = new[]
-                    {
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
-                    };
-                    await Task.WhenAll(renderTasks);
-                    body = renderTasks[0].Result;
+                    body = await RenderTemplate(Path.Combine(templatePath, bodyFile), request);
                 }
                 else
                 {
-                    renderTasks = new[]
+                    var tasks = new[]
                     {
                         RenderTemplate(Path.Combine(templatePath, headerFile), request),
                         RenderTemplate(Path.Combine(templatePath, footerFile), request),
                         RenderTemplate(Path.Combine(templatePath, bodyFile), request)
                     };
-                    await Task.WhenAll(renderTasks);
-                    header = renderTasks[0].Result;
-                    footer = renderTasks[1].Result;
-                    body = renderTasks[2].Result;
+
+                    await Task.WhenAll(tasks);
+
+                    header = tasks[0].Result;
+                    footer = tasks[1].Result;
+                    body = tasks[2].Result;
                 }
 
-                // Console.WriteLine("Get Templates " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                string template = CreatePdfDocument(header, body, footer, styles.Common, styles.Header, styles.Footer, styles.Body, request, styles.Background);
-                // Console.WriteLine("Get CreatePdfDocument " + DateTime.Now.ToString("HH:mm:ss.fff"));
-                // Console.WriteLine(template);
+                string html = await CreatePdfDocumentAsync(
+                    header,
+                    body,
+                    footer,
+                    styles.Common,
+                    styles.Header,
+                    styles.Footer,
+                    styles.Body,
+                    request,
+                    styles.Background
+                );
 
-                await page.SetContentAsync(template);
+                await page.SetContentAsync(html);
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
-                byte[] pdfBytes = await page.PdfDataAsync(pdfOptions);
+                // Generate temporary file path
+                string tempPath = Path.Combine(Path.GetTempPath(), "GiddhPdfs");
+                Directory.CreateDirectory(tempPath);
+                
+                string fileName = !string.IsNullOrWhiteSpace(request?.PdfRename) 
+                    ? SanitizeFileName(request.PdfRename) 
+                    : $"PDF_{DateTime.Now:yyyyMMddHHmmss}";
+                
+                string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
-                // Save PDF to Downloads folder - only in local/development environment
+                // Write PDF directly to disk using streaming to minimize memory usage
+                await page.PdfAsync(tempFilePath, pdfOptions);
+
+                // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
                                      Environment.GetEnvironmentVariable("ENVIRONMENT");
                 
@@ -361,38 +440,27 @@ namespace GiddhTemplate.Services
                     string.Equals(environment, "Local", StringComparison.OrdinalIgnoreCase) ||
                     string.IsNullOrWhiteSpace(environment))
                 {
-                    string fileName = !string.IsNullOrWhiteSpace(request?.PdfRename) 
-                        ? request.PdfRename 
-                        : $"PDF_{DateTime.Now:yyyyMMddHHmmss}";
-
                     string downloadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+                    Directory.CreateDirectory(downloadsPath);
                     
-                    if (!Directory.Exists(downloadsPath))
-                    {
-                        Directory.CreateDirectory(downloadsPath);
-                    }
-
-                    string sanitizedFileName = SanitizeFileName(fileName);
-                    string fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}.pdf");
-                    
+                    string downloadFilePath = Path.Combine(downloadsPath, $"{fileName}.pdf");
                     int counter = 1;
-                    while (File.Exists(fullPath))
+                    while (File.Exists(downloadFilePath))
                     {
-                        fullPath = Path.Combine(downloadsPath, $"{sanitizedFileName}_{counter}.pdf");
+                        downloadFilePath = Path.Combine(downloadsPath, $"{fileName}_{counter}.pdf");
                         counter++;
                     }
-
-                    await File.WriteAllBytesAsync(fullPath, pdfBytes);
+                    
+                    File.Copy(tempFilePath, downloadFilePath, overwrite: false);
                 }
 
-                return pdfBytes;
+                return tempFilePath;
             }
             finally
             {
                 await page.CloseAsync();
                 await page.DisposeAsync();
             }
-            return null;
         }
     }
 }
