@@ -51,7 +51,7 @@
             <!-- Header Section -->
             <tr>
                 <!-- invoice-header -->
-                <td class="text-center pd-15"> 
+                <td class="text-center pd-15">
                     @if (GetDisplayStatus("FormNameInvoice") || GetDisplayStatus("FormNameTaxInvoice"))
                     {
                         <p class="font-weight-500">
@@ -191,10 +191,10 @@
                                         @if (entry?.Stock?.Rate != null)
                                         {
                                             @entry?.Stock?.Rate?.AmountForAccount?.ToString("N2")
-                                            @if (IsShowAmountForCompany() && entry.Stock.Rate?.AmountForCompany != null)
+                                            @if (IsShowAmountForCompany() && entry?.Stock?.Rate?.AmountForCompany != null)
                                             {
                                                 <p class="color-light-gray font-size-small">
-                                                    @entry.Stock.Rate.AmountForCompany
+                                                    @entry?.Stock?.Rate?.AmountForCompany
                                                 </p>
                                             }
                                         } else
@@ -204,7 +204,7 @@
                                     </td>
                                     <td width="25%" class="vertical-align-top text-right no-wrap">
                                         @entry?.Amount?.AmountForAccount?.ToString("N2")
-                                        @if (IsShowAmountForCompany() && entry.EntryTotal?.AmountForCompany != null)
+                                        @if (IsShowAmountForCompany() && entry?.EntryTotal?.AmountForCompany != null)
                                         {
                                             <p class="color-light-gray font-size-small">
                                                 @entry?.EntryTotal?.AmountForCompany

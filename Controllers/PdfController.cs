@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using GiddhTemplate.Services;
 using InvoiceData;
-using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 
 namespace GiddhTemplate.Controllers
 {
-
     [ApiController]
     public class MainController : ControllerBase
     {
@@ -36,33 +34,47 @@ namespace GiddhTemplate.Controllers
         [HttpPost]
         public async Task<IActionResult> GeneratePdfAsync([FromBody] object requestObj)
         {
+            string? tempFilePath = null;
+            
             try
             {
+                // Deserialize request
                 var jsonString = JsonSerializer.Serialize(requestObj);
-                Root request = JsonSerializer.Deserialize<Root>(jsonString, new JsonSerializerOptions
-                {
-                        PropertyNameCaseInsensitive = true
-                });
+                Root request = JsonSerializer.Deserialize<Root>(jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
                 if (request == null || string.IsNullOrEmpty(request.Company?.Name))
                 {
-                            return BadRequest("Invalid request data. Ensure the payload matches the expected format.");
+                    return BadRequest("Invalid request data. Ensure payload matches expected format.");
                 }
-                byte[] pdfBytes = await _pdfService.GeneratePdfAsync(request);
-                if (pdfBytes == null || pdfBytes.Length == 0)
+
+                // Generate PDF to temporary file (reduces RAM usage)
+                tempFilePath = await _pdfService.GeneratePdfToFileAsync(request);
+
+                if (string.IsNullOrEmpty(tempFilePath) || !System.IO.File.Exists(tempFilePath))
                 {
+                    await _slackService.SendErrorAlertAsync(
+                        url: "api/v1/pdf",
+                        environment: _environment,
+                        error: "PDF generation returned empty result.",
+                        stackTrace: "No stacktrace (service returned empty file path)."
+                    );
+
                     return StatusCode(500, new { error = "Failed to generate PDF!" });
                 }
-                // Return the PDF as a file download
-                return File(pdfBytes, "application/pdf", "invoice.pdf");
-            }
-            catch (Exception ex)
-            {
-                 var url = "api/v1/pdf";
-                 var error = ex.Message;
-                 var stackTrace = ex.StackTrace ?? "No stack trace available";
-                 _ = Task.Run(async () => await _slackService.SendErrorAlertAsync(url, _environment, error, stackTrace));
 
-                return StatusCode(500, new { error = ex.Message });
+                // Stream PDF from disk (memory efficient)
+                var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
+                return File(fileStream, "application/pdf", "invoice.pdf");
+            }
+            catch
+            {
+                // Clean up temp file on error
+                if (!string.IsNullOrEmpty(tempFilePath) && System.IO.File.Exists(tempFilePath))
+                {
+                    try { System.IO.File.Delete(tempFilePath); } catch { }
+                }
+                throw;
             }
         }
     }
