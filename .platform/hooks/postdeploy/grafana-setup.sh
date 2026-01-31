@@ -53,7 +53,7 @@ local.file_match "logs" {
     {
       job       = "application",
       namespace = "/var/log/template-logs",
-      __path__  = "/var/log/giddh-template/giddh-template-*.log",
+      __path__  = "/var/log/template-logs/*.log",
     },
   ]
   sync_period       = "10s"
