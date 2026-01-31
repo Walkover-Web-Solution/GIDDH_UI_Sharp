@@ -56,7 +56,6 @@ local.file_match "logs" {
       __path__  = "/var/log/giddh-template/giddh-template-*.log",
     },
   ]
-  ignore_older_than = "24h"
   sync_period       = "10s"
 }
 
