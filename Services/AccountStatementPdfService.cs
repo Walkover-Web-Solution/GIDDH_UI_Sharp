@@ -10,6 +10,7 @@ namespace GiddhTemplate.Services
         private readonly RazorTemplateService _razorTemplateService;
         private readonly PdfService _pdfService;
         private readonly string _templateBasePath;
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
 
         public AccountStatementPdfService(PdfService pdfService, RazorTemplateService razorTemplateService)
         {
@@ -20,10 +21,16 @@ namespace GiddhTemplate.Services
 
         public async Task<string> GenerateAccountStatementPdfToFileAsync(Root request)
         {
-            var browser = await _pdfService.GetBrowserAsync();
-            var page = await browser.NewPageAsync();
+            await _pdfGenerationSemaphore.WaitAsync();
+            Console.WriteLine($"[AccountStatementPdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+            
+            IPage? page = null;
+            try
+            {
+                var browser = await _pdfService.GetBrowserAsync();
+                page = await browser.NewPageAsync();
 
-            var pdfOptions = new PdfOptions
+                var pdfOptions = new PdfOptions
             {
                 Format = PaperFormat.A4,
                 Landscape = false,
@@ -39,8 +46,6 @@ namespace GiddhTemplate.Services
                 }
             };
 
-            try
-            {
                 string templatePath = Path.Combine(_templateBasePath, "AccountStatement");
                 
                 // Render the account statement body
@@ -63,8 +68,15 @@ namespace GiddhTemplate.Services
                     commonStyles,
                     bodyStyles,
                     request);
-                Console.WriteLine(htmlContent);
-                await page.SetContentAsync(htmlContent);
+                
+                Console.WriteLine($"[AccountStatementPdfService] Setting page content (HTML size: {htmlContent.Length} bytes)...");
+                await page.SetContentAsync(htmlContent, new NavigationOptions
+                {
+                    Timeout = 30000,
+                    WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
+                });
+                
+                Console.WriteLine("[AccountStatementPdfService] Emulating print media type...");
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
                 // Generate temporary file path
@@ -77,8 +89,9 @@ namespace GiddhTemplate.Services
                 
                 string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
-                // Write PDF directly to disk using streaming to minimize memory usage
+                Console.WriteLine($"[AccountStatementPdfService] Generating PDF to: {tempFilePath}");
                 await page.PdfAsync(tempFilePath, pdfOptions);
+                Console.WriteLine($"[AccountStatementPdfService] PDF generated successfully. File size: {new FileInfo(tempFilePath).Length} bytes");
 
                 // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
@@ -105,10 +118,42 @@ namespace GiddhTemplate.Services
 
                 return tempFilePath;
             }
+            catch (PuppeteerSharp.TargetClosedException ex)
+            {
+                Console.WriteLine($"[AccountStatementPdfService] CRITICAL: Chrome process crashed (TargetClosedException): {ex.Message}");
+                Console.WriteLine("[AccountStatementPdfService] This usually means Chrome ran out of memory or was killed by OOM killer.");
+                Console.WriteLine("[AccountStatementPdfService] Browser will be recreated on next request.");
+                
+                throw new Exception("Account Statement PDF generation failed: Chrome process crashed. This may be due to insufficient memory or too many concurrent requests.", ex);
+            }
+            catch (PuppeteerSharp.NavigationException ex)
+            {
+                Console.WriteLine($"[AccountStatementPdfService] Navigation error during PDF generation: {ex.Message}");
+                throw new Exception("Account Statement PDF generation failed: Unable to load content into browser.", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AccountStatementPdfService] Unexpected error during PDF generation: {ex.GetType().Name} - {ex.Message}");
+                Console.WriteLine($"[AccountStatementPdfService] Stack trace: {ex.StackTrace}");
+                throw;
+            }
             finally
             {
-                await page.CloseAsync();
-                await page.DisposeAsync();
+                if (page != null)
+                {
+                    try
+                    {
+                        await page.CloseAsync();
+                        await page.DisposeAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[AccountStatementPdfService] Error closing page: {ex.Message}");
+                    }
+                }
+                
+                _pdfGenerationSemaphore.Release();
+                Console.WriteLine($"[AccountStatementPdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
             }
         }
 
