@@ -16,7 +16,8 @@ namespace GiddhTemplate.Services
         private string _latoFontCSS = string.Empty;
         private string _interFontCSS = string.Empty;
 
-        private static readonly SemaphoreSlim _semaphore = new(1, 1);
+        private static readonly SemaphoreSlim _browserLock = new(1, 1);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
@@ -28,33 +29,61 @@ namespace GiddhTemplate.Services
 
         public async Task<IBrowser> GetBrowserAsync()
         {
-            if (_browser == null || !_browser.IsConnected)
+            if (_browser == null || !_browser.IsConnected || _browser.IsClosed)
             {
-                await _semaphore.WaitAsync();
+                await _browserLock.WaitAsync();
                 try
                 {
-                    if (_browser == null || !_browser.IsConnected)
+                    if (_browser == null || !_browser.IsConnected || _browser.IsClosed)
                     {
+                        if (_browser != null)
+                        {
+                            Console.WriteLine("[PdfService] Browser crashed or closed. Recreating browser instance...");
+                            try
+                            {
+                                await _browser.CloseAsync();
+                                await _browser.DisposeAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[PdfService] Error disposing crashed browser: {ex.Message}");
+                            }
+                            _browser = null;
+                        }
+
                         var launchOptions = new LaunchOptions
                         {
                             Headless = true,
                             // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
                             ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
-                            Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--lang=en-US,ar-SA" }
+                            Args = new[]
+                            {
+                                "--no-sandbox",
+                                "--disable-setuid-sandbox",
+                                "--disable-dev-shm-usage",
+                                "--disable-gpu",
+                                "--no-zygote",
+                                "--single-process",
+                                "--lang=en-US,ar-SA"
+                            }
                         };
 
+                        Console.WriteLine("[PdfService] Launching new browser instance with production flags...");
                         _browser = await Puppeteer.LaunchAsync(launchOptions);
+                        Console.WriteLine("[PdfService] Browser launched successfully.");
                     }
                 }
-                catch (PuppeteerSharp.ProcessException)
+                catch (Exception ex)
                 {
+                    Console.WriteLine($"[PdfService] CRITICAL: Failed to launch browser: {ex.GetType().Name} - {ex.Message}");
+                    Console.WriteLine($"[PdfService] Stack trace: {ex.StackTrace}");
                     _browser = null;
                     throw;
                 }
                 finally
                 {
-                    _semaphore.Release();
+                    _browserLock.Release();
                 }
             }
 
@@ -65,23 +94,25 @@ namespace GiddhTemplate.Services
         {
             if (_browser != null)
             {
-                await _semaphore.WaitAsync();
+                await _browserLock.WaitAsync();
                 try
                 {
                     if (_browser != null)
                     {
+                        Console.WriteLine("[PdfService] Disposing browser instance...");
                         await _browser.CloseAsync();
                         await _browser.DisposeAsync();
                         _browser = null;
+                        Console.WriteLine("[PdfService] Browser disposed successfully.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error disposing browser: {ex.Message}");
+                    Console.WriteLine($"[PdfService] Error disposing browser: {ex.Message}");
                 }
                 finally
                 {
-                    _semaphore.Release();
+                    _browserLock.Release();
                 }
             }
         }
@@ -288,26 +319,31 @@ namespace GiddhTemplate.Services
 
         public async Task<string> GeneratePdfToFileAsync(Root request)
         {
-            var browser = await GetBrowserAsync();
-            var page = await browser.NewPageAsync();
-            var pdfOptions = new PdfOptions
-            {
-                Format = PaperFormat.A4,
-                Landscape = false,
-                PrintBackground = true,
-                PreferCSSPageSize = true,
-                DisplayHeaderFooter = false,
-                MarginOptions = new MarginOptions
-                {
-                    Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
-                    Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
-                    Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
-                    Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
-                }
-            };
-
+            await _pdfGenerationSemaphore.WaitAsync();
+            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+            
+            IPage? page = null;
             try
             {
+                var browser = await GetBrowserAsync();
+                page = await browser.NewPageAsync();
+                
+                var pdfOptions = new PdfOptions
+                {
+                    Format = PaperFormat.A4,
+                    Landscape = false,
+                    PrintBackground = true,
+                    PreferCSSPageSize = true,
+                    DisplayHeaderFooter = false,
+                    MarginOptions = new MarginOptions
+                    {
+                        Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
+                        Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
+                        Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
+                        Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
+                    }
+                };
+
                 string templateType = request?.TemplateType?.ToUpper();
 
                 string templateFolderName = templateType switch
@@ -416,7 +452,14 @@ namespace GiddhTemplate.Services
                     styles.Background
                 );
 
-                await page.SetContentAsync(html);
+                Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
+                await page.SetContentAsync(html, new NavigationOptions
+                {
+                    Timeout = 30000,
+                    WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
+                });
+                
+                Console.WriteLine("[PdfService] Emulating print media type...");
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
                 // Generate temporary file path
@@ -429,8 +472,9 @@ namespace GiddhTemplate.Services
                 
                 string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
-                // Write PDF directly to disk using streaming to minimize memory usage
+                Console.WriteLine($"[PdfService] Generating PDF to: {tempFilePath}");
                 await page.PdfAsync(tempFilePath, pdfOptions);
+                Console.WriteLine($"[PdfService] PDF generated successfully. File size: {new FileInfo(tempFilePath).Length} bytes");
 
                 // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
@@ -456,10 +500,44 @@ namespace GiddhTemplate.Services
 
                 return tempFilePath;
             }
+            catch (PuppeteerSharp.TargetClosedException ex)
+            {
+                Console.WriteLine($"[PdfService] CRITICAL: Chrome process crashed (TargetClosedException): {ex.Message}");
+                Console.WriteLine("[PdfService] This usually means Chrome ran out of memory or was killed by OOM killer.");
+                Console.WriteLine("[PdfService] Browser will be recreated on next request.");
+                
+                _browser = null;
+                
+                throw new Exception("PDF generation failed: Chrome process crashed. This may be due to insufficient memory or too many concurrent requests.", ex);
+            }
+            catch (PuppeteerSharp.NavigationException ex)
+            {
+                Console.WriteLine($"[PdfService] Navigation error during PDF generation: {ex.Message}");
+                throw new Exception("PDF generation failed: Unable to load content into browser.", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PdfService] Unexpected error during PDF generation: {ex.GetType().Name} - {ex.Message}");
+                Console.WriteLine($"[PdfService] Stack trace: {ex.StackTrace}");
+                throw;
+            }
             finally
             {
-                await page.CloseAsync();
-                await page.DisposeAsync();
+                if (page != null)
+                {
+                    try
+                    {
+                        await page.CloseAsync();
+                        await page.DisposeAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[PdfService] Error closing page: {ex.Message}");
+                    }
+                }
+                
+                _pdfGenerationSemaphore.Release();
+                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
             }
         }
     }
