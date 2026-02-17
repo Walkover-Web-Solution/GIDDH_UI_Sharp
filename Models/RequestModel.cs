@@ -425,5 +425,6 @@ namespace InvoiceData
         public double? PaymentTotal { get; set; }
         public string? ChequeNumber { get; set; }
         public List<LabelValue>? AccountCustomFields { get; set; }
+        public Amount? Total { get; set; }
     }
 }
