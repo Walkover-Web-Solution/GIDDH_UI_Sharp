@@ -76,7 +76,7 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"[AccountStatementPdfService] Setting page content (HTML size: {htmlContent.Length} bytes)...");
                 await page.SetContentAsync(htmlContent, new NavigationOptions
                 {
-                    Timeout = 120000,
+                    Timeout = 30000,
                     WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
                 });
                 
