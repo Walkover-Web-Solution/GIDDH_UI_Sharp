@@ -709,7 +709,7 @@
                                                                                     </td>
                                                                                 </tr>
                                                                             }
-                                                                            @if (Model?.Settings?.GrandTotal?.Display == true && Model?.total != null)
+                                                                            @if (Model?.Settings?.GrandTotal?.Display == true && Model?.Total != null)
                                                                             {
                                                                                 <tr class="p-0 m-0 line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
@@ -719,7 +719,7 @@
                                                                                     </td>
                                                                                     <td class="text-right p-0">
                                                                                         @(WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol ?? ""))
-                                                                                        <strong>@Model.total?.AmountForAccount</strong>
+                                                                                        <strong>@Model.Total?.AmountForAccount</strong>
                                                                                     </td>
                                                                                 </tr>
                                                                             }
@@ -739,7 +739,7 @@
 
                                                                             @if (Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true)
                                                                             {
-                                                                                @if (Model?.Settings?.GrandTotal?.Display == true && Model?.total != null)
+                                                                                @if (Model?.Settings?.GrandTotal?.Display == true && Model?.Total != null)
                                                                                 {
                                                                                     <tr class="line-height-10">
                                                                                         <td class="p-0 text-right" width="50%">
@@ -749,7 +749,7 @@
                                                                                         </td>
                                                                                         <td class="text-right p-0">
                                                                                             @(Model?.CurrencyFormat == "CODE" ? Model?.Company?.Currency?.Code : 
-                                                                                            WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))<strong>@Model.total?.AmountForCompany</strong>
+                                                                                            WebUtility.HtmlDecode(Model?.Company?.Currency?.Symbol))<strong>@Model.Total?.AmountForCompany</strong>
                                                                                         </td>
                                                                                     </tr>
                                                                                 }
