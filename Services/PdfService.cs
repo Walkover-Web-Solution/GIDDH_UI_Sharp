@@ -17,7 +17,7 @@ namespace GiddhTemplate.Services
         private string _interFontCSS = string.Empty;
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1);
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
@@ -54,8 +54,8 @@ namespace GiddhTemplate.Services
                         var launchOptions = new LaunchOptions
                         {
                             Headless = true,
-                            // ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
-                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
+                             ExecutablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Local path MacOS
+//                            ExecutablePath = "/usr/bin/google-chrome", // Server Google Chrome path
                             // ExecutablePath = "C:/Program Files/Google/Chrome/Application/chrome.exe", // Local path Windows
                             Args = new[]
                             {
@@ -63,10 +63,25 @@ namespace GiddhTemplate.Services
                                 "--disable-setuid-sandbox",
                                 "--disable-dev-shm-usage",
                                 "--disable-gpu",
-                                "--no-zygote",
-                                "--single-process",
+                                "--disable-software-rasterizer",
+                                "--disable-extensions",
+                                "--disable-background-networking",
+                                "--disable-default-apps",
+                                "--disable-sync",
+                                "--disable-translate",
+                                "--hide-scrollbars",
+                                "--metrics-recording-only",
+                                "--mute-audio",
+                                "--no-first-run",
+                                "--safebrowsing-disable-auto-update",
+                                "--disable-breakpad",
+                                "--disable-crash-reporter",
+                                "--disable-hang-monitor",
+                                "--renderer-process-limit=1",
+                                "--js-flags=--max-old-space-size=512",
                                 "--lang=en-US,ar-SA"
-                            }
+                            },
+                            Timeout = 60000
                         };
 
                         Console.WriteLine("[PdfService] Launching new browser instance with production flags...");
@@ -320,13 +335,17 @@ namespace GiddhTemplate.Services
         public async Task<string> GeneratePdfToFileAsync(Root request)
         {
             await _pdfGenerationSemaphore.WaitAsync();
-            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
             
             IPage? page = null;
             try
             {
                 var browser = await GetBrowserAsync();
-                page = await browser.NewPageAsync();
+                
+                Console.WriteLine("[PdfService] Creating new page...");
+                var pageTask = browser.NewPageAsync();
+                page = await pageTask.WaitAsync(TimeSpan.FromSeconds(30));
+                Console.WriteLine("[PdfService] Page created successfully.");
                 
                 var pdfOptions = new PdfOptions
                 {
@@ -455,7 +474,7 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
                 await page.SetContentAsync(html, new NavigationOptions
                 {
-                    Timeout = 30000,
+                    Timeout = 120000,
                     WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
                 });
                 
@@ -537,7 +556,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
             }
         }
     }

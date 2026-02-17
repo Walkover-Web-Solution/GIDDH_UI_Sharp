@@ -10,7 +10,7 @@ namespace GiddhTemplate.Services
         private readonly RazorTemplateService _razorTemplateService;
         private readonly PdfService _pdfService;
         private readonly string _templateBasePath;
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1);
 
         public AccountStatementPdfService(PdfService pdfService, RazorTemplateService razorTemplateService)
         {
@@ -22,13 +22,17 @@ namespace GiddhTemplate.Services
         public async Task<string> GenerateAccountStatementPdfToFileAsync(Root request)
         {
             await _pdfGenerationSemaphore.WaitAsync();
-            Console.WriteLine($"[AccountStatementPdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+            Console.WriteLine($"[AccountStatementPdfService] PDF generation started. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
             
             IPage? page = null;
             try
             {
                 var browser = await _pdfService.GetBrowserAsync();
-                page = await browser.NewPageAsync();
+                
+                Console.WriteLine("[AccountStatementPdfService] Creating new page...");
+                var pageTask = browser.NewPageAsync();
+                page = await pageTask.WaitAsync(TimeSpan.FromSeconds(30));
+                Console.WriteLine("[AccountStatementPdfService] Page created successfully.");
 
                 var pdfOptions = new PdfOptions
             {
@@ -72,7 +76,7 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"[AccountStatementPdfService] Setting page content (HTML size: {htmlContent.Length} bytes)...");
                 await page.SetContentAsync(htmlContent, new NavigationOptions
                 {
-                    Timeout = 30000,
+                    Timeout = 120000,
                     WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
                 });
                 
@@ -153,7 +157,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[AccountStatementPdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+                Console.WriteLine($"[AccountStatementPdfService] PDF generation completed. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
             }
         }
 
