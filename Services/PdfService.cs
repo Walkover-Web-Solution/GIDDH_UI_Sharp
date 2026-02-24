@@ -474,8 +474,8 @@ namespace GiddhTemplate.Services
                 Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
                 await page.SetContentAsync(html, new NavigationOptions
                 {
-                    Timeout = 30000,
-                    WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
+                    Timeout = 60000,
+                    WaitUntil = new[] { WaitUntilNavigation.Load }
                 });
                 
                 Console.WriteLine("[PdfService] Emulating print media type...");
