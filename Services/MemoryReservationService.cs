@@ -19,7 +19,7 @@ namespace GiddhTemplate.Services
             _logger = logger;
             
             // Read configuration (default: 1GB = 1,073,741,824 bytes)
-            _reservedMemoryBytes = configuration.GetValue<long>("MemoryReservation:ReservedMemoryBytes", 1073741824);
+            _reservedMemoryBytes = configuration.GetValue<long>("MemoryReservation:ReservedMemoryBytes", 209715200);
             _enabled = configuration.GetValue<bool>("MemoryReservation:Enabled", false);
         }
 
