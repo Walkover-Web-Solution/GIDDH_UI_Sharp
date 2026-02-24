@@ -64,8 +64,9 @@ namespace GiddhTemplate.Controllers
                 }
 
                 // Stream PDF from disk (memory efficient)
+                Response.Headers.Add("Content-Disposition", "inline; filename=\"invoice.pdf\"");
                 var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
-                return File(fileStream, "application/pdf", "invoice.pdf");
+                return File(fileStream, "application/pdf");
             }
             catch
             {
