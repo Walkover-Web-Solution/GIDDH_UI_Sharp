@@ -59,7 +59,7 @@ namespace GiddhTemplate.Controllers
                 }
 
                 // Stream PDF from disk (memory efficient)
-                Response.Headers.Add("Content-Disposition", "inline; filename=\"account-statement.pdf\"");
+                Response.Headers.Add("Content-Disposition", "attachment; filename=\"account-statement.pdf\"");
                 var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
                 return File(fileStream, "application/pdf");
             }
