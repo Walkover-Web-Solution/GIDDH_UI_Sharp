@@ -11,13 +11,13 @@ namespace GiddhTemplate.Services
     {
         private readonly RazorTemplateService _razorTemplateService;
 
-        private string _openSansFontCSS = string.Empty;
-        private string _robotoFontCSS = string.Empty;
-        private string _latoFontCSS = string.Empty;
-        private string _interFontCSS = string.Empty;
+        private static string _openSansFontCSS = string.Empty;
+        private static string _robotoFontCSS = string.Empty;
+        private static string _latoFontCSS = string.Empty;
+        private static string _interFontCSS = string.Empty;
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
@@ -77,7 +77,7 @@ namespace GiddhTemplate.Services
                                 "--disable-breakpad",
                                 "--disable-crash-reporter",
                                 "--disable-hang-monitor",
-                                "--renderer-process-limit=1",
+                                "--renderer-process-limit=3",
                                 "--js-flags=--max-old-space-size=512",
                                 "--lang=en-US,ar-SA"
                             },
@@ -335,7 +335,7 @@ namespace GiddhTemplate.Services
         public async Task<string> GeneratePdfToFileAsync(Root request)
         {
             await _pdfGenerationSemaphore.WaitAsync();
-            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
+            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
             
             IPage? page = null;
             try
@@ -556,7 +556,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {1 - _pdfGenerationSemaphore.CurrentCount}/1");
+                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
             }
         }
     }
