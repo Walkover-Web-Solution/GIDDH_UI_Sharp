@@ -16,8 +16,8 @@ namespace GiddhTemplate.Services
         private static string _latoFontCSS = string.Empty;
         private static string _interFontCSS = string.Empty;
 
-        private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(3, 3);
+        private static readonly SemaphoreSlim _browserLock = new(1, 3);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(2, 5);
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
