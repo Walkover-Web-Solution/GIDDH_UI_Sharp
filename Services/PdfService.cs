@@ -11,13 +11,13 @@ namespace GiddhTemplate.Services
     {
         private readonly RazorTemplateService _razorTemplateService;
 
-        private static string _openSansFontCSS = string.Empty;
-        private static string _robotoFontCSS = string.Empty;
-        private static string _latoFontCSS = string.Empty;
-        private static string _interFontCSS = string.Empty;
+        private static string? _openSansFontCSS = null;
+        private static string? _robotoFontCSS = null;
+        private static string? _latoFontCSS = null;
+        private static string? _interFontCSS = null;
 
-        private static readonly SemaphoreSlim _browserLock = new(1, 3);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(2, 5);
+        private static readonly SemaphoreSlim _browserLock = new(1, 1);
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 5); // 1 active + 4 queued max
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
@@ -77,8 +77,13 @@ namespace GiddhTemplate.Services
                                 "--disable-breakpad",
                                 "--disable-crash-reporter",
                                 "--disable-hang-monitor",
-                                "--renderer-process-limit=3",
-                                "--js-flags=--max-old-space-size=512",
+                                "--renderer-process-limit=1",
+                                "--js-flags=--max-old-space-size=128",
+                                "--memory-pressure-off",
+                                "--max-gum-fps=5",
+                                "--disable-canvas-aa",
+                                "--disable-2d-canvas-clip-aa",
+                                "--disable-gl-drawing-for-tests",
                                 "--lang=en-US,ar-SA"
                             },
                             Timeout = 60000
@@ -335,8 +340,10 @@ namespace GiddhTemplate.Services
         public async Task<string> GeneratePdfToFileAsync(Root request)
         {
             await _pdfGenerationSemaphore.WaitAsync();
-            Console.WriteLine($"[PdfService] PDF generation started. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
-            
+            int activeSlots = 1 - _pdfGenerationSemaphore.CurrentCount;
+            Console.WriteLine($"[PdfService] PDF generation started. Active: {activeSlots}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1));
             IPage? page = null;
             try
             {
@@ -344,7 +351,7 @@ namespace GiddhTemplate.Services
                 
                 Console.WriteLine("[PdfService] Creating new page...");
                 var pageTask = browser.NewPageAsync();
-                page = await pageTask.WaitAsync(TimeSpan.FromSeconds(30));
+                page = await pageTask.WaitAsync(cts.Token);
                 Console.WriteLine("[PdfService] Page created successfully.");
                 
                 var pdfOptions = new PdfOptions
@@ -471,13 +478,18 @@ namespace GiddhTemplate.Services
                     styles.Background
                 );
 
+                // Free large intermediate strings immediately — Chrome has its own copy after SetContentAsync
+                header = null; footer = null; body = null;
+
                 Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
+                cts.Token.ThrowIfCancellationRequested();
                 await page.SetContentAsync(html, new NavigationOptions
                 {
                     Timeout = 60000,
                     WaitUntil = new[] { WaitUntilNavigation.Load }
                 });
-                
+                html = null; // release before PDF generation — no longer needed
+
                 Console.WriteLine("[PdfService] Emulating print media type...");
                 await page.EmulateMediaTypeAsync(MediaType.Print);
 
@@ -492,6 +504,7 @@ namespace GiddhTemplate.Services
                 string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
                 Console.WriteLine($"[PdfService] Generating PDF to: {tempFilePath}");
+                cts.Token.ThrowIfCancellationRequested();
                 await page.PdfAsync(tempFilePath, pdfOptions);
                 Console.WriteLine($"[PdfService] PDF generated successfully. File size: {new FileInfo(tempFilePath).Length} bytes");
 
@@ -517,16 +530,21 @@ namespace GiddhTemplate.Services
                     File.Copy(tempFilePath, downloadFilePath, overwrite: false);
                 }
 
+                GC.Collect(2, GCCollectionMode.Forced, blocking: true);
+                GC.WaitForPendingFinalizers();
                 return tempFilePath;
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("[PdfService] PDF generation timed out after 1 minute. Slot released for next request.");
+                throw new TimeoutException("PDF generation timed out after 1 minute.");
             }
             catch (PuppeteerSharp.TargetClosedException ex)
             {
                 Console.WriteLine($"[PdfService] CRITICAL: Chrome process crashed (TargetClosedException): {ex.Message}");
                 Console.WriteLine("[PdfService] This usually means Chrome ran out of memory or was killed by OOM killer.");
                 Console.WriteLine("[PdfService] Browser will be recreated on next request.");
-                
                 _browser = null;
-                
                 throw new Exception("PDF generation failed: Chrome process crashed. This may be due to insufficient memory or too many concurrent requests.", ex);
             }
             catch (PuppeteerSharp.NavigationException ex)
@@ -556,7 +574,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] PDF generation completed. Active requests: {3 - _pdfGenerationSemaphore.CurrentCount}/3");
+                Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
             }
         }
     }
