@@ -4,6 +4,9 @@ using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
 using System.Text.Json;
+using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace GiddhTemplate.Services
 {
@@ -17,8 +20,10 @@ namespace GiddhTemplate.Services
         private static string? _interFontCSS = null;
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 3); // 1 active + 4 queued max
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1); // 1 active, no queued
         private static IBrowser? _browser;
+        private static IPage? _sharedPage;
+        private static ConcurrentDictionary<string, (string Html, DateTime Expiry)> _htmlCache = new();
 
         private readonly int decreaseFontSize = 2;
 
@@ -64,7 +69,7 @@ namespace GiddhTemplate.Services
                                 "--disable-dev-shm-usage",
                                 "--disable-gpu",
                                 "--disable-software-rasterizer",
-                                "--disable-extensions",
+                                "--disable-plugins",
                                 "--disable-background-networking",
                                 "--disable-default-apps",
                                 "--disable-sync",
@@ -125,10 +130,18 @@ namespace GiddhTemplate.Services
                         _browser = null;
                         Console.WriteLine("[PdfService] Browser disposed successfully.");
                     }
+                    if (_sharedPage != null)
+                    {
+                        Console.WriteLine("[PdfService] Disposing shared page...");
+                        await _sharedPage.CloseAsync();
+                        await _sharedPage.DisposeAsync();
+                        _sharedPage = null;
+                        Console.WriteLine("[PdfService] Shared page disposed successfully.");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[PdfService] Error disposing browser: {ex.Message}");
+                    Console.WriteLine($"[PdfService] Error disposing browser or page: {ex.Message}");
                 }
                 finally
                 {
@@ -137,8 +150,15 @@ namespace GiddhTemplate.Services
             }
         }
 
-        private async Task<string> LoadFileContentAsync(string filePath) =>
-            File.Exists(filePath) ? await File.ReadAllTextAsync(filePath) : string.Empty;
+        private static void CleanExpiredCache()
+        {
+            var now = DateTime.Now;
+            var expiredKeys = _htmlCache.Where(kvp => kvp.Value.Expiry < now).Select(kvp => kvp.Key).ToList();
+            foreach (var key in expiredKeys)
+            {
+                _htmlCache.TryRemove(key, out _);
+            }
+        }
 
         public async Task<(string Common, string Header, string Footer, string Body, string Background)>
             LoadStylesAsync(string basePath)
@@ -343,143 +363,170 @@ namespace GiddhTemplate.Services
             int activeSlots = 1 - _pdfGenerationSemaphore.CurrentCount;
             Console.WriteLine($"[PdfService] PDF generation started. Active: {activeSlots}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+            var sw = Stopwatch.StartNew();
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45));
             IPage? page = null;
             try
             {
-                var browser = await GetBrowserAsync();
-                
-                Console.WriteLine("[PdfService] Creating new page...");
-                var pageTask = browser.NewPageAsync();
-                page = await pageTask.WaitAsync(cts.Token);
-                Console.WriteLine("[PdfService] Page created successfully.");
-                
-                var pdfOptions = new PdfOptions
+                // Compute request hash for caching
+                string requestJson = JsonSerializer.Serialize(request);
+                string hash = ComputeMD5(requestJson);
+
+                CleanExpiredCache(); // Clean expired entries before checking
+
+                string html;
+                if (_htmlCache.TryGetValue(hash, out var cached) && cached.Expiry > DateTime.Now)
                 {
-                    Format = PaperFormat.A4,
-                    Landscape = false,
-                    PrintBackground = true,
-                    PreferCSSPageSize = true,
-                    DisplayHeaderFooter = false,
-                    MarginOptions = new MarginOptions
-                    {
-                        Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
-                        Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
-                        Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
-                        Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
-                    }
-                };
-
-                string templateType = request?.TemplateType?.ToUpper();
-
-                string templateFolderName = templateType switch
-                {
-                    "TALLY" => "Tally",
-                    "THERMAL" => "Thermal",
-                    _ => "TemplateA"
-                };
-
-                string templatePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "Templates",
-                    templateFolderName
-                );
-
-                var styles = await LoadStylesAsync(templatePath);
-
-                string headerFile = null;
-                string bodyFile = null;
-                string footerFile = "Footer.cshtml";
-
-                bool isReceiptOrPayment = false;
-                bool isThermal = templateFolderName == "Thermal";
-
-                switch (templateFolderName)
-                {
-                    case "Tally":
-                        headerFile = "Header.cshtml";
-                        bodyFile = "Body.cshtml";
-                        footerFile = "Footer.cshtml";
-                        break;
-
-                    case "TemplateA":
-                        if (string.Equals(request?.VoucherType,
-                                VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue(),
-                                StringComparison.OrdinalIgnoreCase)
-                            ||
-                            string.Equals(request?.VoucherType,
-                                VoucherTypeEnums.Payment.GetVoucherTypeEnumValue(),
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            isReceiptOrPayment = true;
-                            bodyFile = "Receipt_Payment_Body.cshtml";
-                        }
-                        else if (
-                            string.Equals(request?.VoucherType,
-                                VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(),
-                                StringComparison.OrdinalIgnoreCase)
-                            ||
-                            string.Equals(request?.VoucherType,
-                                VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(),
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            headerFile = "PO_PB_Header.cshtml";
-                            bodyFile = "PO_PB_Body.cshtml";
-                        }
-                        else
-                        {
-                            headerFile = "Header.cshtml";
-                            bodyFile = "Body.cshtml";
-                        }
-
-                        break;
-
-                    case "Thermal":
-                        bodyFile = "Body.cshtml";
-                        break;
-
-                    default:
-                        headerFile = "Header.cshtml";
-                        bodyFile = "Body.cshtml";
-                        break;
-                }
-
-                string header = null, footer = null, body;
-
-                if (isReceiptOrPayment || isThermal)
-                {
-                    body = await RenderTemplate(Path.Combine(templatePath, bodyFile), request);
+                    html = cached.Html;
+                    Console.WriteLine("[PdfService] Using cached HTML.");
                 }
                 else
                 {
-                    var tasks = new[]
+                    // Render HTML from scratch
+                    var pdfOptions = new PdfOptions
                     {
-                        RenderTemplate(Path.Combine(templatePath, headerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, footerFile), request),
-                        RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        Format = PaperFormat.A4,
+                        Landscape = false,
+                        PrintBackground = true,
+                        PreferCSSPageSize = true,
+                        DisplayHeaderFooter = false,
+                        MarginOptions = new MarginOptions
+                        {
+                            Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
+                            Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
+                            Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
+                            Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
+                        },
+                        Timeout = 30000
                     };
 
-                    await Task.WhenAll(tasks);
+                    string templateType = request?.TemplateType?.ToUpper();
 
-                    header = tasks[0].Result;
-                    footer = tasks[1].Result;
-                    body = tasks[2].Result;
+                    string templateFolderName = templateType switch
+                    {
+                        "TALLY" => "Tally",
+                        "THERMAL" => "Thermal",
+                        _ => "TemplateA"
+                    };
+
+                    string templatePath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "Templates",
+                        templateFolderName
+                    );
+
+                    var styles = await LoadStylesAsync(templatePath);
+
+                    string headerFile = null;
+                    string bodyFile = null;
+                    string footerFile = "Footer.cshtml";
+
+                    bool isReceiptOrPayment = false;
+                    bool isThermal = templateFolderName == "Thermal";
+
+                    switch (templateFolderName)
+                    {
+                        case "Tally":
+                            headerFile = "Header.cshtml";
+                            bodyFile = "Body.cshtml";
+                            footerFile = "Footer.cshtml";
+                            break;
+
+                        case "TemplateA":
+                            if (string.Equals(request?.VoucherType,
+                                    VoucherTypeEnums.Receipt.GetVoucherTypeEnumValue(),
+                                    StringComparison.OrdinalIgnoreCase)
+                                ||
+                                string.Equals(request?.VoucherType,
+                                    VoucherTypeEnums.Payment.GetVoucherTypeEnumValue(),
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                isReceiptOrPayment = true;
+                                bodyFile = "Receipt_Payment_Body.cshtml";
+                            }
+                            else if (
+                                string.Equals(request?.VoucherType,
+                                    VoucherTypeEnums.PurchaseOrder.GetVoucherTypeEnumValue(),
+                                    StringComparison.OrdinalIgnoreCase)
+                                ||
+                                string.Equals(request?.VoucherType,
+                                    VoucherTypeEnums.PurchaseBill.GetVoucherTypeEnumValue(),
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                headerFile = "PO_PB_Header.cshtml";
+                                bodyFile = "PO_PB_Body.cshtml";
+                            }
+                            else
+                            {
+                                headerFile = "Header.cshtml";
+                                bodyFile = "Body.cshtml";
+                            }
+
+                            break;
+
+                        case "Thermal":
+                            bodyFile = "Body.cshtml";
+                            break;
+
+                        default:
+                            headerFile = "Header.cshtml";
+                            bodyFile = "Body.cshtml";
+                            break;
+                    }
+
+                    string header = null, footer = null, body;
+
+                    if (isReceiptOrPayment || isThermal)
+                    {
+                        body = await RenderTemplate(Path.Combine(templatePath, bodyFile), request);
+                    }
+                    else
+                    {
+                        var tasks = new[]
+                        {
+                            RenderTemplate(Path.Combine(templatePath, headerFile), request),
+                            RenderTemplate(Path.Combine(templatePath, footerFile), request),
+                            RenderTemplate(Path.Combine(templatePath, bodyFile), request)
+                        };
+
+                        await Task.WhenAll(tasks);
+
+                        header = tasks[0].Result;
+                        footer = tasks[1].Result;
+                        body = tasks[2].Result;
+                    }
+
+                    html = await CreatePdfDocumentAsync(
+                        header,
+                        body,
+                        footer,
+                        styles.Common,
+                        styles.Header,
+                        styles.Footer,
+                        styles.Body,
+                        request,
+                        styles.Background
+                    );
+
+                    // Cache the HTML
+                    _htmlCache[hash] = (html, DateTime.Now.AddMinutes(10));
+                    Console.WriteLine("[PdfService] HTML cached for future use.");
                 }
 
-                string html = await CreatePdfDocumentAsync(
-                    header,
-                    body,
-                    footer,
-                    styles.Common,
-                    styles.Header,
-                    styles.Footer,
-                    styles.Body,
-                    request,
-                    styles.Background
-                );
-
-                // Free large intermediate strings immediately — Chrome has its own copy after SetContentAsync
-                header = null; footer = null; body = null;
+                var browser = await GetBrowserAsync();
+                
+                if (_sharedPage == null || _sharedPage.IsClosed)
+                {
+                    Console.WriteLine("[PdfService] Creating new shared page...");
+                    _sharedPage = await browser.NewPageAsync();
+                    Console.WriteLine("[PdfService] Shared page created successfully.");
+                }
+                page = _sharedPage;
+                // Reset page content
+                Console.WriteLine("[PdfService] Resetting shared page content...");
+                await page.SetContentAsync("<html></html>", new NavigationOptions { Timeout = 5000, WaitUntil = new[] { WaitUntilNavigation.Load } });
+                Console.WriteLine("[PdfService] Shared page reset successfully.");
 
                 Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
                 cts.Token.ThrowIfCancellationRequested();
@@ -503,10 +550,13 @@ namespace GiddhTemplate.Services
                 
                 string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Memory before PDF: {GC.GetTotalMemory(false)} bytes");
                 Console.WriteLine($"[PdfService] Generating PDF to: {tempFilePath}");
                 cts.Token.ThrowIfCancellationRequested();
                 await page.PdfAsync(tempFilePath, pdfOptions);
                 Console.WriteLine($"[PdfService] PDF generated successfully. File size: {new FileInfo(tempFilePath).Length} bytes");
+                sw.Stop();
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] PDF generation took {sw.ElapsedMilliseconds}ms");
 
                 // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
@@ -536,15 +586,16 @@ namespace GiddhTemplate.Services
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("[PdfService] PDF generation timed out after 1 minute. Slot released for next request.");
-                throw new TimeoutException("PDF generation timed out after 1 minute.");
+                Console.WriteLine("[PdfService] PDF generation timed out after 45 seconds. Slot released for next request.");
+                throw new TimeoutException("PDF generation timed out after 45 seconds.");
             }
             catch (PuppeteerSharp.TargetClosedException ex)
             {
                 Console.WriteLine($"[PdfService] CRITICAL: Chrome process crashed (TargetClosedException): {ex.Message}");
                 Console.WriteLine("[PdfService] This usually means Chrome ran out of memory or was killed by OOM killer.");
-                Console.WriteLine("[PdfService] Browser will be recreated on next request.");
+                Console.WriteLine("[PdfService] Browser and shared page will be recreated on next request.");
                 _browser = null;
+                _sharedPage = null;
                 throw new Exception("PDF generation failed: Chrome process crashed. This may be due to insufficient memory or too many concurrent requests.", ex);
             }
             catch (PuppeteerSharp.NavigationException ex)
@@ -560,19 +611,6 @@ namespace GiddhTemplate.Services
             }
             finally
             {
-                if (page != null)
-                {
-                    try
-                    {
-                        await page.CloseAsync();
-                        await page.DisposeAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[PdfService] Error closing page: {ex.Message}");
-                    }
-                }
-                
                 _pdfGenerationSemaphore.Release();
                 Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
             }
