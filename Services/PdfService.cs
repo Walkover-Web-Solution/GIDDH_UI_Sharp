@@ -83,7 +83,7 @@ namespace GiddhTemplate.Services
                                 "--disable-crash-reporter",
                                 "--disable-hang-monitor",
                                 "--renderer-process-limit=1",
-                                "--js-flags=--max-old-space-size=64",
+                                "--js-flags=--max-old-space-size=128",
                                 "--memory-pressure-off",
                                 "--max-gum-fps=5",
                                 "--disable-canvas-aa",
@@ -150,11 +150,14 @@ namespace GiddhTemplate.Services
             }
         }
 
-        private static string ComputeMD5(string input)
+        private static void CleanExpiredCache()
         {
-            using var md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-            return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            var now = DateTime.Now;
+            var expiredKeys = _htmlCache.Where(kvp => kvp.Value.Expiry < now).Select(kvp => kvp.Key).ToList();
+            foreach (var key in expiredKeys)
+            {
+                _htmlCache.TryRemove(key, out _);
+            }
         }
 
         public async Task<(string Common, string Header, string Footer, string Body, string Background)>
@@ -369,6 +372,8 @@ namespace GiddhTemplate.Services
                 // Compute request hash for caching
                 string requestJson = JsonSerializer.Serialize(request);
                 string hash = ComputeMD5(requestJson);
+
+                CleanExpiredCache(); // Clean expired entries before checking
 
                 string html;
                 if (_htmlCache.TryGetValue(hash, out var cached) && cached.Expiry > DateTime.Now)
