@@ -17,7 +17,7 @@ namespace GiddhTemplate.Services
         private static string? _interFontCSS = null;
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 3); // 1 active + 4 queued max
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1); // 1 active + 0 queued max
         private static IBrowser? _browser;
 
         private readonly int decreaseFontSize = 2;
