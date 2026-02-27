@@ -259,6 +259,15 @@ namespace GiddhTemplate.Services
             return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
         }
 
+        private async Task<string> LoadFileContentAsync(string filePath) =>
+            File.Exists(filePath) ? await File.ReadAllTextAsync(filePath) : string.Empty;
+
+        private static string ComputeMD5(string input)
+        {
+            var bytes = MD5.HashData(Encoding.UTF8.GetBytes(input));
+            return Convert.ToHexString(bytes);
+        }
+
         private async Task<string> ConvertToBase64Async(string filePath)
         {
             byte[] fileBytes = await File.ReadAllBytesAsync(filePath);
@@ -367,6 +376,21 @@ namespace GiddhTemplate.Services
 
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45));
             IPage? page = null;
+            var pdfOptions = new PdfOptions
+            {
+                Format = PaperFormat.A4,
+                Landscape = false,
+                PrintBackground = true,
+                PreferCSSPageSize = true,
+                DisplayHeaderFooter = false,
+                MarginOptions = new MarginOptions
+                {
+                    Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
+                    Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
+                    Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
+                    Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
+                }
+            };
             try
             {
                 // Compute request hash for caching
@@ -384,23 +408,6 @@ namespace GiddhTemplate.Services
                 else
                 {
                     // Render HTML from scratch
-                    var pdfOptions = new PdfOptions
-                    {
-                        Format = PaperFormat.A4,
-                        Landscape = false,
-                        PrintBackground = true,
-                        PreferCSSPageSize = true,
-                        DisplayHeaderFooter = false,
-                        MarginOptions = new MarginOptions
-                        {
-                            Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
-                            Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
-                            Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
-                            Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
-                        },
-                        Timeout = 30000
-                    };
-
                     string templateType = request?.TemplateType?.ToUpper();
 
                     string templateFolderName = templateType switch
