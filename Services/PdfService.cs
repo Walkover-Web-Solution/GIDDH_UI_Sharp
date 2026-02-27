@@ -4,6 +4,7 @@ using InvoiceData;
 using PuppeteerSharp.Media;
 using GiddhTemplate.Models.Enums;
 using System.Text.Json;
+using System.Collections.Concurrent;
 
 namespace GiddhTemplate.Services
 {
@@ -15,6 +16,8 @@ namespace GiddhTemplate.Services
         private static string? _robotoFontCSS = null;
         private static string? _latoFontCSS = null;
         private static string? _interFontCSS = null;
+
+        private static readonly ConcurrentDictionary<string, (string Common, string Header, string Footer, string Body, string Background)> _stylesCache = new();
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
         private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1); // 1 active + 0 queued max
@@ -143,6 +146,11 @@ namespace GiddhTemplate.Services
         public async Task<(string Common, string Header, string Footer, string Body, string Background)>
             LoadStylesAsync(string basePath)
         {
+            if (_stylesCache.TryGetValue(basePath, out var cachedStyles))
+            {
+                return cachedStyles;
+            }
+
             var tasks = new[]
             {
                 LoadFileContentAsync(Path.Combine(basePath, "Styles", "Styles.css")),
@@ -154,13 +162,16 @@ namespace GiddhTemplate.Services
 
             await Task.WhenAll(tasks);
 
-            return (
+            var styles = (
                 Common: tasks[0].Result,
                 Header: tasks[1].Result,
                 Footer: tasks[2].Result,
                 Body: tasks[3].Result,
                 Background: tasks[4].Result
             );
+
+            _stylesCache[basePath] = styles;
+            return styles;
         }
 
         public async Task<string> LoadFontCSSAsync(string fontFamily)
@@ -575,6 +586,9 @@ namespace GiddhTemplate.Services
                 
                 _pdfGenerationSemaphore.Release();
                 Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+
+                // Dispose browser after each PDF to free memory
+                await DisposeBrowserAsync();
             }
         }
     }
