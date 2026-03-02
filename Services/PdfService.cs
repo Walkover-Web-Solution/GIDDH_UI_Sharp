@@ -586,9 +586,6 @@ namespace GiddhTemplate.Services
                 
                 _pdfGenerationSemaphore.Release();
                 Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
-
-                // Dispose browser after each PDF to free memory
-                await DisposeBrowserAsync();
             }
         }
     }
