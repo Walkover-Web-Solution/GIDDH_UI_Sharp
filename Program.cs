@@ -71,7 +71,7 @@ public class Program
             .Enrich.WithProperty("Company", company)
             .Enrich.WithProperty("Product", product)
             .WriteTo.Console(new JsonFormatter())
-            .WriteTo.File(new JsonFormatter(), logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
+            .WriteTo.File(new JsonFormatter(), logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .CreateLogger();
 
         try
