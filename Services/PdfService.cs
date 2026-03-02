@@ -206,7 +206,7 @@ namespace GiddhTemplate.Services
             };
         }
 
-        public async Task<string> BuildFontCSSAsync(string family, string path)
+        public Task<string> BuildFontCSSAsync(string family, string path)
         {
             var styles = new[]
             {
@@ -221,39 +221,25 @@ namespace GiddhTemplate.Services
             };
 
             var sb = new StringBuilder();
-            var tasks = new List<Task<string>>();
 
             foreach (var (style, weight, fontStyle) in styles)
             {
                 string file = Path.Combine(path, $"{family.Replace(" ", "")}-{style}.ttf");
-                tasks.Add(ConvertToBase64Async(file));
-            }
-
-            var base64Results = await Task.WhenAll(tasks);
-
-            for (int i = 0; i < styles.Length; i++)
-            {
-                var (style, weight, fontStyle) = styles[i];
+                string fileUri = new Uri(file).AbsoluteUri;
                 sb.Append(
                     $"@font-face {{ font-family: '{family}'; " +
-                    $"src: url('{base64Results[i]}') format('truetype'); " +
+                    $"src: url('{fileUri}') format('truetype'); " +
                     $"font-weight: {weight}; font-style: {fontStyle}; " +
                     $"unicode-range: U+0020-007E, U+00A0-00FF; }}\n"
                 );
             }
 
-            return sb.ToString();
+            return Task.FromResult(sb.ToString());
         }
 
         public async Task<string> RenderTemplate(string templatePath, Root request)
         {
             return await _razorTemplateService.RenderTemplateAsync(templatePath, request);
-        }
-
-        private async Task<string> ConvertToBase64Async(string filePath)
-        {
-            byte[] fileBytes = await File.ReadAllBytesAsync(filePath);
-            return "data:font/truetype;charset=utf-8;base64," + Convert.ToBase64String(fileBytes);
         }
 
         /// <summary>
@@ -586,9 +572,6 @@ namespace GiddhTemplate.Services
                 
                 _pdfGenerationSemaphore.Release();
                 Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
-
-                // Dispose browser after each PDF to free memory
-                await DisposeBrowserAsync();
             }
         }
     }
