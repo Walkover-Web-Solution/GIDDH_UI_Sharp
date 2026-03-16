@@ -41,7 +41,11 @@ namespace GiddhTemplate.Controllers
                 // Deserialize request
                 var jsonString = JsonSerializer.Serialize(requestObj);
                 Root request = JsonSerializer.Deserialize<Root>(jsonString,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        Converters = { new GiddhTemplate.Converters.NumberToStringConverter() }
+                    });
 
                 if (request == null || string.IsNullOrEmpty(request.Company?.Name))
                 {

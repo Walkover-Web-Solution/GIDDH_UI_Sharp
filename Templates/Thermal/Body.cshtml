@@ -181,7 +181,7 @@
                                     </td>
                                     <td width="20%" class="vertical-align-top text-right no-wrap">
                                         @if (entry?.Stock?.Quantity != null) {
-                                            @entry?.Stock?.Quantity?.ToString("N0") <span>@entry?.Stock?.StockUnit?.Code</span>
+                                            @entry?.Stock?.Quantity <span>@entry?.Stock?.StockUnit?.Code</span>
                                         } else
                                         {
                                             <span>-</span>
@@ -190,7 +190,7 @@
                                     <td width="20%" class="vertical-align-top text-right no-wrap">
                                         @if (entry?.Stock?.Rate != null)
                                         {
-                                            @entry?.Stock?.Rate?.AmountForAccount?.ToString("N2")
+                                            @entry?.Stock?.Rate?.AmountForAccount
                                             @if (IsShowAmountForCompany() && entry?.Stock?.Rate?.AmountForCompany != null)
                                             {
                                                 <p class="color-light-gray font-size-small">
@@ -203,7 +203,7 @@
                                         }
                                     </td>
                                     <td width="25%" class="vertical-align-top text-right no-wrap">
-                                        @entry?.Amount?.AmountForAccount?.ToString("N2")
+                                        @entry?.Amount?.AmountForAccount
                                         @if (IsShowAmountForCompany() && entry?.EntryTotal?.AmountForCompany != null)
                                         {
                                             <p class="color-light-gray font-size-small">
@@ -229,7 +229,7 @@
                             <td class="vertical-align-top p-0" width="50%">
                                 @if (GetDisplayStatus("TotalQuantity"))
                                 {
-                                    @GetLabel("TotalQuantity") <span>@Model?.Entries?.Sum(e => e?.Stock?.Quantity ?? 0).ToString("N0")</span>
+                                    @GetLabel("TotalQuantity") <span>@Model?.Entries?.Sum(e => e?.Stock?.Quantity ?? 0)</span>
                                 }
                             </td>
                             <td class="vertical-align-top p-0" width="50%">
@@ -238,14 +238,14 @@
                                     {
                                         <tr>
                                             <td width="60%">@GetLabel("Discount")</td>
-                                            <td class="text-right p-0" width="40%">@Model?.Entries?.Sum(e => e?.SumOfDiscounts?.AmountForAccount ?? 0).ToString("N2")</td>
+                                            <td class="text-right p-0" width="40%">@Model?.Entries?.Sum(e => decimal.TryParse(e?.SumOfDiscounts?.AmountForAccount, out var sumOfDiscountsAmountForAccount) ? sumOfDiscountsAmountForAccount : 0)</td>
                                         </tr>
                                     }
                                     @if (GetDisplayStatus("TaxableAmount"))
                                     {
                                         <tr>
                                             <td width="60%">@GetLabel("TaxableAmount")</td>
-                                            <td class="text-right p-0" width="40%">@Model?.TaxableAmount?.AmountForAccount?.ToString("N2")
+                                            <td class="text-right p-0" width="40%">@Model?.TaxableAmount?.AmountForAccount
                                             </td>
                                         </tr>
                                     }
@@ -255,8 +255,8 @@
                                         @foreach (var tax in Model.GstTaxesTotal)
                                         {
                                             <tr>
-                                                <td width="60%">@tax?.TaxType@(tax?.TaxPercent?.ToString("N0"))%</td>
-                                                <td class="text-right p-0" width="40%">@tax?.Amount?.AmountForAccount?.ToString("N2")</td>
+                                                <td width="60%">@tax?.TaxType@(tax?.TaxPercent)%</td>
+                                                <td class="text-right p-0" width="40%">@tax?.Amount?.AmountForAccount</td>
                                             </tr>
                                         }
                                     }
