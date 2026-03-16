@@ -175,10 +175,10 @@ namespace InvoiceData
 
     public class Margin
     {
-        public double? Top { get; set; }
-        public double? Right { get; set; }
-        public double? Bottom { get; set; }
-        public double? Left { get; set; }
+        public string? Top { get; set; }
+        public string? Right { get; set; }
+        public string? Bottom { get; set; }
+        public string? Left { get; set; }
     }
 
     public class Font
@@ -204,8 +204,8 @@ namespace InvoiceData
 
     public class Amount
     {
-        public double? AmountForAccount { get; set; }
-        public double? AmountForCompany { get; set; }
+        public string? AmountForAccount { get; set; }
+        public string? AmountForCompany { get; set; }
     }
 
     public class AmountAsString
@@ -225,7 +225,7 @@ namespace InvoiceData
         public string? Name { get; set; } // In Case of Estimate/Proforma
         public string? AccountName { get; set; }
         public Amount? Amount { get; set; }
-        public double? TaxPercent { get; set; }
+        public string? TaxPercent { get; set; }
         public bool? ConsiderInItemTotal { get; set; }
         public bool? ConsiderInVoucherTotal { get; set; }
         public bool? ShowOnVoucher { get; set; }
@@ -303,7 +303,7 @@ namespace InvoiceData
     {
         public string? AccountName { get; set; }
         public Amount? Amount { get; set; }
-        public double? TaxPercent { get; set; }
+        public string? TaxPercent { get; set; }
         public string? AccountUniqueName { get; set; }
     }
 
@@ -323,7 +323,7 @@ namespace InvoiceData
         public Amount? SumOfDiscounts { get; set; }
         public string? Description { get; set; }
         public string? HsnNumber { get; set; }
-        public double? UsedQuantity { get; set; }
+        public string? UsedQuantity { get; set; }
         public string? SacNumber { get; set; }
     }
 
@@ -335,7 +335,7 @@ namespace InvoiceData
     public class CommonDiscountEntry
     {
         public string? AccountName { get; set; }
-        public double? Amount { get; set; }
+        public string? Amount { get; set; }
     }
 
     public class Root
@@ -356,7 +356,7 @@ namespace InvoiceData
         public WarehouseDetails? WarehouseDetails { get; set; }
         public Amount? Balance { get; set; }
         public string? PlaceOfSupply { get; set; }
-        public double? ExchangeRate { get; set; }
+        public string? ExchangeRate { get; set; }
         public string? PlaceOfCountry { get; set; }
         public string? LutNumber { get; set; }
         public string? CustomerName { get; set; }
@@ -419,10 +419,10 @@ namespace InvoiceData
         public string? formNameInvoice { get; set; }
         public string? CompanyTaxType { get; set; }
         public List<CommonDiscountEntry>? CommonDiscountEntries { get; set; }
-        public double? OtherDiscount { get; set; }
+        public string? OtherDiscount { get; set; }
         public string? VoucherType { get; set; }
         public VoucherTypeEnums VoucherTypeEnums { get; set; }
-        public double? PaymentTotal { get; set; }
+        public string? PaymentTotal { get; set; }
         public string? ChequeNumber { get; set; }
         public List<LabelValue>? AccountCustomFields { get; set; }
     }

@@ -360,10 +360,10 @@ namespace GiddhTemplate.Services
                     DisplayHeaderFooter = false,
                     MarginOptions = new MarginOptions
                     {
-                        Top = $"{Math.Max(request?.Theme?.Margin?.Top ?? 0, 10)}px",
-                        Bottom = $"{Math.Max(request?.Theme?.Margin?.Bottom ?? 0, 15)}px",
-                        Left = $"{Math.Max(request?.Theme?.Margin?.Left ?? 0, 10)}px",
-                        Right = $"{Math.Max(request?.Theme?.Margin?.Right ?? 0, 10)}px"
+                        Top = $"{Math.Max(int.TryParse(request?.Theme?.Margin?.Top, out var mt) ? mt : 0, 10)}px",
+                        Bottom = $"{Math.Max(int.TryParse(request?.Theme?.Margin?.Bottom, out var mb) ? mb : 0, 15)}px",
+                        Left = $"{Math.Max(int.TryParse(request?.Theme?.Margin?.Left, out var ml) ? ml : 0, 10)}px",
+                        Right = $"{Math.Max(int.TryParse(request?.Theme?.Margin?.Right, out var mr) ? mr : 0, 10)}px"
                     }
                 };
 
