@@ -35,6 +35,8 @@ namespace InvoiceData
         public Setting? DueDate { get; set; }
         public Setting? DisplayExchangeRate { get; set; }
         public Setting? DisplayPlaceOfSupply { get; set; }
+        public Setting? SourceOfSupply { get; set; }
+        public Setting? DestinationOfSupply { get; set; }
         public Setting? DisplayPlaceOfCountry { get; set; }
         public Setting? ShippingTaxNumber { get; set; }
         public Setting? CompanyTaxNumber { get; set; }
@@ -356,6 +358,8 @@ namespace InvoiceData
         public WarehouseDetails? WarehouseDetails { get; set; }
         public Amount? Balance { get; set; }
         public string? PlaceOfSupply { get; set; }
+        public string? DestinationOfSupply { get; set; }
+        public string? SourceOfSupply { get; set; }
         public double? ExchangeRate { get; set; }
         public string? PlaceOfCountry { get; set; }
         public string? LutNumber { get; set; }

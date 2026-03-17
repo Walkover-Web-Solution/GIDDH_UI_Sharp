@@ -314,6 +314,17 @@
                                                                                 </tr>
                                                                             }
 
+                                                                            @if (GetDisplayStatus("SourceOfSupply"))
+                                                                            {
+                                                                                <tr>
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
+                                                                                        @GetLabel("SourceOfSupply")
+                                                                                    </td>
+                                                                                    <td class="border-none p-0">:
+                                                                                        @Model?.SourceOfSupply</td>
+                                                                                </tr>
+                                                                            }
+
                                                                             @if (GetDisplayStatus("AttentionTo"))
                                                                             {
                                                                                 <tr>
@@ -390,6 +401,17 @@
                                                                                         </td>
                                                                                         <td class="border-none p-0">:
                                                                                             @Model?.AttentionTo</td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                                @if (GetDisplayStatus("DestinationOfSupply"))
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="border-none p-0 capitalize" width="120px">
+                                                                                            @GetLabel("DestinationOfSupply")
+                                                                                        </td>
+                                                                                        <td class="border-none p-0">:
+                                                                                            @Model?.DestinationOfSupply</td>
                                                                                     </tr>
                                                                                 }
 
