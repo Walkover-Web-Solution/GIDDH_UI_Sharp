@@ -35,8 +35,6 @@ namespace InvoiceData
         public Setting? DueDate { get; set; }
         public Setting? DisplayExchangeRate { get; set; }
         public Setting? DisplayPlaceOfSupply { get; set; }
-        public Setting? SourceOfSupply { get; set; }
-        public Setting? DestinationOfSupply { get; set; }
         public Setting? DisplayPlaceOfCountry { get; set; }
         public Setting? ShippingTaxNumber { get; set; }
         public Setting? CompanyTaxNumber { get; set; }
@@ -358,8 +356,6 @@ namespace InvoiceData
         public WarehouseDetails? WarehouseDetails { get; set; }
         public Amount? Balance { get; set; }
         public string? PlaceOfSupply { get; set; }
-        public string? DestinationOfSupply { get; set; }
-        public string? SourceOfSupply { get; set; }
         public double? ExchangeRate { get; set; }
         public string? PlaceOfCountry { get; set; }
         public string? LutNumber { get; set; }
@@ -408,7 +404,7 @@ namespace InvoiceData
         public List<Entry>? Entries { get; set; }
         public EInvoiceDetails? EInvoiceDetails { get; set; }
         public string? RoundOff { get; set; }
-        public string? PdfRename { get; set; } = string.Empty;
+        public string? PdfRename { get; set; } = string.Empty; // This key used only in local pdf generation to Rename based on request
         public string? ShippingDate { get; set; }
         public string? GrandTotalInAccountsCurrency { get; set; }
         public string? TotalInWordsInAccountsCurrency { get; set; }

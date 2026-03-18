@@ -235,7 +235,7 @@
                                                                 </table>
                                                             </td>
                                                             <td width="50%" class="border-none border-left p-0 vertical-align-top">
-                                                                <table>
+                                                                <table class="table-row-height">
                                                                     <tbody>
                                                                         @if (GetDisplayStatus("VoucherNumber") ||
                                                                         GetDisplayStatus("VoucherDate"))
@@ -262,48 +262,6 @@
                                                                                     <td width="50%"
                                                                                         class="border-none border-bottom border-left"></td>
                                                                                 }
-                                                                            </tr>
-                                                                        }
-                                                                        @if (GetDisplayStatus("DisplayPlaceOfSupply") ||
-                                                                        GetDisplayStatus("SourceOfSupply") || GetDisplayStatus("DestinationOfSupply"))
-                                                                        {
-                                                                            <tr>
-                                                                                @if (GetDisplayStatus("DisplayPlaceOfSupply"))
-                                                                                {
-                                                                                    <td colspan="2" class="border-none p-0">
-                                                                                        <table>
-                                                                                            <tr>
-                                                                                                <td width="120px" class="border-none">@GetLabel("DisplayPlaceOfSupply")</td>
-                                                                                                <td class="border-none">: @Model?.PlaceOfSupply</td>
-                                                                                            </tr>
-                                                                                        </table>
-                                                                                    </td>
-                                                                                } else {
-                                                                                    @if(GetDisplayStatus("SourceOfSupply") && GetDisplayStatus("DestinationOfSupply")) {
-                                                                                        <td class="border-none vertical-align-top">
-                                                                                            <span>@GetLabel("SourceOfSupply")</span>
-                                                                                            <p class="font-weight-500">@Model?.SourceOfSupply</p>
-                                                                                        </td>
-                                                                                        <td class="border-none vertical-align-top border-left">
-                                                                                            <span>@GetLabel("DestinationOfSupply")</span>
-                                                                                            <p class="font-weight-500">@Model?.DestinationOfSupply</p>
-                                                                                        </td>
-                                                                                    } else {
-                                                                                        @if(GetDisplayStatus("DestinationOfSupply") || GetDisplayStatus("SourceOfSupply")){
-                                                                                            var label = GetDisplayStatus("DestinationOfSupply") ? GetLabel("DestinationOfSupply") : GetLabel("SourceOfSupply");
-                                                                                            var value = GetDisplayStatus("DestinationOfSupply") ? Model?.DestinationOfSupply : Model?.SourceOfSupply;
-                                                                                            <td colspan="2" class="border-none p-0">
-                                                                                                <table>
-                                                                                                    <tr>
-                                                                                                        <td width="120px" class="border-none">@label</td>
-                                                                                                        <td class="border-none">: @value</td>
-                                                                                                    </tr>
-                                                                                                </table>
-                                                                                            </td>
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                
                                                                             </tr>
                                                                         }
                                                                     </tbody>
@@ -342,6 +300,17 @@
                                                                                     </td>
                                                                                     <td class="border-none p-0">:
                                                                                         @Model?.Billing?.StateCounty</td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            @if (GetDisplayStatus("DisplayPlaceOfSupply"))
+                                                                            {
+                                                                                <tr>
+                                                                                    <td class="border-none p-0 capitalize" width="120px">
+                                                                                        @GetLabel("DisplayPlaceOfSupply")
+                                                                                    </td>
+                                                                                    <td class="border-none p-0">:
+                                                                                        @Model?.PlaceOfSupply</td>
                                                                                 </tr>
                                                                             }
 

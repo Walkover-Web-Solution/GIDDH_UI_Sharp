@@ -215,20 +215,6 @@
                                                                     <p>@Model.PlaceOfSupply</p>
                                                                 </div>
                                                             }
-                                                            @if (Model?.Settings?.SourceOfSupply?.Display == true && !string.IsNullOrEmpty(Model?.SourceOfSupply))
-                                                            {
-                                                                <div class="grid-item">
-                                                                    <p>@Model?.Settings?.SourceOfSupply?.Label</p>
-                                                                    <p>@Model.SourceOfSupply</p>
-                                                                </div>
-                                                            }
-                                                            @if (Model?.Settings?.DestinationOfSupply?.Display == true && !string.IsNullOrEmpty(Model?.DestinationOfSupply))
-                                                            {
-                                                                <div class="grid-item">
-                                                                    <p>@Model?.Settings?.DestinationOfSupply?.Label</p>
-                                                                    <p>@Model.DestinationOfSupply</p>
-                                                                </div>
-                                                            }
                                                             @if (Model?.Settings?.DisplayPlaceOfCountry?.Display == true && !string.IsNullOrEmpty(Model?.PlaceOfCountry))
                                                             {
                                                                 <div class="grid-item">
