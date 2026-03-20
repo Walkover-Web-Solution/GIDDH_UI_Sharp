@@ -21,6 +21,15 @@ namespace GiddhTemplate.Services
             // Read configuration (default: 1GB = 1,073,741,824 bytes)
             _reservedMemoryBytes = configuration.GetValue<long>("MemoryReservation:ReservedMemoryBytes", 209715200);
             _enabled = configuration.GetValue<bool>("MemoryReservation:Enabled", false);
+
+            // Cap at int.MaxValue since byte[] max length is int.MaxValue
+            if (_reservedMemoryBytes > int.MaxValue)
+            {
+                logger.LogWarning(
+                    "ReservedMemoryBytes ({ConfiguredBytes}) exceeds max array size ({MaxSize}). Capping to {MaxSize}.",
+                    _reservedMemoryBytes, int.MaxValue, int.MaxValue);
+                _reservedMemoryBytes = int.MaxValue;
+            }
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
