@@ -165,3 +165,7 @@ This project is part of the Walkover Web Solution ecosystem.
 ---
 
 For detailed information on any component, refer to the specific documentation files in the `docs/` directory.
+
+## ✍️ Author
+
+**Divyanshu Shrivastava**
