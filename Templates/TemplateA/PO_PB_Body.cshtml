@@ -373,7 +373,7 @@
                                                                         @if (Model?.Settings?.Discount?.Display == true)
                                                                         {
                                                                             <td class="text-right">
-                                                                                @if (Entry?.SumOfDiscounts != null && Entry.SumOfDiscounts.AmountForAccount >= 0)
+                                                                                @if (decimal.TryParse(Entry?.SumOfDiscounts?.AmountForAccount, out var discAmt) && discAmt >= 0)
                                                                                 {
                                                                                     if (Model?.AccountCurrency?.Code != null)
                                                                                     {
@@ -571,7 +571,7 @@
                                                                                     </tr>
                                                                                 }
                                                                             }
-                                                                            @if (Model?.OtherDiscount != null && Model?.OtherDiscount > 0)
+                                                                            @if (decimal.TryParse(Model?.OtherDiscount, out var otherDisc) && otherDisc > 0)
                                                                             {
                                                                                 <tr class="p-0 m-0 line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">Trade Discount</td>
@@ -648,7 +648,7 @@
                                                                                 }
                                                                             }
 
-                                                                            @if (Model?.PaidAmount.AmountForAccount > 0 && @Model?.Balance != null)
+                                                                            @if (decimal.TryParse(Model?.PaidAmount?.AmountForAccount, out var paidAmt) && paidAmt > 0 && Model?.Balance != null)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%" >Paid</td>
@@ -690,7 +690,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tcs?.Display == true && Model?.TcsTotalTax != null && Model.TcsTotalTax.AmountForAccount > 0)
+                                                                            @if (Model?.Settings?.Tcs?.Display == true && decimal.TryParse(Model?.TcsTotalTax?.AmountForAccount, out var tcsAmt) && tcsAmt > 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
@@ -702,7 +702,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tds?.Display == true && Model?.TdsTotalTax != null && Model.TdsTotalTax.AmountForAccount > 0)
+                                                                            @if (Model?.Settings?.Tds?.Display == true && decimal.TryParse(Model?.TdsTotalTax?.AmountForAccount, out var tdsAmt) && tdsAmt > 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
