@@ -690,7 +690,7 @@
                                                                 @if (GetDisplayStatus("Discount"))
                                                                 {
                                                                     <td class="py-0 border-none border-right text-center">
-                                                                        @if (Entry?.SumOfDiscounts != null && (decimal.TryParse(Entry.SumOfDiscounts.AmountForAccount, out var discAmt) ? discAmt >= 0 : true))
+                                                                        @if (decimal.TryParse(Entry?.SumOfDiscounts?.AmountForAccount, out var discAmt) && discAmt >= 0)
                                                                         {
                                                                             if (Model?.AccountCurrency?.Code != null)
                                                                             {

@@ -502,7 +502,7 @@
                                                                         @if (Model?.Settings?.Discount?.Display == true)
                                                                         {
                                                                             <td class="text-right">
-                                                                                @if (Entry?.SumOfDiscounts != null && (decimal.TryParse(Entry.SumOfDiscounts.AmountForAccount, out var discAmt) ? discAmt >= 0 : true))
+                                                                                @if (decimal.TryParse(Entry?.SumOfDiscounts?.AmountForAccount, out var discAmt) && discAmt >= 0)
                                                                                 {
                                                                                     if (Model?.AccountCurrency?.Code != null)
                                                                                     {
@@ -768,7 +768,7 @@
                                                                                 }
                                                                             }
 
-                                                                            @if ((decimal.TryParse(Model?.PaidAmount?.AmountForAccount, out var paidAmt) ? paidAmt > 0 : false) && Model?.Balance != null)
+                                                                            @if (decimal.TryParse(Model?.PaidAmount?.AmountForAccount, out var paidAmt) && paidAmt > 0 && Model?.Balance != null)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%" >Paid</td>
@@ -810,7 +810,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tcs?.Display == true && Model?.TcsTotalTax != null && (decimal.TryParse(Model.TcsTotalTax.AmountForAccount, out var tcsAmt) ? tcsAmt != 0 : false))
+                                                                            @if (Model?.Settings?.Tcs?.Display == true && decimal.TryParse(Model?.TcsTotalTax?.AmountForAccount, out var tcsAmt) && tcsAmt != 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
@@ -822,7 +822,7 @@
                                                                                 </tr>
                                                                             }
 
-                                                                            @if (Model?.Settings?.Tds?.Display == true && Model?.TdsTotalTax != null && (decimal.TryParse(Model.TdsTotalTax.AmountForAccount, out var tdsAmt) ? tdsAmt != 0 : false))
+                                                                            @if (Model?.Settings?.Tds?.Display == true && decimal.TryParse(Model?.TdsTotalTax?.AmountForAccount, out var tdsAmt) && tdsAmt != 0)
                                                                             {
                                                                                 <tr class="line-height-10">
                                                                                     <td class="p-0 text-right" width="50%">
