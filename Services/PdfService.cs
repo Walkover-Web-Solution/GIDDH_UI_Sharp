@@ -20,8 +20,11 @@ namespace GiddhTemplate.Services
         private static readonly ConcurrentDictionary<string, (string Common, string Header, string Footer, string Body, string Background)> _stylesCache = new();
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1); // 1 active + 0 queued max
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(2, 2); // 2 concurrent PDF generations
         private static IBrowser? _browser;
+        private static int _maxConcurrentPdfs = 2; // Dynamically adjusted based on memory pressure
+        private static DateTime _lastMemoryCheck = DateTime.MinValue;
+        private static bool _startupLogged = false;
 
         private readonly int decreaseFontSize = 2;
 
@@ -341,22 +344,95 @@ namespace GiddhTemplate.Services
             </html>";
         }
 
+        private static void CheckMemoryPressure()
+        {
+            var gcMemoryInfo = GC.GetGCMemoryInfo();
+            long totalMemoryMB = GC.GetTotalMemory(false) / 1024 / 1024;
+            long totalAvailableMB = gcMemoryInfo.TotalAvailableMemoryBytes / 1024 / 1024;
+            
+            // Log environment detection on first run
+            if (!_startupLogged)
+            {
+                _startupLogged = true;
+                string envType = totalAvailableMB >= 1700 ? "PROD (2GB+ RAM)" : 
+                                 totalAvailableMB >= 1200 ? "STAGING (1.5GB RAM)" : 
+                                 "TEST (1GB RAM)";
+                Console.WriteLine($"[PdfService] Environment detected: {envType}. Total available: {totalAvailableMB}MB. Starting with 2 concurrent PDFs (will auto-adjust based on memory pressure).");
+            }
+            
+            // Check memory every 30 seconds
+            if ((DateTime.UtcNow - _lastMemoryCheck).TotalSeconds < 30)
+                return;
+            
+            _lastMemoryCheck = DateTime.UtcNow;
+            
+            // Adaptive thresholds based on total system RAM
+            // Calculate thresholds as percentage of available memory
+            // High threshold: 70% of available RAM
+            // Low threshold: 50% of available RAM
+            long highThresholdMB = (long)(totalAvailableMB * 0.70);
+            long lowThresholdMB = (long)(totalAvailableMB * 0.50);
+            
+            // If memory pressure is high, reduce to 1 concurrent
+            if (totalMemoryMB > highThresholdMB)
+            {
+                if (_maxConcurrentPdfs == 2)
+                {
+                    _maxConcurrentPdfs = 1;
+                    Console.WriteLine($"[PdfService] ⚠️ High memory pressure detected ({totalMemoryMB}MB / {totalAvailableMB}MB total). Reducing to 1 concurrent PDF generation.");
+                }
+            }
+            // If memory is healthy, restore to 2 concurrent
+            else if (totalMemoryMB < lowThresholdMB)
+            {
+                if (_maxConcurrentPdfs == 1)
+                {
+                    _maxConcurrentPdfs = 2;
+                    Console.WriteLine($"[PdfService] ✅ Memory pressure normalized ({totalMemoryMB}MB / {totalAvailableMB}MB total). Restoring to 2 concurrent PDF generations.");
+                }
+            }
+        }
+
         public async Task<string> GeneratePdfToFileAsync(Root request)
         {
-            await _pdfGenerationSemaphore.WaitAsync();
-            int activeSlots = 1 - _pdfGenerationSemaphore.CurrentCount;
-            Console.WriteLine($"[PdfService] PDF generation started. Active: {activeSlots}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+            CheckMemoryPressure();
+            
+            var semaphoreWaitStart = DateTime.UtcNow;
+            bool acquired = await _pdfGenerationSemaphore.WaitAsync(TimeSpan.FromSeconds(90));
+            
+            if (!acquired)
+            {
+                Console.WriteLine("[PdfService] PDF generation queue timeout - another request is taking too long. Rejecting request.");
+                throw new TimeoutException("PDF generation service is busy. Please retry after a few seconds.");
+            }
+            
+            var waitDuration = (DateTime.UtcNow - semaphoreWaitStart).TotalSeconds;
+            int activeSlots = 2 - _pdfGenerationSemaphore.CurrentCount;
+            
+            // If memory pressure mode is active (max=1) but we have 2 slots, reject the 2nd concurrent request
+            if (_maxConcurrentPdfs == 1 && activeSlots > 1)
+            {
+                _pdfGenerationSemaphore.Release();
+                Console.WriteLine($"[PdfService] Memory pressure mode active - rejecting request to stay at 1 concurrent.");
+                throw new TimeoutException("PDF generation service is under memory pressure. Please retry after a few seconds.");
+            }
+            
+            Console.WriteLine($"[PdfService] PDF generation started. Waited {waitDuration:F2}s for slot. Active: {activeSlots}/{_maxConcurrentPdfs}, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             IPage? page = null;
+            var totalTimer = System.Diagnostics.Stopwatch.StartNew();
             try
             {
+                var stepTimer = System.Diagnostics.Stopwatch.StartNew();
                 var browser = await GetBrowserAsync();
+                Console.WriteLine($"[PdfService] Browser ready in {stepTimer.ElapsedMilliseconds}ms");
                 
+                stepTimer.Restart();
                 Console.WriteLine("[PdfService] Creating new page...");
                 var pageTask = browser.NewPageAsync();
                 page = await pageTask.WaitAsync(cts.Token);
-                Console.WriteLine("[PdfService] Page created successfully.");
+                Console.WriteLine($"[PdfService] Page created in {stepTimer.ElapsedMilliseconds}ms");
                 
                 var pdfOptions = new PdfOptions
                 {
@@ -485,6 +561,7 @@ namespace GiddhTemplate.Services
                 // Free large intermediate strings immediately — Chrome has its own copy after SetContentAsync
                 header = null; footer = null; body = null;
 
+                stepTimer.Restart();
                 Console.WriteLine($"[PdfService] Setting page content (HTML size: {html.Length} bytes)...");
                 cts.Token.ThrowIfCancellationRequested();
                 await page.SetContentAsync(html, new NavigationOptions
@@ -492,6 +569,7 @@ namespace GiddhTemplate.Services
                     Timeout = 60000,
                     WaitUntil = new[] { WaitUntilNavigation.Load }
                 });
+                Console.WriteLine($"[PdfService] Content loaded in {stepTimer.ElapsedMilliseconds}ms");
                 html = null; // release before PDF generation — no longer needed
 
                 Console.WriteLine("[PdfService] Emulating print media type...");
@@ -507,10 +585,13 @@ namespace GiddhTemplate.Services
                 
                 string tempFilePath = Path.Combine(tempPath, $"{fileName}_{Guid.NewGuid():N}.pdf");
 
+                stepTimer.Restart();
                 Console.WriteLine($"[PdfService] Generating PDF to: {tempFilePath}");
                 cts.Token.ThrowIfCancellationRequested();
                 await page.PdfAsync(tempFilePath, pdfOptions);
-                Console.WriteLine($"[PdfService] PDF generated successfully. File size: {new FileInfo(tempFilePath).Length} bytes");
+                var fileSize = new FileInfo(tempFilePath).Length;
+                var memoryUsed = GC.GetTotalMemory(false) / 1024 / 1024;
+                Console.WriteLine($"[PdfService] PDF generated in {stepTimer.ElapsedMilliseconds}ms. File size: {fileSize} bytes. Total time: {totalTimer.ElapsedMilliseconds}ms. Memory: {memoryUsed}MB");
 
                 // Save to Downloads folder in dev environment (optional copy)
                 string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? 
@@ -540,8 +621,8 @@ namespace GiddhTemplate.Services
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("[PdfService] PDF generation timed out after 1 minute. Slot released for next request.");
-                throw new TimeoutException("PDF generation timed out after 1 minute.");
+                Console.WriteLine("[PdfService] PDF generation timed out after 2 minutes. Slot released for next request.");
+                throw new TimeoutException("PDF generation timed out after 2 minutes.");
             }
             catch (PuppeteerSharp.TargetClosedException ex)
             {
@@ -578,7 +659,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+                Console.WriteLine($"[PdfService] PDF generation completed. Active: {2 - _pdfGenerationSemaphore.CurrentCount}/2, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
             }
         }
     }
