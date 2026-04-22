@@ -84,7 +84,6 @@ namespace GiddhTemplate.Services
                                 "--disable-crash-reporter",
                                 "--disable-hang-monitor",
                                 "--renderer-process-limit=1",
-                                "--single-process",
                                 "--js-flags=--max-old-space-size=96 --max-semi-space-size=1 --max-heap-size=96",
                                 "--memory-pressure-off",
                                 "--max-gum-fps=5",
@@ -398,26 +397,20 @@ namespace GiddhTemplate.Services
             CheckMemoryPressure();
             
             var semaphoreWaitStart = DateTime.UtcNow;
-            bool acquired = await _pdfGenerationSemaphore.WaitAsync(TimeSpan.FromSeconds(90));
+            bool acquired = await _pdfGenerationSemaphore.WaitAsync(TimeSpan.FromSeconds(60));
             
             if (!acquired)
             {
-                Console.WriteLine("[PdfService] PDF generation queue timeout - another request is taking too long. Rejecting request.");
+                Console.WriteLine("[PdfService] PDF generation queue timeout after 60s - another request is taking too long. Rejecting request.");
                 throw new TimeoutException("PDF generation service is busy. Please retry after a few seconds.");
             }
             
             var waitDuration = (DateTime.UtcNow - semaphoreWaitStart).TotalSeconds;
             int activeSlots = 2 - _pdfGenerationSemaphore.CurrentCount;
             
-            // If memory pressure mode is active (max=1) but we have 2 slots, reject the 2nd concurrent request
-            if (_maxConcurrentPdfs == 1 && activeSlots > 1)
-            {
-                _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] Memory pressure mode active - rejecting request to stay at 1 concurrent.");
-                throw new TimeoutException("PDF generation service is under memory pressure. Please retry after a few seconds.");
-            }
-            
-            Console.WriteLine($"[PdfService] PDF generation started. Waited {waitDuration:F2}s for slot. Active: {activeSlots}/{_maxConcurrentPdfs}, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+            // Log memory pressure status but allow request to proceed (semaphore already controls concurrency)
+            string pressureStatus = _maxConcurrentPdfs == 1 ? " [MEMORY PRESSURE MODE]" : "";
+            Console.WriteLine($"[PdfService] PDF generation started. Waited {waitDuration:F2}s for slot. Active: {activeSlots}/2{pressureStatus}, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
 
             using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             IPage? page = null;
