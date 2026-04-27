@@ -9,7 +9,7 @@ A .NET 8.0 web application for generating PDF documents from HTML templates usin
 - Google Chrome browser
 - Git
 
-### Installation 
+### Installation
 ```bash
 # Clone the repository
 git clone https://github.com/Walkover-Web-Solution/GIDDH_UI_Sharp
