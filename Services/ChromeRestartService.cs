@@ -7,6 +7,7 @@ namespace GiddhTemplate.Services
         private readonly ILogger<ChromeRestartService> _logger;
         private readonly PdfService _pdfService;
         private readonly TimeSpan _restartTime = new TimeSpan(9, 0, 0); // 9:00 AM
+        private readonly TimeZoneInfo _istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
 
         public ChromeRestartService(ILogger<ChromeRestartService> logger, PdfService pdfService)
         {
@@ -16,24 +17,25 @@ namespace GiddhTemplate.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("[ChromeRestartService] Chrome restart service started. Will restart Chrome daily at 9:00 AM.");
+            _logger.LogInformation("[ChromeRestartService] Chrome restart service started. Will restart Chrome daily at 9:00 AM IST.");
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    var now = DateTime.Now;
-                    var nextRestart = now.Date.Add(_restartTime);
+                    var nowUtc = DateTime.UtcNow;
+                    var nowIst = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, _istTimeZone);
+                    var nextRestartIst = nowIst.Date.Add(_restartTime);
                     
-                    // If 9 AM has already passed today, schedule for tomorrow
-                    if (now > nextRestart)
+                    // If 9 AM IST has already passed today, schedule for tomorrow
+                    if (nowIst > nextRestartIst)
                     {
-                        nextRestart = nextRestart.AddDays(1);
+                        nextRestartIst = nextRestartIst.AddDays(1);
                     }
                     
-                    var delay = nextRestart - now;
-                   _logger.LogInformation("[ChromeRestartService] Next Chrome restart scheduled at {NextRestart} (in {Hours}h {Minutes}m)",
-                                          nextRestart.ToString("yyyy-MM-dd HH:mm:ss"), (int)delay.TotalHours, delay.Minutes);
+                    var delay = nextRestartIst - nowIst;
+                   _logger.LogInformation("[ChromeRestartService] Next Chrome restart scheduled at {NextRestart} IST (in {Hours}h {Minutes}m)",
+                                          nextRestartIst.ToString("yyyy-MM-dd HH:mm:ss"), (int)delay.TotalHours, delay.Minutes);
 
                     await Task.Delay(delay, stoppingToken);
 
@@ -72,7 +74,7 @@ namespace GiddhTemplate.Services
                         _logger.LogWarning(killEx, "[ChromeRestartService] Could not kill old Chrome processes: {Message}", killEx.Message);
                     }
                     
-                    _logger.LogInformation("[ChromeRestartService] Chrome browser restarted successfully. Next restart tomorrow at 9:00 AM.");
+                    _logger.LogInformation("[ChromeRestartService] Chrome browser restarted successfully. Next restart tomorrow at 9:00 AM IST.");
                 }
                 catch (OperationCanceledException)
                 {
