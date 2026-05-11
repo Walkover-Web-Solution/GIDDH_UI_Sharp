@@ -33,7 +33,7 @@
                 <td class="p-0 border-none border-bottom vertical-align-bottom @(Model?.ShowSectionsInline == true ? "border-left border-right" : "")">
                     <table style="margin-top: 50px;">
                         <tbody>
-                            @if (GetDisplayStatus("ShowMessage2"))
+                            @if (GetDisplayStatus("ShowMessage2") && !string.IsNullOrEmpty(GetLabel("ShowMessage2")))
                             {
                                 <tr>
                                     <td class="border-none" colspan="2">
