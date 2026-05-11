@@ -145,6 +145,7 @@ public class Program
             builder.Services.AddScoped<AccountStatementPdfService>();
             builder.Services.AddHostedService<MemoryReservationService>();
             builder.Services.AddHostedService<PdfCleanupService>();
+            builder.Services.AddHostedService<ChromeRestartService>();
             builder.Services.AddControllers();
 
             var app = builder.Build();

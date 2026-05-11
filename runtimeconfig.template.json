@@ -1,10 +1,11 @@
 {
   "configProperties": {
-    "System.GC.HeapHardLimit": 2147483648,
+    "System.GC.HeapHardLimit": 838860800,
     "System.GC.HeapHardLimitPercent": null,
-    "System.GC.Server": true,
+    "System.GC.Server": false,
     "System.GC.Concurrent": true,
     "System.GC.RetainVM": false,
-    "System.Runtime.TieredCompilation": true
+    "System.GC.ConserveMemory": 9,
+    "System.Runtime.TieredCompilation": false
   }
 }
