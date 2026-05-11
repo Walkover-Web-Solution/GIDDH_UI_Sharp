@@ -520,7 +520,7 @@
                                                                 }
 
                                                                 <td class="text-right">
-                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.GstEntriesTotal?.AmountForAccount
+                                                                    @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.GrandTotal?.AmountForAccount
                                                                 </td>
                                                             </tr>
                                                         </tfoot>
