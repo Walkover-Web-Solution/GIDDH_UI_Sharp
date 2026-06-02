@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-16"></meta>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Invoice</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <style>
+        @@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
+        body{font-family: 'Open Sans', sans-serif; font-size:13px; font-weight:400; background:#272c30}
+        .container{ border:0px solid #eee; box-shadow: 0 2px 6px #000; background:#fff;padding:0 !important;}
+        h3{font-weight:700; margin-bottom:20px; font-size:17px;}
+        p{margin-bottom:5px;}
+        .invHd{display: inline-block; padding: 10px 16px; background: #fff; position: relative; top: -10px; margin:0}
+        table.table{font-size:13px; margin-top:30px;}
+        table.table td, table.table th{vertical-align:middle !important; text-align:right;}
+        table.table td:first-child, table.table th:first-child{text-align:left;}
+        table.table td small{color:#777}
+        table.table th{background: #d2d2d2 !important;}
+        .signature{border-top:1px solid #ccc; margin-top:60px; padding-top:8px; width:260px; float:right}
+        .thankyou{border-bottom:2px solid #E14926; margin-bottom:5px}
+        .thankyou h3{margin-bottom:5px}
+        @@media (max-width:767px) {
+            .container{margin:0}
+        }
+
+        .page
+        {
+            page-break-after: always;
+        }
+        .footer {
+            position: fixed; bottom: 0px;left:0; right:0
+        }
+        .footer:after {
+            counter-increment: page;
+            content: "Page" counter(page) " of " counter(pages);
+            float:right;
+            top: 100%;
+
+        }
+        .greybg{
+            background: color:#E14926 !important;
+        }
+        @@page {
+            @@top-center {
+                content: element(pageHeader)
+            }
+        }
+        #pageHeader {
+            position: fixed; top: 0px;left:0; right:0
+        }
+        .entryDiv {
+            margin-top: 50%;
+            width:100% !important;
+        }
+    </style>
+</head>
+<body>
+<section class="container">
+@using System.Collections.Generic;
+@{
+    int serial = 0;
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+    <div id="pageHeader">
+        <div class="clearfix" >
+
+            <table style="width: 100%;">
+                <tbody>
+                <tr>
+                    <td style="vertical-align: top;">
+
+                        <h3 style="color:#E14926 !important;">@Model?.company?.name</h3>
+                        <table class="with-pd">
+                            <tbody>
+                            <tr>
+                                <td style="padding-right: 15px;">
+                                    <p><b>GSTIN</b></p>
+                                    <p><b>PAN</b></p>
+                                </td>
+                                <td>
+                                    @if (HasKey(Model, "companyGstNumber") && !string.IsNullOrEmpty(Model?.companyGstNumber?.ToString()))
+                                    {
+                                        <p>@Model?.companyGstNumber</p>
+                                    }
+                                    else
+                                    {
+                                        <p>-</p>
+                                    }
+                                    @if (HasKey(Model, "companyPanNumber") && !string.IsNullOrEmpty(Model?.companyPanNumber?.ToString()))
+                                    {
+                                        <p>@Model?.companyPanNumber</p>
+                                    }
+                                    else
+                                    {
+                                        <p>-</p>
+                                    }
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </td>
+
+                    <td style="text-align: right;">
+                        <h3 style="color:#E14926 !important; margin-bottom:8px;">Total  @Model?.grandTotal</h3>
+                        <table style="float: right; vertical-align: top;margin:0;" >
+                            <tbody>
+                            <tr>
+                                <td style="padding-right: 15px; vertical-align: top;">
+                                    <p><b>Invoice Date</b></p>
+                                    <p><b>Invoice No.</b></p>
+                                </td>
+                                <td>
+                                    <p>@Model?.invoiceDetails?.invoiceDate</p>
+                                    <p>@Model?.invoiceDetails?.invoiceNumber</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="border-bottom:2px solid #E14926 !important; margin-top: 10px;"></div>
+        <div class="text-center"><h3 class="invHd" style="background: #fff !important; color:#E14926 !important;"> @if (Model?.showTaxes == true) { <text>TAX</text> } INVOICE</h3></div>
+        <div class="clearfix">
+
+            <table style="width: 100%">
+                <tbody>
+                <tr>
+                    <td style="width:180px; padding-right: 15px; vertical-align: top;">
+                        @if (HasKey(Model?.account, "name") && !string.IsNullOrEmpty(Model?.account?.name?.ToString()))
+                        {
+                            <p>@Model?.account?.name</p>
+                        }
+                        @if (HasKey(Model, "accountAttentionTo") && !string.IsNullOrEmpty(Model?.accountAttentionTo?.ToString()))
+                        {
+                            <p>@Model?.accountAttentionTo</p>
+                        }
+                        @if (HasKey(Model?.account, "email") && !string.IsNullOrEmpty(Model?.account?.email?.ToString()))
+                        {
+                            <p>@Model?.account?.email</p>
+                        }
+                        @if (HasKey(Model?.account, "mobileNumber") && !string.IsNullOrEmpty(Model?.account?.mobileNumber?.ToString()))
+                        {
+                            <p>@Model?.account?.mobileNumber</p>
+                        }
+                        @if (HasKey(Model, "dueDate") && !string.IsNullOrEmpty(Model?.dueDate?.ToString()))
+                        {
+                            <p><b>Due Date</b></p>
+                            <p>@Model?.dueDate</p>
+                        }
+                    </td>
+
+                    <td style="padding-right: 15px; vertical-align: top;">
+                        <p><b>Billing Address</b></p>
+                        @if (HasKey(Model, "customerBillingAddress"))
+                        {
+                            @foreach (var bAddress in Model?.customerBillingAddress)
+                            {
+                                <p>@bAddress</p>
+                            }
+                        }
+                        @if (HasKey(Model, "billingState") && !string.IsNullOrEmpty(Model?.billingState?.ToString()))
+                        {
+                            <p>@Model?.billingState</p>
+                        }
+                        <br />
+                        @if (HasKey(Model, "customerBillingGst") && !string.IsNullOrEmpty(Model?.customerBillingGst?.ToString()))
+                        {
+                            <b>GSTIN</b>
+                            <p>@Model?.customerBillingGst</p>
+                        }
+                    </td>
+
+                    <td style="vertical-align: top;">
+                        <p><b>Shipping Address</b></p>
+                        @if (HasKey(Model, "customerShippingAddress") && Model?.customerShippingAddress?.Count > 0)
+                        {
+                            @foreach (var sAddress in Model?.customerShippingAddress)
+                            {
+                                <p>@sAddress</p>
+                            }
+                        }
+                        @if (HasKey(Model, "shippingState") && !string.IsNullOrEmpty(Model?.shippingState?.ToString()))
+                        {
+                            <p>@Model?.shippingState</p>
+                        }
+                        <br />
+                        @if (HasKey(Model, "customerShippingGst") && !string.IsNullOrEmpty(Model?.customerShippingGst?.ToString()))
+                        {
+                            <b>GSTIN</b>
+                            <p>@Model?.customerShippingGst</p>
+                        }
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    @{
+        int tableCount = 0;
+        if (HasKey(Model, "gstEntries") && Model?.gstEntries != null)
+        {
+            foreach (var entryss in Model?.gstEntries)
+            {
+                tableCount++;
+    }
+        }
+    }
+
+    @if (HasKey(Model, "gstEntries") && Model?.gstEntries != null)
+    {
+        int tableCountLoop = 0;
+        @foreach (var entryss in Model.gstEntries)
+        {
+            tableCountLoop++;
+            <div class="entryDiv" style="width:100% !important;" >
+                <table class="table" style="table-layout:auto; width:100% !important; ">
+                    <thead  class="greybg" >
+                    <tr  style="background: #ff0000 !important;">
+                        <th>S. No.</th>
+                        <th style="text-align:left;">Item</th>
+                        @if (HasKey(Model, "showSac") && Model?.showSac == true && HasKey(Model, "showHsn") && Model?.showHsn == true)
+                        {
+                            <th>HSN/SAC</th>
+                        }
+                        else if (HasKey(Model, "showSac") && Model?.showSac == true)
+                        {
+                            <th>SAC</th>
+                        }
+                        else if (HasKey(Model, "showHsn") && Model?.showHsn == true)
+                        {
+                            <th>HSN</th>
+                        }
+                        else
+                        {
+                            <th></th>
+                        }
+                        @if (HasKey(Model, "showQty") && Model?.showQty == true)
+                        {
+                            <th>Qty.</th>
+                        }
+                        @if (HasKey(Model, "showRate") && Model?.showRate == true)
+                        {
+                            <th>Rate/<br />Item (Rs)</th>
+                        }
+                        @if (HasKey(Model, "showDiscount") && Model?.showDiscount == true)
+                        {
+                            <th>Discount/<br />Item (Rs)</th>
+                        }
+                        @if (HasKey(Model, "showTaxes") && Model?.showTaxes == true)
+                        {
+                            <th>Taxable <br />Value (Rs)</th>
+                            @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
+                            {
+                                @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                {
+                                    <th>@(HasKey(taxWithTotal, "name") ? taxWithTotal?.name : "")</th>
+                                }
+                            }
+                        }
+                        <th>Total<br />(Rs)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @if (entryss != null)
+                        {
+                            @foreach (var entry in entryss)
+                            {
+                                @if (HasKey(entry, "transactions") && entry?.transactions != null)
+                                {
+                                    @foreach (var tr in entry?.transactions)
+                                    {
+                                        serial++; decimal distTotal = 0; string category = "other"; decimal txTotal = 0;
+                                        <tr>
+                                            <td>@serial</td>
+                                            <td style="text-align:left;">@tr?.description</td>
+                                            @if (HasKey(tr, "hsnNumber") && !string.IsNullOrEmpty(tr?.hsnNumber?.ToString()))
+                                            {
+                                                <td>@tr?.hsnNumber <br /><small> (H)</small></td>
+                                            }
+                                            else if (HasKey(tr, "sacNumber") && !string.IsNullOrEmpty(tr?.sacNumber?.ToString()))
+                                            {
+                                                <td>@tr?.sacNumber <br /><small>(S)</small></td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                            @if (HasKey(Model, "showQty") && Model?.showQty == true)
+                                            {
+                                                @if (HasKey(tr, "quantity") && tr?.quantity != null)
+                                                {
+                                                    <td>@tr?.quantity @(HasKey(tr, "stockUnit") ? tr?.stockUnit : "")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                            @if (HasKey(Model, "showRate") && Model?.showRate == true)
+                                            {
+                                                @if (HasKey(tr, "rate") && !string.IsNullOrEmpty(tr?.rate?.ToString()))
+                                                {
+                                                    <td>@tr?.rate</td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                            @if (HasKey(Model, "showDiscount") && Model?.showDiscount == true && (HasKey(entry, "discounts") && (entry?.discounts == null || entry?.discounts.Count < 1)))
+                                            {
+                                                <td></td>
+                                            }
+                                            @{
+                                                distTotal = 0;
+                                                if (HasKey(entry, "discounts"))
+                                                {
+                                                    foreach (var discount in entry?.discounts)
+                                                    {
+                                                        if (HasKey(tr, "category") && tr?.category != category)
+                                                        {
+                                                            distTotal = distTotal + (decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            @if (HasKey(Model, "showTaxes") && Model?.showTaxes == true)
+                                            {
+                                                @if (HasKey(tr, "category") && tr?.category != category)
+                                                {
+                                                    <td>@((HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) + distTotal)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                                @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
+                                                {
+                                                    @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                                    {
+                                                        int foundTax = 0;
+                                                        decimal tempTax = 0;
+                                                        decimal taxRate = 0;
+                                                        if (HasKey(entry, "taxes") && entry?.taxes != null)
+                                                        {
+                                                            foreach (var tax in entry?.taxes)
+                                                            {
+                                                                if (HasKey(taxWithTotal, "uniqueName") && HasKey(tax, "accountUniqueName") && taxWithTotal?.uniqueName == tax?.accountUniqueName)
+                                                                {
+                                                                    foundTax = 1;
+                                                                    tempTax = (decimal)(HasKey(tax, "amount") ? tax?.amount ?? 0 : 0);
+                                                                    taxRate = (decimal)(HasKey(tax, "rate") ? tax?.rate ?? 0 : 0);
+                                                                    txTotal = txTotal + tempTax;
+                                                                }
+                                                            }
+                                                        }
+                                                        @if (foundTax == 1 && HasKey(tr, "category") && tr?.category != category)
+                                                        {
+                                                            <td>@tempTax <br /><small>@@@taxRate%</small></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            @if (HasKey(tr, "category") && tr?.category != category)
+                                            {
+                                                txTotal = (tr?.amount ?? 0) + txTotal + distTotal;
+                                                <td>@txTotal</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@tr?.amount</td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            }
+                        }
+                    </tbody>
+                    @if (tableCountLoop == tableCount)
+                    {
+                        <tfoot>
+                        <tr style="background-color: #f5f5f5;">
+                            <th></th>
+                            <th></th>
+                            @if (HasKey(Model, "showSac") && Model?.showSac == true && HasKey(Model, "showHsn") && Model?.showHsn == true)
+                            {
+                                <th></th>
+                            }
+                            else if (HasKey(Model, "showSac") && Model?.showSac == true)
+                            {
+                                <th></th>
+                            }
+                            else if (HasKey(Model, "showHsn") && Model?.showHsn == true)
+                            {
+                                <th></th>
+                            }
+                            else
+                            {
+                                <th></th>
+                            }
+                            @if (HasKey(Model, "showQty") && Model?.showQty == true)
+                            {
+                                <th></th>
+                            }
+                            @if (HasKey(Model, "showRate") && Model?.showRate == true)
+                            {
+                                <th></th>
+                            }
+                            @if (HasKey(Model, "showDiscount") && Model?.showDiscount == true)
+                            {
+                                <th></th>
+                            }
+                            @if (HasKey(Model, "showTaxes") && Model?.showTaxes == true)
+                            {
+                                <th>@(HasKey(Model, "taxableAmount") ? Model?.taxableAmount : "")</th>
+                                @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
+                                {
+                                    @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                    {
+                                        <th>@(HasKey(taxWithTotal, "total") ? taxWithTotal?.total : "")</th>
+                                    }
+                                }
+                            }
+                            <th>@Model?.gstEntriesTotal</th>
+                        </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+            @if (tableCountLoop != tableCount)
+            {
+                <div class="page"></div>
+            }
+        }
+    }
+
+    <div class="clearfix text-right">
+        <table style="width: 100%;">
+            <tbody>
+            <tr>
+                <td>
+                    <p><b>Taxable Amount</b></p>
+                    <p><b>Total Tax*</b></p>
+                    @if (HasKey(Model, "roundOff") && !string.IsNullOrEmpty(Model?.roundOff?.ToString()))
+                    {
+                        <p><b>Round Off</b></p>
+                    }
+                    <p><b>Invoice Total</b></p>
+                    <p><b>Invoice Total (In words)</b></p>
+                </td>
+                <td>
+                    <p><b>Rs. @(HasKey(Model, "taxableAmount") ? Model?.taxableAmount : "")</b></p>
+                    <p><b>Rs. @(HasKey(Model, "taxTotal") ? Model?.taxTotal : "")</b></p>
+                    @if (HasKey(Model, "roundOff") && !string.IsNullOrEmpty(Model?.roundOff?.ToString()))
+                    {
+                        <p><b>Rs. @Model?.roundOff</b></p>
+                    }
+                    <p><b>Rs. @(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</b></p>
+                    <p><b>@(HasKey(Model, "amountInWords") ? Model?.amountInWords : "")</b></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer" >
+        <div class="clearfix small" style="margin-top:60px">
+            <div class="clearfix">
+
+                <table style="width: 100%;">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <p><b></b></p>
+                            <br />
+                            @if (HasKey(Model, "terms") && Model?.terms != null && Model?.terms.Count > 0)
+                            {
+                                <p><b>Notes</b></p>
+                                @foreach (var term in Model?.terms)
+                                {
+                                    <p>@term</p>
+                                }
+                            }
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="signature">
+                                <p><b>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</b></p>
+                                <p><b class="text-muted"></b></p>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="clearfix">
+            <div class="thankyou">
+                <h3 style="color: #E14926 !important;">Thank you for your business</h3>
+            </div>
+            <div class="small text-center">
+                <p><b>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</b></p>
+                @if (HasKey(Model, "companyGstAddress") && Model?.companyGstAddress != null)
+                {
+                    @foreach (var address in Model?.companyGstAddress)
+                    {
+                        <p>@address</p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

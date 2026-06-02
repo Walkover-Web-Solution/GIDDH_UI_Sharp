@@ -1,0 +1,305 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html style="padding: 0 15px; margin-bottom: 15px;">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+<head>
+    <title>Purchase Order</title>
+    <style>
+        body {
+            height: 100% !important;
+            width: 100% !important;
+            font-size: 14px !important;
+        }
+
+        .PO-table-wrapper table,
+        .PO-table-wrapper tr,
+        .PO-table-wrapper th,
+        .PO-table-wrapper td {
+            border: 1px solid #d9d9d9;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        * {
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt !important;
+            mso-table-rspace: 0pt !important;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        .for-mobile {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        .PO-table-wrapper th:first-child {
+            min-width: 20px;
+        }
+
+        @@media only screen and (min-width:991px) {
+            .for-desktop {
+                display: table !important;
+            }
+        }
+
+        @@media only screen and (max-width:990px) {
+            .PO-table-wrapper {
+                overflow-x: auto;
+            }
+
+            .PO-table-wrapper th {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body style="background:#f1f1f1; color:#333; mso-line-height-rule: exactly; font-family: Roboto, arial, sans-serif; margin: 0; padding: 15px 0 0;">
+    @{
+        int serial = 0;
+    }
+    <div style="max-width: 700px; margin: 20px auto;background-color: #fff; padding: 15px; font-family: sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+            <tbody>
+                <tr>
+                    <td>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                                <tr>
+                                    <td style="margin-bottom: 15px;">Hey <span style="font-weight: bold;">@(HasKey(Model, "customerName") ? Model?.customerName : "")</span>
+                                        <br>
+                                        <br>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p style="width:100%; white-space: normal;word-break: break-word;">
+                                            We have selected your company for the order. The order would be for @(HasKey(Model, "totalItems") ? Model?.totalItems : "") (no. of items) of
+                                            @(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")/-. We are also enclosing the purchase order attached for your consideration. If you need any clarifications
+                                            regarding the same, please feel free to contact us.
+                                        </p>
+                                        <br>
+                                        <br>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p style="margin-bottom: 10px;">
+                            PO details
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="for-desktop" style="width: 100%;">
+                        <div class="PO-table-wrapper">
+                            <table border="1px solid #d9d9d9" cellspacing="0" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px 8px; width:20px; max-width: 20px;">#</th>
+                                        <th style="padding: 10px 8px;">Description</th>
+                                        @if (HasKey(Model, "hasStocks") && Model?.hasStocks == true)
+                                        {
+                                            <th style="padding: 10px 8px; text-align: right;">Qty.</th>
+                                            <th style="padding: 10px 8px; text-align: right;">Price</th>
+                                            <th style="padding: 10px 8px;">Unit</th>
+                                        }
+                                        @if ((HasKey(Model, "hasDiscount") && Model?.hasDiscount == true) || (HasKey(Model, "hasDiscount") && Model?.hasDiscount != true && HasKey(Model, "hasTaxes") && Model?.hasTaxes != true))
+                                        {
+                                            <th style="padding: 10px 8px; text-align: right;">Amt.</th>
+                                        }
+                                        @if (HasKey(Model, "hasDiscount") && Model?.hasDiscount == true)
+                                        {
+                                            <th style="padding: 10px 8px; text-align: right;">Dis.</th>
+                                        }
+                                        @if (HasKey(Model, "hasTaxes") && Model?.hasTaxes == true)
+                                        {
+                                            <th style="padding: 10px 8px; text-align: right;">Amt.</th>
+                                            <th style="padding: 10px 8px; text-align: right;">Tax</th>
+                                        }
+                                        <th style="padding: 10px 8px; text-align: right;">Total Amt.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (HasKey(Model, "entries") && Model?.entries != null)
+                                    {
+                                        @foreach (var entry in Model?.entries)
+                                        {
+                                            serial++;
+                                            <tr>
+                                                <td style="padding: 10px 8px; width:20px; max-width: 20px;">@serial.</td>
+                                                <td style="padding: 10px 8px; width: 140px; white-space: normal; word-break: break-all;">
+                                                    @if (HasKey(entry?.stock, "name") && entry?.stock?.name != null)
+                                                    {
+                                                        <span style="display:block;">@entry?.stock?.name</span>
+                                                    }
+                                                    else if (HasKey(entry, "accountName") && !string.IsNullOrEmpty(entry?.accountName?.ToString()))
+                                                    {
+                                                        <span style="display:block;">@entry?.accountName</span>
+                                                    }
+                                                    @if (HasKey(entry, "description") && !string.IsNullOrEmpty(entry?.description?.ToString()) && entry?.description != entry?.stock?.name && entry?.description != entry?.accountName)
+                                                    {
+                                                        <span style="display:block; padding: 2px 0;">@entry?.description</span>
+                                                    }
+                                                    <span style="display:block; padding: 2px 0;">@(HasKey(entry, "entryDate") ? entry?.entryDate : "")</span>
+                                                </td>
+                                                @if (HasKey(Model, "hasStocks") && Model?.hasStocks == true)
+                                                {
+                                                    <td style="padding: 10px 8px; text-align: right;">
+                                                        @if (HasKey(entry?.stock, "quantity") && entry?.stock?.quantity != null)
+                                                        {
+                                                            @entry?.stock?.quantity
+                                                        }
+                                                    </td>
+                                                    <td style="padding: 10px 8px; text-align: right;">
+                                                        @if (HasKey(entry, "stock") && HasKey(entry?.stock, "rate") && HasKey(entry?.stock?.rate, "amountForAccount") && entry?.stock?.rate?.amountForAccount != null)
+                                                        {
+                                                            @entry?.stock?.rate?.amountForAccount
+                                                        }
+                                                    </td>
+                                                    <td style="padding: 10px 8px;text-transform:capitalize;">
+                                                        @if (HasKey(entry, "stock") && HasKey(entry?.stock, "stockUnit") && HasKey(entry?.stock?.stockUnit, "code") && entry?.stock?.stockUnit?.code != null)
+                                                        {
+                                                            @entry?.stock?.stockUnit?.code
+                                                        }
+                                                    </td>
+                                                }
+                                                @if ((HasKey(Model, "hasDiscount") && Model?.hasDiscount == true) || (HasKey(Model, "hasDiscount") && Model?.hasDiscount != true && HasKey(Model, "hasTaxes") && Model?.hasTaxes != true))
+                                                {
+                                                    <td style="padding: 10px 8px; text-align: right;">
+                                                        @(HasKey(entry, "amtBfrDiscount") ? entry?.amtBfrDiscount : "")
+                                                    </td>
+                                                }
+                                                @if (HasKey(Model, "hasDiscount") && Model?.hasDiscount == true)
+                                                {
+                                                    <td style="padding: 10px 8px; text-align: right;">
+                                                        @if (HasKey(entry, "hasDiscount") && entry?.hasDiscount == true && HasKey(entry, "distTotal") && entry?.distTotal != null)
+                                                        {
+                                                            <text>-@entry?.distTotal</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>0</text>
+                                                        }
+                                                    </td>
+                                                }
+                                                @if (HasKey(Model, "hasTaxes") && Model?.hasTaxes == true)
+                                                {
+                                                    <td style="padding: 10px 8px; text-align: right;">@(HasKey(entry, "taxableAmt") ? entry?.taxableAmt : "")</td>
+                                                    <td style="padding: 10px 8px; text-align: right;">
+                                                        @if (HasKey(entry, "hasTaxes") && entry?.hasTaxes == true && HasKey(entry, "taxesTotal") && entry?.taxesTotal != null)
+                                                        {
+                                                            @entry?.taxesTotal
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>0</text>
+                                                        }
+                                                    </td>
+                                                }
+                                                <td style="padding: 10px 8px; text-align: right;">@(HasKey(entry, "grandTotal") ? entry?.grandTotal : "")</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <table cellspacing="0" style="float: right; margin-top: 10px;">
+                            <tbody>
+                                @if ((HasKey(Model, "hasDiscount") && Model?.hasDiscount == true) || (HasKey(Model, "hasDiscount") && Model?.hasDiscount != true && HasKey(Model, "hasTaxes") && Model?.hasTaxes != true))
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 3px; min-width: 150px;">Total Amount</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "amtBfrDiscount") ? Model?.amtBfrDiscount : "")</td>
+                                    </tr>
+                                }
+                                @if (HasKey(Model, "hasDiscount") && Model?.hasDiscount == true)
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; min-width: 150px;">Discount</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">-@(HasKey(Model, "distTotal") ? Model?.distTotal : "")</td>
+                                    </tr>
+                                }
+                                @if (HasKey(Model, "hasTaxes") && Model?.hasTaxes == true)
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; min-width: 150px;">Taxable Value</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "taxableAmt") ? Model?.taxableAmt : "")</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; min-width: 150px;">Tax</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "taxesTotal") ? Model?.taxesTotal : "")</td>
+                                    </tr>
+                                }
+                                @if (HasKey(Model, "hasRoundOff") && Model?.hasRoundOff == true)
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; font-weight: bold; min-width: 150px;">Round Off</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "roundOff") ? Model?.roundOff : "")</td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; font-weight: bold; min-width: 150px;">Total</td>
+                                    <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</td>
+                                </tr>
+                                @if (HasKey(Model, "hasTcs") && Model?.hasTcs == true)
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; min-width: 150px;">TCS</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">@(HasKey(Model, "tcsTotal") ? Model?.tcsTotal : "")</td>
+                                    </tr>
+                                }
+                                @if (HasKey(Model, "hasTds") && Model?.hasTds == true)
+                                {
+                                    <tr>
+                                        <td colspan="14" style="border: none !important; text-align: right; padding: 3px 20px 0; min-width: 150px;">TDS</td>
+                                        <td style="border: none; text-align: right; padding: 3px 0 3px;">-@(HasKey(Model, "tdsTotal") ? Model?.tdsTotal : "")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                    <td>
+                        <p style="margin-top:50px; margin-bottom:5px;">Thanks & Regards</p>
+                        <p style="font-weight: bold; margin-top:0; margin-bottom:5px;">@(HasKey(Model, "senderName") ? Model?.senderName : "")</p>
+                        <p style="font-weight: bold; margin-top:0; margin-bottom:5px;">@(HasKey(Model, "companyName") ? Model?.companyName : "")</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

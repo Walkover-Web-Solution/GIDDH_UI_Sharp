@@ -1,0 +1,246 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html id="default">
+<head>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <title>Tally Template</title>
+    <style>
+        @@font-face { font-family: "Calibri"; src: url("https://s3.ap-south-1.amazonaws.com/giddhbuildartifacts/calibri.ttf"); }
+        * { font-family: 'Calibri'; font-weight: normal; }
+        body, h1, h2, h3, h4, p, span { font-size: 12px!important; margin-top: 0; margin-bottom: 0; }
+        .medium { font-size: 14px!important; }
+        .small { font-size: 10px!important; }
+        .bold, .strong, strong { font-weight: bold !important; }
+        .mb-0 { margin-bottom: 0px; }
+        .mb-4 { margin-bottom: 40px !important; }
+        .clogo_figure { overflow: hidden; margin-bottom: 5px; }
+        .clogo { float: left; }
+        .pb-1 { padding-bottom: 10px; }
+        header h1 {}
+        header h2 { font-weight: bold; }
+        table { width: 100%; border-collapse: inherit; }
+        html { overflow: auto; background: #fff; padding: 0; }
+        body { box-sizing: border-box; margin: 0 auto; overflow: hidden; letter-spacing: 0; width: 100%; background: #FFF; border-radius: 1px; margin-top: 14px; padding: 15px 15px 0 15px; }
+        header:after { clear: both; content: ""; display: table; }
+        header .numDetail strong { width: 50px; float: left; }
+        .meta tbody tr th { background: none; text-align: left; color: #262626; }
+        .hidden-label { opacity: 0; }
+        .meta tbody tr td { padding: 7px 0; }
+        header figure { margin: 0 0 0.3em; width: 100%; padding: 0; }
+        header figure p { margin: 0 0 0.25em; }
+        header table tr td strong { margin: 0; }
+        article { margin-bottom: 10px; }
+        article:after { clear: both; content: ""; display: table; }
+        article h1 { clip: rect(0 0 0 0); position: absolute; }
+        article address { float: left; font-weight: bold; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left !important; }
+        table.item { clear: both; width: 100%; table-layout: auto; }
+        table.item tfoot tr th, table.item th { position: relative; padding: 14px 7px; }
+        table.item tfoot tr th { padding-right: 7px; }
+        table.item td { border-radius: 0; padding: 7px; vertical-align: top; border-bottom: 1px solid #262626; }
+        table.item td p { color: #595959; }
+        table.balance { width: 85%; float: right; margin: 0; }
+        table.balance td, table.balance th { width: 50%; text-align: right; padding: 0 2px; }
+        aside h1 { border: none; border-width: 0 0 1px; margin: 0 0 1em; border-color: #999; border-bottom-style: solid; }
+        .subfooter { padding: 0 10px; }
+        .subfooter hr { width: 100%; border-bottom: 1px solid #595959; margin: 3px 0; }
+        .subfooter h4 { margin-top: 5px; margin-bottom: 5px; }
+        p { margin: 0; }
+        h2 { margin: 0; }
+        table.item th .bgClr { position: absolute; top: 0; bottom: 0; background: aqua; left: 0; right: 0; width: 100%; opacity: 0.05; z-index: 0; }
+        .docTitle { width: 100%; text-align: center; height: 20px; bottom: 0; position: relative; float: left; z-index: 9; }
+        #default .docTitle h2 { right: 0; left: 0; bottom: 0; width: 100%; font-weight: bold; z-index: 9; }
+        #default .docTitle h2:after { content: attr(title); width: auto; position: relative; background: #fff; margin: 0 auto; padding: 6px 16px; right: 0; vertical-align: middle; z-index: 99; left: 0; bottom: 20px; max-height: 20px; }
+        .disabled-area { position: relative; float: left; width: 100%; margin-bottom: 10px; }
+        .disabled-area:after { content: ' '; position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; background: rgba(204, 204, 204, 0.5); border: 1px dashed #808080; }
+        .edit-template { position: absolute; top: 0; right: 0; padding: 4px; height: 15px; z-index: 1; background: #fff; width: 20px; }
+        .edit-template i { background: url("data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ2OS4zMzEgNDY5LjMzMSIgd2lkdGg9IjE2cHgiIGhlaWdodD0iMTZweCI+CjxnPgoJPHBhdGggZD0iTTQzOC45MzEsMzAuNDAzYy00MC40LTQwLjUtMTA2LjEtNDAuNS0xNDYuNSwwbC0yNjguNiwyNjguNWMtMi4xLDIuMS0zLjQsNC44LTMuOCw3LjdsLTE5LjksMTQ3LjQgICBjLTAuNiw0LjIsMC45LDguNCwzLjgsMTEuM2MyLjUsMi41LDYsNCw5LjUsNGMwLjYsMCwxLjIsMCwxLjgtMC4xbDg4LjgtMTJjNy40LTEsMTIuNi03LjgsMTEuNi0xNS4yYy0xLTcuNC03LjgtMTIuNi0xNS4yLTExLjYgICBsLTcxLjIsOS42bDEzLjktMTAyLjhsMTA4LjIsMTA4LjJjMi41LDIuNSw2LDQsOS41LDRzNy0xLjQsOS41LTRsMjY4LjYtMjY4LjVjMTkuNi0xOS42LDMwLjQtNDUuNiwzMC40LTczLjMgICBTNDU4LjUzMSw0OS45MDMsNDM4LjkzMSwzMC40MDN6IE0yOTcuNjMxLDYzLjQwM2w0NS4xLDQ1LjFsLTI0NS4xLDI0NS4xbC00NS4xLTQ1LjFMMjk3LjYzMSw2My40MDN6IE0xNjAuOTMxLDQxNi44MDNsLTQ0LjEtNDQuMSAgIGwyNDUuMS0yNDUuMWw0NC4xLDQ0LjFMMTYwLjkzMSw0MTYuODAzeiBNNDI0LjgzMSwxNTIuNDAzbC0xMDcuOS0xMDcuOWMxMy43LTExLjMsMzAuOC0xNy41LDQ4LjgtMTcuNWMyMC41LDAsMzkuNyw4LDU0LjIsMjIuNCAgIHMyMi40LDMzLjcsMjIuNCw1NC4yQzQ0Mi4zMzEsMTIxLjcwMyw0MzYuMTMxLDEzOC43MDMsNDI0LjgzMSwxNTIuNDAzeiIgZmlsbD0iIzAwMDAwMCIvPgo8L2c+Cjwvc3ZnPgo=") no-repeat; width: 17px; position: absolute; right: 1px; background-size: 14px; height: 18px; }
+        .font-normal, .font-normal th { font-weight: normal !important; }
+        .docTitle hr { border-top: 1px solid #f63407; }
+        .meta_header { padding-left: 15px; padding-right: 15px; margin-bottom: 10px; }
+        .nowrap { white-space: nowrap; }
+        #default table { width: 100%; border-collapse: inherit; }
+        #default .item th, #default tfoot tr th { background: #f2f3f4; font-weight: normal !important; }
+        #default { overflow: auto; position: relative; padding: 0; }
+        #default body { letter-spacing: 0; position: relative; min-height: 100%; background: #FFF; margin: 0; }
+        #default header { position: relative; display: block; overflow: hidden; clear: both; float: none; }
+        .pull-right tr td { text-align: right !important; }
+        #default header .numDetail strong { width: 50px; display: inline-block; }
+        #default .meta tbody tr td { padding: 5px 0; }
+        #default header figure { display: block; overflow: hidden; margin: 0; }
+        #default header figure p { margin: 0 0 0.25em; }
+        #default #Template-header .align-bottom { vertical-align: bottom !important; }
+        #default article:after { clear: both; content: ""; display: table; }
+        .text-center { text-align: center; }
+        #default table.item { clear: both; width: 100%; table-layout: auto; }
+        #default table.item tfoot tr th, #default table.item th { position: relative; padding: 14px 7px; font-weight: normal; text-transform: capitalize; background: #f2f3f4; border-bottom: 1px solid #262626; }
+        #default table.item td { border-radius: 0; padding: 5px 7px; text-transform: capitalize; }
+        #default table.item > tr > td:last-child { border-bottom: 1px solid #262626 !important; }
+        #default table.item td p { color: #595959; }
+        #default table.balance { width: 75%; float: right; margin: 0 7px; }
+        #default table.balance td, #default table.balance th { width: 50%; text-align: right; }
+        #default .subfooter { padding: 0; }
+        #default .signature hr { width: 300px; margin: 3px auto; height: 1px; background: #595959; border: 0; }
+        #default .subfooter h6 { color: #f63407; margin: 10px 0 0; }
+        #default p { margin: 0; word-wrap: break-word; overflow-wrap: break-word; }
+        #default h2 { margin: 0; font-size: inherit; }
+        strong { font-weight: 800; }
+        .disabled-area { position: relative; }
+        .disabled-area:after { content: ' '; position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(204, 204, 204, 0.5); border: 1px dashed #808080; }
+        #default .docTitle { width: 100%; text-align: center; height: 20px; bottom: 0; position: relative; float: left; z-index: 9; }
+        #default .docTitle h2 { right: 0; left: 0; bottom: 0; width: 100%; font-weight: 800; z-index: 9; }
+        #default .docTitle h2:after { content: attr(title); width: auto; position: relative; background: #fff; margin: 0 auto; padding: 6px 16px; right: 0; vertical-align: middle; z-index: 99; left: 0; bottom: 20px; }
+        .page { page-break-after: always; }
+        .meta_header { width: 100%; overflow: hidden; float: left; }
+        .meta_header td, .meta_header th {}
+        .cargoDetail, .meta { width: 100%; }
+        #Template-header { min-width: 794px; }
+        #Template-header #client { border-collapse: collapse; }
+        #Template-header #client tbody tr td { padding: 5px 0 5px 15px; }
+        .content_wrap { margin: 0 15px 0 15px; }
+        #taxBifurcation.tax-bifurcation-table thead tr th { padding: 7px; border-bottom: 1px solid #262626; }
+        #taxBifurcation.tax-bifurcation-table thead tr th:last-child { border-right: 0px; }
+        #taxBifurcation.tax-bifurcation-table tbody tr td { border-top: 0px; border-bottom: 0px; border-right: 1px solid #262626; }
+        #taxBifurcation.tax-bifurcation-table tbody tr td:last-child { border-right: 0px; }
+        #taxBifurcation.tax-bifurcation-table tbody tr { border-top: 0px; border-bottom: 0px; }
+        #taxBifurcation.tax-bifurcation-table tbody tr.bifurcation-total td { border-top: 1px solid #262626; border-bottom: 1px solid #262626; }
+        #hsnTable.hsn-table .item tfoot tr th { background: #fff; }
+        #hsnTable.hsn-table .item thead tr th, #hsnTable.hsn-table .item tfoot tr th { padding: 7px; }
+        #hsnTable.hsn-table thead tr th:not(:last-child), #hsnTable.hsn-table tbody tr td:not(:last-child), #hsnTable.hsn-table tfoot tr th:not(:last-child) { border-right: 1px solid #262626; }
+        #hsnTable.hsn-table tfoot tr th { border-bottom: 1px solid #262626; }
+        #lastRow { page-break-before: always !important; clear: both; }
+        .page-break { page-break-before: always !important; clear: both; }
+        table.qr-code { float: left; width: 20% !important; }
+        table.qr-code #qr-code { object-fit: contain; max-height: none !important; padding-bottom: 0 !important; margin-bottom:0 !important; line-height: 1px !important; width: 150px; height: 150px; }
+        @@page { margin: 0; padding: 10.0px 10.0px 0; size: A4 portrait; @@top-center { content: element(pageHeader); } }
+        @@media print { #lastRow { page-break-before: always !important; clear: both; } .page-break { page-break-before: always !important; clear: both; } #default table.item tfoot tr th, #default table.item th { position: relative; padding: 14px 10px; } #default footer { float: left; width: 100%; } #default header table { margin-top: 10px; } #default .subfooter { margin: 0 10.0px; width: 100%; } .content_wrap { position: relative; } }
+        .docTitle hr { border-top: 1px solid #f63407; height: 1px; }
+        .docTitle .txt { background: #fff; width: 100px; }
+        .company_name { width: 100%; }
+        .company_name h2 { margin: 0; }
+        .clogo_figure { overflow: hidden; margin-bottom: 5px; }
+        .clogo { float: left; max-width: 110px; }
+        .bold { font-weight: 800; }
+        .table-details tr td { background: #F2F2F2; padding: 6px !important; display: block; }
+        .no-wrap { white-space: nowrap; }
+        .word-break { word-wrap: break-word; }
+        .word-long { word-break: break-word; }
+        .total-in-words { border-bottom: 1px solid #595959; }
+        .description2 { width: 150px !important; max-width: 150px !important; }
+        .description-text { display: block; line-height: 1.1 !important; }
+        #last_txn tr th {}
+        #client, .bifurcation-table { padding-left: 15px; padding-right: 15px; }
+        .p-0 { padding: 0 !important; }
+        .p-b0 { padding-bottom: 0 !important; }
+        .p-t0 { padding-top: 0 !important; }
+        .tcs hr { margin-top: 50px; width: 100%; border-bottom: 1px solid #f63407; }
+        .tcs { padding: 0 15px; }
+        .tcs table { margin: 50px 0; clear: both; width: 100%; border-collapse: collapse !important; }
+        .tcs table td, .tcs table th { border-radius: 0; padding: 5px; border: 1px solid #262626; vertical-align: top; text-align: right; }
+        .tcs table td:first-child { text-align: left; }
+        .tcs table tfoot tr th, .tcs table th { position: relative; padding: 5px; font-weight: bold; }
+        .tcs table th:first-child, .tcs table tfoot tr th:first-child { text-align: left; }
+        .br0 { border-right: 0px!important; }
+        .bl0 { border-left: 0px!important; }
+        .text-muted { color:#9a9a9a!important; }
+        .text-light { color:#7c7c7c!important; }
+        .d-block { display:block; }
+        .pr-3 { padding-right: 3px; }
+        @@media print { table { page-break-after:auto } tr { page-break-inside:avoid; page-break-after:auto } td { page-break-inside:avoid; page-break-after:auto } thead { display:table-header-group } tfoot { display:table-footer-group } }
+        .capitalize { text-transform:capitalize; }
+        .pull-left { float: left; }
+        .pull-right { float: right; }
+        table { page-break-inside:auto }
+        tr { page-break-inside:avoid; page-break-after:auto }
+        thead { display:table-header-group }
+        tfoot { display:table-footer-group }
+    </style>
+</head>
+<body>
+    <div class="content_wrap" id='body'>
+        <div id="Template-header">
+            <header>
+                <table class="meta">
+                    <tbody>
+                        <tr>
+                            <td>
+                                @if (HasKey(Model, "companyName") && !string.IsNullOrEmpty(Model?.companyName?.ToString()))
+                                {
+                                    <h2>@Model?.companyName</h2>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </header>
+        </div>
+
+        @{
+            int serial = 0;
+        }
+
+        <div id="Template-table" class="entryDiv">
+            <article>
+                <table class="item" id="product_table" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr class="font-normal">
+                            <th class="text-left">Item</th>
+                            <th class="text-right">Quantity</th>
+                            <th class="text-right">Rate</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (HasKey(Model, "items") && Model?.items != null)
+                        {
+                            @foreach (var item in Model?.items)
+                            {
+                                serial++;
+                                <tr>
+                                    <td class="text-left">@(HasKey(item, "name") ? item?.name : "")</td>
+                                    <td class="text-right">@(HasKey(item, "quantity") ? item?.quantity : "")</td>
+                                    <td class="text-right">@(HasKey(item, "rate") ? item?.rate : "")</td>
+                                    <td class="text-right">@(HasKey(item, "amount") ? item?.amount : "")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-normal">
+                            <th colspan="3" class="text-right">Total</th>
+                            <th class="text-right">@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </article>
+        </div>
+
+        <div style="width: 100%; display: block; float: none; overflow: hidden;" id='footerTable'>
+            <table class="balance">
+                <tr>
+                    <th>Total In Words</th>
+                    <td><span class="total-in-words">@(HasKey(Model, "totalInWords") ? Model?.totalInWords : "")</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

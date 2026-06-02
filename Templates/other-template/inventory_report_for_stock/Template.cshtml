@@ -1,0 +1,62 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        table thead th, table tbody td { font-size: 12px; }
+        table { table-layout: auto; }
+        table.giddh-table { border: 1px solid #999999; border-collapse: collapse; }
+        table.giddh-table td { padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family: Arial, Helvetica, sans-serif; }
+        table.giddh-table td.bdr-bottom-none { border: none !important; }
+    </style>
+</head>
+<body>
+    <table cellspacing="0" class="giddh-table" style="width:100%">
+        <tbody>
+            <tr>
+                <td colspan="6" align="center" class="bdr-bottom-none" style="border-bottom: 0;">
+                    <br/><b>Inventory Report for @(HasKey(Model?.stock, "name") ? Model?.stock?.name : "")</b><br/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Date</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Type</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Quantity</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Unit</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Balance</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;"><strong>Description</strong></td>
+            </tr>
+            @if (HasKey(Model, "transactions") && Model?.transactions != null)
+            {
+                @foreach (var transaction in Model?.transactions)
+                {
+                    <tr>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "date") ? transaction?.date : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "type") ? transaction?.type : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "quantity") ? transaction?.quantity : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "unit") ? transaction?.unit : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "balance") ? transaction?.balance : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family:Arial, Helvetica, sans-serif;">@(HasKey(transaction, "description") ? transaction?.description : "")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+</html>

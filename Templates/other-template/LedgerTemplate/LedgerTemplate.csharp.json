@@ -1,0 +1,13 @@
+{
+    "templateType": "LedgerTemplate",
+    "title": "Ledger Report",
+    "entries": [
+        {
+            "date": "01-06-2026",
+            "particulars": "Opening",
+            "debit": "50000",
+            "credit": "0",
+            "balance": "50000"
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "templateType": "ledger_admin_condensed",
+    "company": {
+        "name": "ABC Pvt Ltd"
+    },
+    "companyAddress": "123 Business Street, City, State 12345",
+    "account": {
+        "name": "Sales Account"
+    },
+    "fromDate": "01-06-2026",
+    "toDate": "30-06-2026",
+    "entries": [
+        {
+            "date": "01-06-2026",
+            "particulars": "Opening Balance",
+            "debit": "50000",
+            "credit": "0",
+            "balance": "50000"
+        },
+        {
+            "date": "05-06-2026",
+            "particulars": "Sales",
+            "debit": "10000",
+            "credit": "0",
+            "balance": "60000"
+        },
+        {
+            "date": "10-06-2026",
+            "particulars": "Expense",
+            "debit": "0",
+            "credit": "5000",
+            "balance": "55000"
+        }
+    ],
+    "totalDebit": "60000",
+    "totalCredit": "5000"
+}

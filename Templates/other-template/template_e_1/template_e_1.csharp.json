@@ -1,0 +1,29 @@
+{
+    "templateType": "template_e_1",
+    "company": {
+        "name": "ABC Pvt Ltd"
+    },
+    "companyGstNumber": "18AABCT1234H1Z0",
+    "branch": "Indore",
+    "customer": {
+        "name": "Customer Name",
+        "address": "456 Customer Lane, City"
+    },
+    "invoiceNumber": "INV-001",
+    "invoiceDate": "01-06-2026",
+    "items": [
+        {
+            "description": "Product A",
+            "quantity": 10,
+            "rate": 500,
+            "amount": 5000
+        },
+        {
+            "description": "Product B",
+            "quantity": 5,
+            "rate": 600,
+            "amount": 3000
+        }
+    ],
+    "totalAmount": "8000"
+}
