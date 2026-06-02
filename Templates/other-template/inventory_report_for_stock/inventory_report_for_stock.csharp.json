@@ -1,0 +1,24 @@
+{
+    "templateType": "inventory_report_for_stock",
+    "stock": {
+        "name": "Product A"
+    },
+    "transactions": [
+        {
+            "date": "01-06-2026",
+            "type": "IN",
+            "quantity": 100,
+            "unit": "pcs",
+            "balance": 100,
+            "description": "Purchase"
+        },
+        {
+            "date": "05-06-2026",
+            "type": "OUT",
+            "quantity": 30,
+            "unit": "pcs",
+            "balance": 70,
+            "description": "Sale"
+        }
+    ]
+}

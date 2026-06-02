@@ -1,0 +1,135 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-16"></meta>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Invoice</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
+    <style>
+        @@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
+        body { font-family: 'Open Sans', sans-serif; font-size:13px; font-weight:400; background:#272c30 }
+        .container { padding:10px; margin:0 auto; max-width:900px; border:0px solid #eee; box-shadow: 0 2px 6px #000; background:#fff }
+        h3 { font-weight:700; margin-bottom:20px; font-size:17px; }
+        p { margin-bottom:5px; }
+        .invHd { display: inline-block; padding: 10px 16px; background: #fff; position: relative; top: -20px; margin:0 }
+        table.table { font-size:11px; margin-top:30px; }
+        table.table td, table.table th { vertical-align:top !important; text-align:right; }
+        table.table td:first-child, table.table th:first-child { text-align:left; }
+        table.table td small { color:#777 }
+        .signature { border-top:1px solid #ccc; margin-top:60px; padding-top:8px; width:260px; float:right }
+        .thankyou { border-bottom:2px solid #E14926; margin-bottom:5px }
+        .thankyou h3 { margin-bottom:5px }
+        @@media (max-width:767px) {
+            .container { margin:0 }
+        }
+        .page { page-break-after: always; }
+        .footer { position: fixed; bottom: 0px;left:0; right:0 }
+        .greybg { background: color:#E14926 !important; }
+        #pageHeader { position: running(pageHeader) }
+        #entryDiv { }
+    </style>
+</head>
+<body>
+    <section class="container">
+        <div id="pageHeader">
+            <div class="clearfix">
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="vertical-align: top;">
+                                <h3 style="color:#E14926 !important;">@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</h3>
+                                <table class="with-pd">
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding-right: 15px;">
+                                                <p><b>GSTIN</b></p>
+                                                <p><b>Branch</b></p>
+                                            </td>
+                                            <td>
+                                                <p>@(HasKey(Model, "companyGstNumber") ? Model?.companyGstNumber : "")</p>
+                                                <p>@(HasKey(Model, "branch") ? Model?.branch : "")</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="text-align: right; vertical-align: top;">
+                                <h3 class="invHd">Invoice</h3>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <table style="width: 100%;">
+                <tbody>
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <p><b>Bill To:</b></p>
+                            <p>@(HasKey(Model?.customer, "name") ? Model?.customer?.name : "")</p>
+                            <p>@(HasKey(Model?.customer, "address") ? Model?.customer?.address : "")</p>
+                        </td>
+                        <td style="width: 50%; text-align: right; vertical-align: top;">
+                            <p><b>Invoice #:</b> @(HasKey(Model, "invoiceNumber") ? Model?.invoiceNumber : "")</p>
+                            <p><b>Date:</b> @(HasKey(Model, "invoiceDate") ? Model?.invoiceDate : "")</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (HasKey(Model, "items") && Model?.items != null)
+                {
+                    @foreach (var item in Model?.items)
+                    {
+                        <tr>
+                            <td>@(HasKey(item, "description") ? item?.description : "")</td>
+                            <td>@(HasKey(item, "quantity") ? item?.quantity : "")</td>
+                            <td>@(HasKey(item, "rate") ? item?.rate : "")</td>
+                            <td>@(HasKey(item, "amount") ? item?.amount : "")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: right;">
+            <p><b>Total:</b> @(HasKey(Model, "totalAmount") ? Model?.totalAmount : "")</p>
+        </div>
+        <div class="thankyou">
+            <h3>Thank You!</h3>
+        </div>
+        <div class="signature">
+            <p>Authorized Signature</p>
+        </div>
+    </section>
+</body>
+</html>

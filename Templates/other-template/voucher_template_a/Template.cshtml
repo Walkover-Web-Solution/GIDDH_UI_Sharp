@@ -1,0 +1,356 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="en" id="voucher1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-16"></meta>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Voucher</title>
+    <style type="text/css">
+        #voucher1 * {
+            border: 0;
+            color: #231f20;
+            font-family: inherit;
+            font-size: inherit;
+            font-style: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            margin: 0;
+            padding: 0;
+            text-decoration: none;
+            vertical-align: top;
+        }
+        #voucher1 {
+            font: 12px/1 'Open Sans', sans-serif;
+            background: #fff;
+            width: 100%;
+            max-width:100%;
+            margin: 0 auto;
+            height:100%;
+            position: relative;
+        }
+        #voucher1 header { line-height: 17px }
+        #voucher1 header h1 { margin-bottom: 7px; font-size: 30px; line-height: 24px; font-weight: bold; }
+        #voucher1 .text-right { text-align: right; }
+        #voucher1 .text-left { text-align: left !important; }
+        #voucher1 .pull-right { float: right; }
+        #voucher1 .pull-left { float: left; }
+        #voucher1 table { width: 100%; table-layout: fixed; border-collapse: inherit }
+        #voucher1 .logo { max-width: 120px; width: 100%; }
+        #voucher1 strong { font-weight: bold; }
+        #voucher1 .item { table-layout: auto !important; width: 100%; line-height: 15px; }
+        #voucher1 .item tbody tr td, #voucher1 .item thead tr th { text-align: right; }
+        #voucher1 .total-amount { font-size: 26px; background: url(amt.png); background-repeat: no-repeat; background-position: center; text-align: center; background-size: 80%; }
+        #voucher1 .mrL2 { margin-left: 20px; }
+        #voucher1 .mrB2 { margin-bottom: 20px; }
+        #voucher1 .mrB1 { margin-bottom: 10px; }
+        #voucher1 .meta { margin: 20px 0; line-height: 17px; }
+        #voucher1 .meta h4 { font-weight: bold; font-size: 18px; line-height: 19px; }
+        #voucher1 .product-table { background: #f2f2f2; position: relative; padding-bottom: 10px; }
+        #voucher1 .item thead tr th { padding: 14px 7px 0; border-bottom: 1px solid #000000; line-height: 24px; font-weight: bold; }
+        #voucher1 .product-table tbody tr:last-child td { padding-bottom: 50px; }
+        #voucher1 .product-table:before { position: absolute; top: 0; bottom: 0; content: ' '; background: #f2f2f2; left: -30px; width: 106%; z-index: -1; }
+        #voucher1 .arrow-down { width: 0; position: absolute; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 15px solid #fff; z-index: 9; margin-left: 80px; top: -3px; }
+        #voucher1 .inwords { color: #b2b1b1; }
+        #voucher1 .item tfoot tr th, #voucher1 .item tbody tr td { padding: 3px 7px; line-height: 15px; }
+        #voucher1 .total-row { border-top: 1px solid #000000; }
+        #voucher1 .bdrB { border-bottom: 1px solid#666; }
+        #voucher1 .subfooter { border-bottom: 1px solid #000; font-size: 11px; }
+        #voucher1 .subfooter h1 { font-size: 28px; margin: 10px 0 0; font-weight: bold; color:#4b4c4f !important; }
+        #voucher1 .subfooter h2 { margin-top: 7px; color:#4b4c4f !important; font-size: 13px; }
+        #voucher1 .subfooter .normal { font-size: 12px; vertical-align: baseline }
+        #voucher1 .subfooter>tbody>tr:nth-child(1) td { padding: 0 20px; }
+        #voucher1 .subfooter>tbody>tr:nth-child(1) td:nth-child(1) { border-left-color: transparent }
+        #voucher1 .vmiddle { vertical-align: middle; }
+        #voucher1 .note { margin: 10px 0 10px 0; padding-left: 15px; }
+        #voucher1 .note li { list-style-type: initial; padding:2px 0; font-size: 11px !important; color:#4b4c4f !important; }
+        #voucher1 footer { position: relative; padding: 6px 0 0; line-height: 20px; overflow: hidden; }
+        #voucher1 .pos-rel { position: relative; }
+        #voucher1 .primary-clr { color: #df4927; }
+        #voucher1 .text-center { text-align: center }
+        #template-footer { position: absolute; bottom: 20px; }
+        .pRL { padding-left: 30px; padding-right: 30px; }
+    </style>
+</head>
+<body>
+    <div id="template-header" style="margin: 45px 65px 0;">
+        <a href="javascript:void(0);" class="edit-template"><i class="fa fa-pencil"></i></a>
+        <header>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <h1>@(HasKey(Model, "voucherType") ? Model?.voucherType : "")</h1>
+                            <p style="padding:0;"><strong>Number: @(HasKey(Model, "docNumber") ? Model?.docNumber : "")</strong></p>
+                            <strong>@(HasKey(Model, "docDate") ? Model?.docDate : "")</strong>
+                            @if (HasKey(Model?.company, "gstNumber") && !string.IsNullOrEmpty(Model?.company?.gstNumber?.ToString()))
+                            {
+                                <p style="padding:0;"><strong>GSTIN: @Model?.company?.gstNumber</strong></p>
+                            }
+                        </td>
+                        <td class="text-right">
+                            @if (HasKey(Model, "showlogo") && Model?.showlogo == true && HasKey(Model, "logopath") && !string.IsNullOrEmpty(Model?.logopath?.ToString()))
+                            {
+                                <img style="max-width: 160px;" class="clogo" src="@Model?.logopath" />
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </header>
+
+        <table class="meta">
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <p>To,</p>
+                        <p><strong>@(HasKey(Model?.account, "customerName") ? Model?.account?.customerName : "")</strong></p>
+                        @if (HasKey(Model?.account, "data") && Model?.account?.data != null)
+                        {
+                            @foreach (var accountData in Model?.account?.data)
+                            {
+                                <p>@accountData</p>
+                            }
+                        }
+                        @if (HasKey(Model?.account?.billingDetails, "gstNumber") && !string.IsNullOrEmpty(Model?.account?.billingDetails?.gstNumber?.ToString()))
+                        {
+                            <p><strong>GSTIN: @Model?.account?.billingDetails?.gstNumber</strong></p>
+                        }
+                        @if (HasKey(Model?.account, "attentionTo") && !string.IsNullOrEmpty(Model?.account?.attentionTo?.ToString()))
+                        {
+                            <p><strong>Att: @Model?.account?.attentionTo</strong></p>
+                        }
+                        @if (HasKey(Model?.account, "email") && !string.IsNullOrEmpty(Model?.account?.email?.ToString()))
+                        {
+                            <span>@Model?.account?.email</span>
+                        }
+                        @if (HasKey(Model?.account, "email") && !string.IsNullOrEmpty(Model?.account?.email?.ToString()) && HasKey(Model?.account, "mobileNumber") && !string.IsNullOrEmpty(Model?.account?.mobileNumber?.ToString()))
+                        {
+                            <span>, </span>
+                        }
+                        @if (HasKey(Model?.account, "mobileNumber") && !string.IsNullOrEmpty(Model?.account?.mobileNumber?.ToString()))
+                        {
+                            <span>@Model?.account?.mobileNumber</span>
+                        }
+                    </td>
+                    <td colspan="1"></td>
+                    <td class="text-right vmiddle total-amount">
+                        <h2 class="amt text-center">@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")/-</h2>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="Template-table" class="pos-rel">
+        <span class="arrow-down"></span>
+        <table class="item product-table mrB2" cellspacing="0" cellpadding="0" style="padding: 0 65px;">
+            <thead>
+                <br />
+                <tr>
+                    <th class="text-right" style="width: 50px;">S. No.</th>
+                    <th class="text-left">Description</th>
+                    @{
+                        bool hasQuantity = false;
+                        if (Model?.entries != null && Model.entries.Count > 0)
+                        {
+                            var firstEntry = Model.entries[0];
+                            if (firstEntry?.transactions != null && firstEntry.transactions.Count > 0)
+                            {
+                                hasQuantity = firstEntry.transactions[0]?.quantity != null;
+                            }
+                        }
+                    }
+                    @if (hasQuantity)
+                    {
+                        <th>Qty.</th>
+                    }
+                    else
+                    {
+                        <th></th>
+                    }
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int serial = 0;
+                }
+                @if (HasKey(Model, "entries") && Model?.entries != null)
+                {
+                    @foreach (var entry in Model?.entries)
+                    {
+                        @if (HasKey(entry, "transactions") && entry?.transactions != null)
+                        {
+                            @foreach (var transaction in entry?.transactions)
+                            {
+                                serial++;
+                                <tr>
+                                    <td class="text-right" style="width: 50px;">@serial</td>
+                                    @if (HasKey(transaction?.stockDetails, "name") && transaction?.stockDetails?.name != null)
+                                    {
+                                        <td class="text-left">@transaction?.stockDetails?.name</td>
+                                    }
+                                    else if (HasKey(transaction, "accountName") && !string.IsNullOrEmpty(transaction?.accountName?.ToString()))
+                                    {
+                                        <td class="text-left">@transaction?.accountName</td>
+                                    }
+                                    @if (HasKey(transaction, "quantity") && transaction?.quantity != null)
+                                    {
+                                        <td>@transaction?.quantity</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    <td>@(HasKey(transaction, "amount") ? transaction?.amount : "")</td>
+                                </tr>
+                                @if (HasKey(transaction, "description") && !string.IsNullOrEmpty(transaction?.description?.ToString()) && transaction?.description != transaction?.stockDetails?.name && transaction?.description != transaction?.accountName)
+                                {
+                                    <tr>
+                                        <td class="text-left"></td>
+                                        <td class="text-left">@transaction?.description</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-right">Sub Total</th>
+                    <th class="text-right">@(HasKey(Model, "subTotal") ? Model?.subTotal : "")</th>
+                </tr>
+                @{
+                    try
+                    {
+                        var discountTotal = HasKey(Model, "discountTotal") ? Model?.discountTotal : null;
+                        if (discountTotal != null)
+                        {
+                            <tr>
+                                <th colspan="3" class="text-right">Discount</th>
+                                <th class="text-right">@discountTotal</th>
+                            </tr>
+                        }
+                    }
+                    catch { }
+                }
+                @if (HasKey(Model, "taxes") && Model?.taxes != null)
+                {
+                    @foreach (var tax in Model?.taxes)
+                    {
+                        <tr>
+                            <th colspan="3" class="text-right">@(HasKey(tax, "name") ? tax?.name : "")</th>
+                            <th class="text-right">@(HasKey(tax, "total") ? tax?.total : "")</th>
+                        </tr>
+                    }
+                }
+                @{
+                    try
+                    {
+                        var roundOff = HasKey(Model, "roundOff") ? Model?.roundOff : null;
+                        if (roundOff != null)
+                        {
+                            <tr>
+                                <th colspan="3" class="text-right">Round Off</th>
+                                <th class="text-right">@roundOff</th>
+                            </tr>
+                        }
+                    }
+                    catch { }
+                }
+                <tr>
+                    <th colspan="3" class="text-right total-row"><strong>Total</strong></th>
+                    <th class="text-right total-row"><strong>@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</strong></th>
+                </tr>
+                <br />
+                <tr>
+                    <th colspan="4" class="text-right"><strong>@(HasKey(Model, "totalAsWords") ? Model?.totalAsWords : "")</strong></th>
+                </tr>
+                <br />
+            </tfoot>
+        </table>
+
+        <div style="margin:0px 65px;">
+            <h2><strong>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</strong></h2>
+            <br/>
+            <br />
+            <h2><strong class="inwords">Digitally Generated No Signature required</strong></h2>
+        </div>
+    </div>
+
+    <div id="template-footer" style="margin:0px 65px;">
+        <table class="subfooter">
+            <tbody>
+                <tr>
+                    @{
+                        bool hasMessage1 = HasKey(Model, "message1") && !string.IsNullOrEmpty(Model?.message1?.ToString());
+                        bool hasMessage2 = HasKey(Model, "message2") && !string.IsNullOrEmpty(Model?.message2?.ToString());
+                    }
+                    @if (hasMessage1 && hasMessage2)
+                    {
+                        <td class="vmiddle text-center">
+                            <h1>THANK YOU</h1>
+                            <h2>FOR YOUR BUSINESS.</h2>
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="vmiddle text-left" colspan="3">
+                            <h1>THANK YOU</h1>
+                            <h2>FOR YOUR BUSINESS.</h2>
+                        </td>
+                    }
+
+                    @if (hasMessage1)
+                    {
+                        <td class="vmiddle">
+                            <section>
+                                <p> </p>
+                                <p>@Model?.message1</p>
+                            </section>
+                        </td>
+                    }
+                    @if (hasMessage2)
+                    {
+                        <td class="vmiddle">
+                            <section>
+                                <p>This is note 2 </p>
+                                <p>@Model?.message2</p>
+                            </section>
+                        </td>
+                    }
+                </tr>
+                <br />
+                <tr>
+                    <td colspan="3">
+                        <ul class="note">
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer style="text-align: center;width:100%;margin-top: 20px;">
+            <p><strong>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</strong></p>
+            <p>@(HasKey(Model, "companyAddress") ? Model?.companyAddress : "")</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "templateType": "gst_template_backup",
+  "type": "invoice",
+  "logo": {
+    "path": "https://example.com/logo.png"
+  },
+  "proformaDate": "01-06-2026",
+  "proformaNumber": "PF-001",
+  "dueDate": "15-06-2026",
+  "invoiceDetails": {
+    "invoiceDate": "01-06-2026",
+    "invoiceNumber": "INV-001"
+  },
+  "company": {
+    "name": "ABC Pvt Ltd",
+    "data": [
+      "123 Business Street",
+      "City, State 12345",
+      "Phone: 1234567890"
+    ]
+  },
+  "account": {
+    "name": "Customer Name",
+    "attentionTo": "Attention To",
+    "data": [
+      "456 Customer Lane",
+      "City, State 67890"
+    ],
+    "email": "customer@example.com",
+    "mobileNumber": "9876543210"
+  },
+  "entriesGST": [
+    {
+      "transactions": [
+        {
+          "accountName": "Sales Account",
+          "hsnNumber": "1001",
+          "quantity": 10,
+          "rate": 500
+        },
+        {
+          "accountName": "Sales Account",
+          "hsnNumber": "1002",
+          "quantity": 5,
+          "rate": 600
+        }
+      ],
+      "taxableValue": 8000,
+      "taxes": [
+        {
+          "accountName": "CGST",
+          "amount": 720,
+          "rate": 9
+        },
+        {
+          "accountName": "SGST",
+          "amount": 720,
+          "rate": 9
+        }
+      ]
+    }
+  ],
+  "discountTotal": 0,
+  "subTotal": 8000,
+  "taxes": [
+    {
+      "accountName": "CGST",
+      "taxRate": 9,
+      "amount": 720
+    },
+    {
+      "accountName": "SGST",
+      "taxRate": 9,
+      "amount": 720
+    }
+  ],
+  "commonDiscountEntries": [],
+  "roundOff": 0.25,
+  "grandTotal": 9440.25,
+  "amountInWords": "Nine Thousand Four Hundred Forty Rupees and Twenty Five Paise",
+  "companyIdentities": {
+    "data": "GST: 18AABCT1234H1Z0, PAN: AAABCT1234H"
+  },
+  "signature": {
+    "name": "Authorized Signatory",
+    "data": "https://example.com/signature.png"
+  },
+  "terms": [
+    "Payment due within 30 days",
+    "Please make payment to the account mentioned above",
+    "Thank you for your business"
+  ],
+  "seal": "https://example.com/seal.png"
+}

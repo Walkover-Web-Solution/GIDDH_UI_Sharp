@@ -1,0 +1,27 @@
+{
+    "templateType": "ledger_admin_detailed",
+    "company": {
+        "name": "ABC Pvt Ltd"
+    },
+    "companyAddress": "123 Business Street",
+    "fromDate": "01-06-2026",
+    "toDate": "30-06-2026",
+    "entries": [
+        {
+            "date": "01-06-2026",
+            "reference": "INV-001",
+            "particulars": "Opening",
+            "debit": "50000",
+            "credit": "0",
+            "balance": "50000"
+        },
+        {
+            "date": "05-06-2026",
+            "reference": "INV-002",
+            "particulars": "Sales",
+            "debit": "10000",
+            "credit": "0",
+            "balance": "60000"
+        }
+    ]
+}

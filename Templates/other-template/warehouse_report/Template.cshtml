@@ -1,0 +1,58 @@
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        table thead th, table tbody td { font-size: 12px; }
+        table { table-layout: auto; }
+        table.giddh-table { border: 1px solid #999999; border-collapse: collapse; }
+        table.giddh-table td { padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family: Arial, Helvetica, sans-serif; }
+    </style>
+</head>
+<body>
+    <table cellspacing="0" class="giddh-table" style="width:100%">
+        <tbody>
+            <tr>
+                <td colspan="5" align="center" style="border-bottom: 0;">
+                    <br/><b>Warehouse Report for @(HasKey(Model?.warehouse, "name") ? Model?.warehouse?.name : "")</b><br/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Date</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Item</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Quantity</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Unit</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Status</strong></td>
+            </tr>
+            @if (HasKey(Model, "items") && Model?.items != null)
+            {
+                @foreach (var item in Model?.items)
+                {
+                    <tr>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(item, "date") ? item?.date : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(item, "name") ? item?.name : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(item, "quantity") ? item?.quantity : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(item, "unit") ? item?.unit : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(item, "status") ? item?.status : "")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+</html>

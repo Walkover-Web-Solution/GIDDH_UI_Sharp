@@ -1,0 +1,110 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        table.giddh-table td {
+            padding: 2px 4px 2px 4px;
+            border-collapse: collapse;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        table.giddh-table {
+            table-layout: fixed;
+            border: 1px solid #999999;
+            border-collapse: collapse;
+            margin-left: 1cm;
+            margin-right: 1cm;
+        }
+    </style>
+</head>
+<body>
+    <table cellspacing="0" class="giddh-table" style="width: 100%; table-layout: fixed; border: 1px solid #999999; border-collapse: collapse; margin-left:1cm; margin-right: 1cm;">
+        <tbody>
+            <tr>
+                <td colspan="5" class="bdr-bottom-none" style="border-bottom: 0;">
+                    <div style="padding: 5px">
+                        @{
+                            int count = 0;
+                        }
+                        @if (HasKey(Model, "companyandaccountdata") && Model?.companyandaccountdata != null)
+                        {
+                            @foreach (var companydata in Model?.companyandaccountdata)
+                            {
+                                count++;
+                                @companydata<br/>
+                                @if (count % 2 == 0)
+                                {
+                                    <br/><br/>
+                                }
+                            }
+                        }
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="left" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;"><div style="padding: 5px">Date</div></td>
+                <td align="left" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">Particulars</td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">Debit</td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">Credit</td>
+                <td align="left" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">Balance</td>
+            </tr>
+            <tr>
+                <td colspan="2" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;"><div style="padding: 5px">Opening Balance</div></td>
+                <td colspan="3" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">@(HasKey(Model, "openingbalance") ? Model?.openingbalance : "")</td>
+            </tr>
+
+            @if (HasKey(Model, "ledgerEntries") && Model?.ledgerEntries != null)
+            {
+                @foreach (var sublist in Model?.ledgerEntries)
+                {
+                    <tr>
+                        @if (sublist != null)
+                        {
+                            @foreach (var ledger in sublist)
+                            {
+                                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;"><div style="padding: 5px">@ledger</div></td>
+                            }
+                        }
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td colspan="2" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;"><div style="padding: 5px">Total</div></td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;">@(HasKey(Model, "debitTotal") ? Model?.debitTotal : "")</td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;">@(HasKey(Model, "creditTotal") ? Model?.creditTotal : "")</td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td colspan="2" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;"><div style="padding: 5px">Closing Balance</div></td>
+                <td colspan="3" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; font-weight:bold;">@(HasKey(Model, "closingBal") ? Model?.closingBal : "")</td>
+            </tr>
+
+            <tr>
+                <td colspan="2" align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;"><div style="padding: 5px">Reckoning</div></td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;">@(HasKey(Model, "reckdebitcreditTotal") ? Model?.reckdebitcreditTotal : "")</td>
+                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;">@(HasKey(Model, "reckdebitcreditTotal") ? Model?.reckdebitcreditTotal : "")</td>
+                <td colspan="1"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

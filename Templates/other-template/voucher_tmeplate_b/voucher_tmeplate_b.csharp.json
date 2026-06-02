@@ -1,0 +1,78 @@
+{
+    "templateType": "voucher_tmeplate_b",
+    "label": {
+        "invoiceNumber": "Invoice #",
+        "invoiceDate": "Date",
+        "gstin": "GSTIN",
+        "pan": "PAN",
+        "billingAddress": "Bill To",
+        "billingGstin": "GSTIN",
+        "dueDate": "Due Date",
+        "shippingDate": "Shipping Date",
+        "shippedVia": "Shipped Via",
+        "trackingNumber": "Tracking #",
+        "sNo": "S.No",
+        "item": "Item",
+        "hsnSac": "HSN/SAC",
+        "taxes": "Tax",
+        "quantity": "Qty",
+        "rate": "Rate",
+        "total": "Total",
+        "taxableAmount": "Taxable Amount",
+        "totalInWords": "Total In Words"
+    },
+    "invoiceNumber": "INV-001",
+    "invoiceDate": "01-06-2026",
+    "gstin": "18AABCT1234H1Z0",
+    "pan": "AABCT1234H",
+    "showlogo": true,
+    "logopath": "https://example.com/logo.png",
+    "billingAddress": [
+        "123 Business Street",
+        "City, State 12345"
+    ],
+    "billingGstin": "18AABCT1234H1Z0",
+    "grandTotal": "10000",
+    "customerName": "Customer Name",
+    "dueDate": "15-06-2026",
+    "attentionTo": "Attention To",
+    "shippingDate": "01-06-2026",
+    "shippedVia": "Courier",
+    "trackingNumber": "TRK123456",
+    "entries": [
+        {
+            "transactions": [
+                {
+                    "stockDetails": {
+                        "name": "Product A"
+                    },
+                    "accountName": "Sales Account",
+                    "quantity": 10,
+                    "stockUnit": "pcs",
+                    "rate": "500",
+                    "amount": "5000",
+                    "hsnNumber": "85011010",
+                    "description": "Item description"
+                },
+                {
+                    "stockDetails": {
+                        "name": "Product B"
+                    },
+                    "accountName": "Sales Account",
+                    "quantity": 5,
+                    "stockUnit": "pcs",
+                    "rate": "600",
+                    "amount": "3000",
+                    "sacNumber": "998399",
+                    "description": "Item description"
+                }
+            ]
+        }
+    ],
+    "taxableAmount": "8000",
+    "totalInWords": "Ten Thousand Rupees",
+    "slogan": "Thank you for your business",
+    "message2": "Please contact us for any queries",
+    "companyName": "ABC Pvt Ltd",
+    "companyAddress": "123 Business Street, City, State 12345"
+}

@@ -1,0 +1,21 @@
+{
+    "templateType": "stock_report_v2",
+    "stocks": [
+        {
+            "name": "Product A",
+            "code": "SKU-001",
+            "quantity": 100,
+            "unit": "pcs",
+            "rate": 500,
+            "value": 50000
+        },
+        {
+            "name": "Product B",
+            "code": "SKU-002",
+            "quantity": 50,
+            "unit": "pcs",
+            "rate": 600,
+            "value": 30000
+        }
+    ]
+}

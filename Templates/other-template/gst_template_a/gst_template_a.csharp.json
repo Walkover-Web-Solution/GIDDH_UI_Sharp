@@ -1,0 +1,105 @@
+{
+  "templateType": "gst_template_a",
+  "company": {
+    "name": "ABC Pvt Ltd"
+  },
+  "companyGstNumber": "18AABCT1234H1Z0",
+  "companyPanNumber": "AABCT1234H",
+  "grandTotal": 11840.25,
+  "invoiceDetails": {
+    "invoiceDate": "01-06-2026",
+    "invoiceNumber": "INV-001"
+  },
+  "showTaxes": true,
+  "account": {
+    "name": "Customer Name",
+    "email": "customer@example.com",
+    "mobileNumber": "9876543210"
+  },
+  "accountAttentionTo": "Attention To",
+  "dueDate": "15-06-2026",
+  "customerBillingAddress": [
+    "123 Business Street",
+    "City, State 12345"
+  ],
+  "billingState": "State Name",
+  "customerBillingGst": "18AABCT1234H1Z0",
+  "customerShippingAddress": [
+    "456 Shipping Lane",
+    "City, State 67890"
+  ],
+  "shippingState": "State Name",
+  "customerShippingGst": "18AABCT1234H1Z0",
+  "showSac": false,
+  "showHsn": true,
+  "showQty": true,
+  "showRate": true,
+  "showDiscount": true,
+  "gstEntries": [
+    [
+      {
+        "transactions": [
+          {
+            "description": "Product A - High quality item",
+            "hsnNumber": "1001",
+            "sacNumber": null,
+            "quantity": 10,
+            "stockUnit": "pcs",
+            "rate": 500,
+            "category": "other",
+            "amount": 5000
+          },
+          {
+            "description": "Product B - Premium quality",
+            "hsnNumber": "1002",
+            "sacNumber": null,
+            "quantity": 5,
+            "stockUnit": "pcs",
+            "rate": 600,
+            "category": "other",
+            "amount": 3000
+          }
+        ],
+        "discounts": [],
+        "taxes": [
+          {
+            "accountUniqueName": "cgst",
+            "amount": 720,
+            "rate": 9
+          },
+          {
+            "accountUniqueName": "sgst",
+            "amount": 720,
+            "rate": 9
+          }
+        ]
+      }
+    ]
+  ],
+  "taxesWithTotal": [
+    {
+      "name": "CGST",
+      "uniqueName": "cgst",
+      "total": 720
+    },
+    {
+      "name": "SGST",
+      "uniqueName": "sgst",
+      "total": 720
+    }
+  ],
+  "taxableAmount": 8000,
+  "taxTotal": 1440,
+  "gstEntriesTotal": 9440,
+  "roundOff": 0.25,
+  "amountInWords": "Eleven Thousand Eight Hundred Forty Rupees and Twenty Five Paise",
+  "terms": [
+    "Payment terms: Net 30",
+    "Thank you for your business"
+  ],
+  "companyGstAddress": [
+    "123 Business Street",
+    "City, State 12345",
+    "Phone: 1234567890"
+  ]
+}

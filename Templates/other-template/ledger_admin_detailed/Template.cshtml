@@ -1,0 +1,57 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        table thead th, table tbody td { font-size: 12px; }
+        table { table-layout: auto; }
+        table.giddh-table { border: 1px solid #999999; border-collapse: collapse; }
+        table.giddh-table td { padding: 2px 4px 2px 4px; border: 1px solid #999999; font-family: Arial, Helvetica, sans-serif; }
+    </style>
+</head>
+<body>
+    <table cellspacing="0" class="giddh-table" style="width:100%">
+        <tbody>
+            <tr><td colspan="6"><br/><strong>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</strong><br/>@(HasKey(Model, "companyAddress") ? Model?.companyAddress : "")<br/>Detailed Ledger<br/>@(HasKey(Model, "fromDate") ? Model?.fromDate : "") to @(HasKey(Model, "toDate") ? Model?.toDate : "")<br/></td></tr>
+            <tr>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Date</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Ref</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Particulars</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Debit</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Credit</strong></td>
+                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;"><strong>Balance</strong></td>
+            </tr>
+            @if (HasKey(Model, "entries") && Model?.entries != null)
+            {
+                @foreach (var entry in Model?.entries)
+                {
+                    <tr>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "date") ? entry?.date : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "reference") ? entry?.reference : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "particulars") ? entry?.particulars : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "debit") ? entry?.debit : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "credit") ? entry?.credit : "")</td>
+                        <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(entry, "balance") ? entry?.balance : "")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+</html>
