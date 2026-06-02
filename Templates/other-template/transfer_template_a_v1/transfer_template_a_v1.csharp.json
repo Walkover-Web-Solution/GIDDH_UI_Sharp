@@ -1,0 +1,90 @@
+{
+    "templateType": "transfer_template_a_v1",
+    "label": {
+        "sources": "From",
+        "destinations": "To",
+        "gstin": "GSTIN",
+        "dispatchedDate": "Dispatched Date",
+        "transporterName": "Transporter Name",
+        "transporterId": "Transporter ID",
+        "transportMode": "Transport Mode",
+        "vehicleNumber": "Vehicle Number",
+        "sNo": "S.No",
+        "item": "Item",
+        "hsnSac": "HSN/SAC",
+        "quantity": "Qty",
+        "rate": "Rate",
+        "total": "Total",
+        "grandTotal": "Grand Total",
+        "totalInWords": "Total In Words",
+        "skuCode": "SKU Code"
+    },
+    "sources": [
+        {
+            "name": "Source Warehouse",
+            "warehouse": {
+                "address": "123 Source Street, City",
+                "taxNumber": "18AABCT1234H1Z0"
+            }
+        }
+    ],
+    "destinations": [
+        {
+            "name": "Destination Warehouse",
+            "warehouse": {
+                "address": "456 Destination Street, City",
+                "taxNumber": "18AABCT5678H1Z0"
+            }
+        }
+    ],
+    "transporterDetails": {
+        "dispatchedDate": "01-06-2026",
+        "transporterName": "ABC Transporter",
+        "transporterId": "TRANS123",
+        "transportMode": "Road",
+        "vehicleNumber": "MH01AB1234"
+    },
+    "products": [
+        {
+            "name": "Product A",
+            "variant": {
+                "name": "Variant 1"
+            },
+            "showVariant": true,
+            "description": "Item description",
+            "stockDetails": {
+                "skuCode": "SKU001",
+                "skuCodeHeading": "SKU",
+                "quantity": 10,
+                "stockUnit": "pcs",
+                "rate": "500",
+                "amount": "5000"
+            },
+            "hsnNumber": "85011010"
+        },
+        {
+            "name": "Product B",
+            "variant": {
+                "name": "Variant 2"
+            },
+            "showVariant": true,
+            "description": "Item description",
+            "stockDetails": {
+                "skuCode": "SKU002",
+                "skuCodeHeading": "SKU",
+                "quantity": 5,
+                "stockUnit": "pcs",
+                "rate": "600",
+                "amount": "3000"
+            },
+            "hsnNumber": "85011020"
+        }
+    ],
+    "grandTotal": "8000",
+    "totalInWords": "Eight Thousand Rupees",
+    "companyDetails": {
+        "currency": {
+            "code": "INR"
+        }
+    }
+}

@@ -1,0 +1,120 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt</title>
+    <style type="text/css">
+        @@font-face {
+            font-family: 'calibri';
+            src: url(Calibri.ttf);
+        }
+        p {
+            font-weight: normal;
+            margin: 0;
+        }
+        table {
+            font-family: 'calibri';
+            font-weight: normal;
+            font-size: 16px;
+            color: #262626;
+            border-top: 0;
+            position: relative;
+            table-layout: fixed;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+        img {
+            width: auto;
+            float: right;
+            max-width: 200px;
+        }
+        table th {
+            text-align: left;
+            padding: 20px 0;
+            color: #737373;
+            border-bottom: 1px solid #595959;
+        }
+        table th h2 {
+            color: #737373;
+        }
+        table th,
+        table td {
+            font-family: inherit;
+            vertical-align: -webkit-baseline-middle;
+            padding: 3px 0;
+        }
+        h2, h4 {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <th>
+                    <h2>@(HasKey(Model, "title") ? Model?.title : "")</h2>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <p><strong>Date:</strong> @(HasKey(Model, "date") ? Model?.date : "")</p>
+                    <p><strong>Receipt #:</strong> @(HasKey(Model, "receiptNumber") ? Model?.receiptNumber : "")</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p><strong>From:</strong> @(HasKey(Model?.company, "name") ? Model?.company?.name : "")</p>
+                    <p>@(HasKey(Model?.company, "address") ? Model?.company?.address : "")</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p><strong>To:</strong> @(HasKey(Model?.customer, "name") ? Model?.customer?.name : "")</p>
+                    <p>@(HasKey(Model?.customer, "address") ? Model?.customer?.address : "")</p>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <h4>Items</h4>
+                </th>
+            </tr>
+            @if (HasKey(Model, "items") && Model?.items != null)
+            {
+                @foreach (var item in Model?.items)
+                {
+                    <tr>
+                        <td>
+                            <p>@(HasKey(item, "description") ? item?.description : "") - @(HasKey(item, "amount") ? item?.amount : "")</p>
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td style="border-top: 1px solid #595959; padding-top: 10px;">
+                    <p><strong>Total Amount:</strong> @(HasKey(Model, "totalAmount") ? Model?.totalAmount : "")</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

@@ -141,7 +141,9 @@ public class Program
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ISlackService, SlackService>();
             builder.Services.AddSingleton<RazorTemplateService>();
+            builder.Services.AddSingleton<GenericRazorTemplateService>();
             builder.Services.AddSingleton<PdfService>();
+            builder.Services.AddSingleton<GenericPdfService>();
             builder.Services.AddScoped<AccountStatementPdfService>();
             builder.Services.AddHostedService<MemoryReservationService>();
             builder.Services.AddHostedService<PdfCleanupService>();

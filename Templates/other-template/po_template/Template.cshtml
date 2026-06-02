@@ -1,0 +1,155 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html id="default">
+<head>
+    <meta charset="utf-8">
+    <title>Purchase Order</title>
+    <style>
+        * { font-family: 'Calibri', sans-serif; color: #262626; }
+        body { margin: 0; padding: 15px; background: #fff; }
+        h1, h2 { margin: 0; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        .header { margin-bottom: 20px; }
+        .header h1 { font-size: 24px; color: #f63407; }
+        .meta { margin-bottom: 20px; }
+        .meta td { padding: 5px 0; }
+        .meta .label { font-weight: bold; width: 150px; }
+        .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .items-table th { background: #f2f3f4; padding: 10px; text-align: left; border-bottom: 1px solid #262626; font-weight: normal; }
+        .items-table td { padding: 8px; border-bottom: 1px solid #262626; }
+        .items-table .text-right { text-align: right; }
+        .items-table tfoot th { background: #f2f3f4; padding: 10px; text-align: right; border-top: 1px solid #262626; }
+        .footer { margin-top: 30px; }
+        .footer-table { width: 75%; float: right; }
+        .footer-table td { padding: 5px; text-align: right; }
+        .footer-table th { padding: 5px; text-align: right; font-weight: normal; }
+        .total-in-words { margin-top: 20px; padding: 10px; border-bottom: 1px solid #595959; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body>
+    <div id="Template-header">
+        <div class="header">
+            <h1>PURCHASE ORDER</h1>
+        </div>
+
+        <table class="meta">
+            <tbody>
+                <tr>
+                    <td class="label">PO Number:</td>
+                    <td>@(HasKey(Model, "poNumber") ? Model?.poNumber : "")</td>
+                    <td class="label" style="padding-left: 40px;">PO Date:</td>
+                    <td>@(HasKey(Model, "poDate") ? Model?.poDate : "")</td>
+                </tr>
+                <tr>
+                    <td class="label">Supplier:</td>
+                    <td colspan="3">@(HasKey(Model, "supplierName") ? Model?.supplierName : "")</td>
+                </tr>
+                <tr>
+                    <td class="label">Address:</td>
+                    <td colspan="3">
+                        @if (HasKey(Model, "supplierAddress") && Model?.supplierAddress != null)
+                        {
+                            @foreach (var addr in Model?.supplierAddress)
+                            {
+                                <div>@addr</div>
+                            }
+                        }
+                    </td>
+                </tr>
+                @if (HasKey(Model, "supplierGstin") && !string.IsNullOrEmpty(Model?.supplierGstin?.ToString()))
+                {
+                    <tr>
+                        <td class="label">GSTIN:</td>
+                        <td>@Model?.supplierGstin</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="Template-table">
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th class="text-left">Item</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Unit</th>
+                    <th class="text-right">Rate</th>
+                    <th class="text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int serial = 0;
+                }
+                @if (HasKey(Model, "items") && Model?.items != null)
+                {
+                    @foreach (var item in Model?.items)
+                    {
+                        serial++;
+                        <tr>
+                            <td class="text-left">@(HasKey(item, "name") ? item?.name : "")</td>
+                            <td class="text-right">@(HasKey(item, "quantity") ? item?.quantity : "")</td>
+                            <td class="text-right">@(HasKey(item, "unit") ? item?.unit : "")</td>
+                            <td class="text-right">@(HasKey(item, "rate") ? item?.rate : "")</td>
+                            <td class="text-right">@(HasKey(item, "amount") ? item?.amount : "")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-right">Sub Total</th>
+                    <th class="text-right">@(HasKey(Model, "subTotal") ? Model?.subTotal : "")</th>
+                </tr>
+                @if (HasKey(Model, "tax") && !string.IsNullOrEmpty(Model?.tax?.ToString()))
+                {
+                    <tr>
+                        <th colspan="4" class="text-right">Tax</th>
+                        <th class="text-right">@Model?.tax</th>
+                    </tr>
+                }
+                <tr>
+                    <th colspan="4" class="text-right"><strong>Total</strong></th>
+                    <th class="text-right"><strong>@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</strong></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div id="footerTable" class="footer">
+        <div class="total-in-words">
+            <strong>Total In Words:</strong> @(HasKey(Model, "totalInWords") ? Model?.totalInWords : "")
+        </div>
+
+        <table class="footer-table">
+            <tbody>
+                @if (HasKey(Model, "notes") && !string.IsNullOrEmpty(Model?.notes?.ToString()))
+                {
+                    <tr>
+                        <td colspan="2"><strong>Notes:</strong> @Model?.notes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

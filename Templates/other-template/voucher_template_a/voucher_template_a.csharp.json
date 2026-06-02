@@ -1,0 +1,67 @@
+{
+    "templateType": "voucher_template_a",
+    "voucherType": "Payment Voucher",
+    "docNumber": "VCH-001",
+    "docDate": "01-06-2026",
+    "showlogo": true,
+    "logopath": "https://example.com/logo.png",
+    "company": {
+        "name": "ABC Pvt Ltd",
+        "gstNumber": "18AABCT1234H1Z0"
+    },
+    "account": {
+        "customerName": "Customer Name",
+        "data": [
+            "123 Customer Lane",
+            "City, State 12345"
+        ],
+        "billingDetails": {
+            "gstNumber": "18AABCT5678H1Z0"
+        },
+        "attentionTo": "Attention To",
+        "email": "customer@example.com",
+        "mobileNumber": "9876543210"
+    },
+    "grandTotal": "10000",
+    "entries": [
+        {
+            "transactions": [
+                {
+                    "stockDetails": {
+                        "name": "Product A"
+                    },
+                    "accountName": "Sales Account",
+                    "quantity": 10,
+                    "amount": "5000",
+                    "description": "Item description"
+                },
+                {
+                    "stockDetails": {
+                        "name": "Product B"
+                    },
+                    "accountName": "Sales Account",
+                    "quantity": 5,
+                    "amount": "3000",
+                    "description": "Item description"
+                }
+            ]
+        }
+    ],
+    "subTotal": "8000",
+    "discountTotal": "0",
+    "taxes": [
+        {
+            "name": "CGST",
+            "total": "720"
+        },
+        {
+            "name": "SGST",
+            "total": "720"
+        }
+    ],
+    "roundOff": "0.25",
+    "totalAsWords": "Ten Thousand Rupees",
+    "message1": "Thank you for your business",
+    "message2": "Please contact us for any queries",
+    "companyAddress": "123 Business Street, City, State 12345"
+}

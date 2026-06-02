@@ -1,0 +1,266 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<html>
+<head>
+<style>
+    {
+        margin: 0;
+        padding: 0;
+        font-size: 10pt;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
+    }
+    ul li{
+        list-style: none;
+    }
+    p{
+        margin: 0;
+        padding: 0;
+        line-height:20px
+    }
+    h1{
+        font-size:24px;
+        text-align:center;
+        margin-bottom:20px;
+    }
+</style>
+</head>
+<div style=" margin:0 ;width:auto ;font-size: 10pt">
+    @if (HasKey(Model, "type") && Model?.type?.Equals("proforma") == true)
+    {
+        <h1>Proforma</h1>
+    }
+    else
+    {
+        <h1>@if (HasKey(Model, "taxes") && Model?.taxes != null && Model?.taxes.Count > 0) { <text>Tax </text> }Invoice</h1>
+    }
+    <div style="background-color:#ddd; height:.5pt; width:100%; margin: 10px 0;"></div>
+
+    <div id="header" style="height:80px;width:100%;border-bottom:1px solid #e0e0e0;padding-top:20px">
+
+        <table style="width: 100%" border="0">
+            <tr>
+                <td style="width: 50%; text-align:right">
+                    @if (HasKey(Model, "type") && Model?.type?.Equals("proforma") == true)
+                    {
+                        @if (HasKey(Model, "proformaDate") && Model?.proformaDate != null)
+                        {
+                            <p style="text-align:right;">Date: @Model?.proformaDate</p>
+                        }
+                        @if (HasKey(Model, "proformaNumber") && Model?.proformaNumber != null)
+                        {
+                            <p style="text-align:right;">Proforma #: @Model?.proformaNumber</p>
+                        }
+                        @if (HasKey(Model, "dueDate") && Model?.dueDate != null)
+                        {
+                            <p style="text-align:right;">Due Date: @Model?.dueDate</p>
+                        }
+                    }
+                    else
+                    {
+                        @if (HasKey(Model?.invoiceDetails, "invoiceDate") && Model?.invoiceDetails?.invoiceDate != null)
+                        {
+                            <p style="text-align:right;">Date: @Model?.invoiceDetails?.invoiceDate</p>
+                        }
+                        @if (HasKey(Model?.invoiceDetails, "invoiceNumber") && Model?.invoiceDetails?.invoiceNumber != null)
+                        {
+                            <p style="text-align:right;">Invoice #: <b>@Model?.invoiceDetails?.invoiceNumber</b></p>
+                        }
+                        @if (HasKey(Model, "dueDate") && Model?.dueDate != null)
+                        {
+                            <p style="text-align:right;">Due Date: @Model?.dueDate</p>
+                        }
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="middle" style="padding:10px 0; border-bottom:1px solid #e0e0e0; min-height:400px;overflow:hidden;">
+        <table style="width: 100%" border="0">
+            <tr>
+                <td style="width: 45%; vertical-align:top">
+                    <p>From:</p>
+                    <p style="font-weight:bold;">@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</p>
+                    @if (HasKey(Model?.company, "data") && Model?.company?.data != null)
+                    {
+                        @foreach (var companyData in Model?.company?.data)
+                        {
+                            <p>@companyData</p>
+                        }
+                    }
+                </td>
+                <td style="width: 10%;"></td>
+                <td style="width: 45%; vertical-align:top">
+                    <p>To: <strong>@(HasKey(Model?.account, "name") ? Model?.account?.name : "")</strong></p>
+                    @if (HasKey(Model?.account, "attentionTo") && !string.IsNullOrEmpty(Model?.account?.attentionTo))
+                    {
+                        <p>Att: <strong>@Model?.account?.attentionTo</strong></p>
+                    }
+                    @if (HasKey(Model?.account, "data") && Model?.account?.data != null)
+                    {
+                        @foreach (var accountData in Model?.account?.data)
+                        {
+                            <p>@accountData</p>
+                        }
+                    }
+                    @if (HasKey(Model?.account, "email") && !string.IsNullOrEmpty(Model?.account?.email))
+                    {
+                        <p>@Model?.account?.email</p>
+                    }
+                    @if (HasKey(Model?.account, "mobileNumber") && !string.IsNullOrEmpty(Model?.account?.mobileNumber))
+                    {
+                        <p>@Model?.account?.mobileNumber</p>
+                    }
+                </td>
+            </tr>
+        </table>
+
+        <div id="transactions" style="width:100%;overflow:hidden">
+            <table style="width:100%;border-top: 1px solid #e0e0e0;margin-top:10px;">
+                <thead>
+                <tr>
+                    <th style="border-left:1px solid #e0e0e0;border-bottom: 1px solid #e0e0e0;padding:8px 5px; text-align: left; width:10%">Serial #</th>
+                    <th style="border-bottom: 1px solid #e0e0e0;border-left:1px solid #e0e0e0;padding:8px 5px; text-align: left;width:75%">Description</th>
+                    <th style="border-right:1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;border-left:1px solid #e0e0e0;padding:8px 5px; text-align: right; width:15%">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    int serial = 0;
+                    if (HasKey(Model, "entries") && Model?.entries != null)
+                    {
+                        foreach (var entry in Model?.entries)
+                        {
+                            if (HasKey(entry, "transactions") && entry?.transactions != null)
+                            {
+                                foreach (var transaction in entry?.transactions)
+                                {
+                                    serial++;
+                                    <tr>
+                                        <td style="border-left:1px solid #e0e0e0; padding:8px 5px; border-bottom:1px solid #e0e0e0;">@serial</td>
+                                        <td style="border-left:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; padding:8px 5px;">@(HasKey(transaction, "description") ? transaction?.description : "")</td>
+                                        <td style="border-right:1px solid #e0e0e0; border-left:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; padding:8px 5px; text-align: right;">@(HasKey(transaction, "amount") ? transaction?.amount : "")</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                }
+                </tbody>
+                <tfoot>
+                @if (HasKey(Model, "discountTotal") && Model?.discountTotal != null)
+                {
+                    <tr>
+                        <td style="text-align:right; padding:16px 5px 5px;"></td>
+                        <td style="text-align:right; padding:16px 5px 5px;">Discount Total :</td>
+                        <td style="text-align:right; padding:16px 5px 5px;">@Model?.discountTotal</td>
+                    </tr>
+                }
+                <tr>
+                    <td style="text-align:right; padding:16px 5px 5px;"></td>
+                    <td style="text-align:right; padding:16px 5px 5px;">Sub Total :</td>
+                    <td style="text-align:right; padding:16px 5px 5px;">@(HasKey(Model, "subTotal") ? Model?.subTotal : "")</td>
+                </tr>
+                @if (HasKey(Model, "taxes") && Model?.taxes != null && Model?.taxes.Count > 0)
+                {
+                    foreach (var tax in Model?.taxes)
+                    {
+                        <tr>
+                            <td style="text-align:right; padding:5px;"></td>
+                            <td style="text-align:right; padding:5px;">@(HasKey(tax, "accountName") ? tax?.accountName : "") (@(HasKey(tax, "taxRate") ? tax?.taxRate : "")%):</td>
+                            <td style="text-align:right; padding:5px;">@(HasKey(tax, "amount") ? tax?.amount : "")</td>
+                        </tr>
+                    }
+                }
+                @if (HasKey(Model, "commonDiscountEntries") && Model?.commonDiscountEntries != null && Model?.commonDiscountEntries.Count > 0)
+                {
+                    foreach (var discount in Model?.commonDiscountEntries)
+                    {
+                        <tr>
+                            <td style="text-align:right; padding:5px;"></td>
+                            <td style="text-align:right; padding:5px;">@(HasKey(discount, "accountName") ? discount?.accountName : "") :</td>
+                            <td style="text-align:right; padding:5px;">@(HasKey(discount, "amount") ? discount?.amount : "")</td>
+                        </tr>
+                    }
+                }
+                @if (HasKey(Model, "roundOff") && Model?.roundOff != null)
+                {
+                    <tr>
+                        <td style="text-align:right; padding:5px;"></td>
+                        <td style="text-align:right; padding:5px;">Round Off :</td>
+                        <td style="text-align:right; padding:5px;">@Model?.roundOff</td>
+                    </tr>
+                }
+                <tr>
+                    <th style="text-align:right; padding:5px;"></th>
+                    <th style="text-align:right; padding:5px;"><b>Total</b> :</th>
+                    <th style="text-align:right; padding:5px;">@(HasKey(Model, "grandTotal") ? Model?.grandTotal : "")</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div>
+        <p><b>Amount In Words</b>:</p>
+        <p>@(HasKey(Model, "amountInWords") ? Model?.amountInWords : "")</p>
+        <div style="height:10px; width:100%"></div>
+        <div style="background-color:#ddd; height:.5pt; width:100%; margin: 10px 0;"></div>
+        <div style="height:10px; width:100%"></div>
+    </div>
+    @if (HasKey(Model, "seal") && !string.IsNullOrEmpty(Model?.seal))
+    {
+        <div style="width:200px; float:left;"><img src='@Model?.seal' height='150px;' /> </div>
+    }
+    @if ((HasKey(Model, "companyIdentities") && Model?.companyIdentities != null) || (HasKey(Model, "signature") && Model?.signature != null))
+    {
+        <div id="bottom" style="padding:10px 0; border-bottom:1px solid #e0e0e0; overflow:hidden">
+            <table style="width:100%;" border="0">
+                <tr>
+                    <td style="width: 50%">
+                        @if (HasKey(Model?.companyIdentities, "data") && Model?.companyIdentities?.data != null)
+                        {
+                            @foreach (var identity in Model?.companyIdentities?.data.Split(","))
+                            {
+                                <p>@identity</p>
+                            }
+                        }
+                    </td>
+
+                    <td style="width: 50%">
+                        @if (HasKey(Model, "signature") && Model?.signature != null)
+                        {
+                            @if (HasKey(Model?.signature, "name") && !string.IsNullOrEmpty(Model?.signature?.name))
+                            {
+                                <div><p style="text-align:right">@Model?.signature?.name</p></div>
+                                <div style="height: 62px"></div>
+                            }
+                            @if (HasKey(Model?.signature, "data") && !string.IsNullOrEmpty(Model?.signature?.data))
+                            {
+                                <div><p style="text-align:right">@Model?.signature?.data</p></div>
+                            }
+                        }
+                    </td>
+                </tr>
+            </table>
+            <div style="height:10px; width:100%"></div>
+            <div style="background-color:#ddd; height:.5pt; width:100%; margin: 10px 0;"></div>
+            <div style="height:10px; width:100%"></div>
+        </div>
+    }
+</div>
+</html>

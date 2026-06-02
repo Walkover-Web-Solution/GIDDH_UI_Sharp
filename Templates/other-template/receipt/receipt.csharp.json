@@ -1,0 +1,25 @@
+{
+    "templateType": "receipt",
+    "title": "Receipt",
+    "date": "01-06-2026",
+    "receiptNumber": "RCP-001",
+    "company": {
+        "name": "ABC Pvt Ltd",
+        "address": "123 Business Street, City"
+    },
+    "customer": {
+        "name": "Customer Name",
+        "address": "456 Customer Lane, City"
+    },
+    "items": [
+        {
+            "description": "Product A",
+            "amount": "5000"
+        },
+        {
+            "description": "Product B",
+            "amount": "3000"
+        }
+    ],
+    "totalAmount": "8000"
+}

@@ -1,0 +1,37 @@
+{
+  "templateType": "entry",
+  "entries": [
+    {
+      "transactions": [
+        {
+          "description": "Product A - High quality item",
+          "amount": 5000
+        },
+        {
+          "description": "Product B - Premium quality",
+          "amount": 3000
+        }
+      ]
+    }
+  ],
+  "discountTotal": 500,
+  "subTotal": 8000,
+  "taxes": [
+    {
+      "accountName": "CGST",
+      "taxRate": 9,
+      "amount": 720
+    },
+    {
+      "accountName": "SGST",
+      "taxRate": 9,
+      "amount": 720
+    }
+  ],
+  "commonDiscountEntry": {
+    "accountName": "Trade Discount"
+  },
+  "commonDiscount": 100,
+  "roundOff": 0.25,
+  "grandTotal": 9440.25
+}
