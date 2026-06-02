@@ -265,7 +265,7 @@
                                                     @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
                                                     {
                                                         <td class="text-right no-wrap vertical-top">
-                                                            @if (HasKey(entry?.entryTotalWithoutTcsTds, "amountForAccount") && entry?.entryTotalWithoutTcsTds?.amountForAccount != null)
+                                                            @if (HasKey(entry, "entryTotalWithoutTcsTds") && HasKey(entry?.entryTotalWithoutTcsTds, "amountForAccount") && entry?.entryTotalWithoutTcsTds?.amountForAccount != null)
                                                             {
                                                                 <span class="pull-right">
                                                                     <div class="d-inline-block">@entry?.entryTotalWithoutTcsTds?.amountForAccount</div>
