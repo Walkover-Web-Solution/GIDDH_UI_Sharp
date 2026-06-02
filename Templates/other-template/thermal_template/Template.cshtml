@@ -1,0 +1,428 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html id="default">
+<head>
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <title>Thermal Template</title>
+    <style>
+        @@font-face { font-family: "Calibri"; src: url("https://s3.ap-south-1.amazonaws.com/giddhbuildartifacts/calibri.ttf"); }
+        * { font-family: 'Calibri'; }
+        body, h1, h2, h3, h4, p, span { font-size: 12px!important; }
+        .medium { font-size: 14px!important; }
+        .small { font-size: 10px!important; }
+        .strong, strong { font-weight: 600 !important; }
+        #lastRow { page-break-before: always !important; }
+        thead { display: table-header-group; }
+        tfoot { display: table-row-group; }
+        tr { page-break-inside: avoid; }
+        .balance { page-break-inside: avoid; }
+        .height-100 { display: block; clear: both; float: none; overflow: hidden; }
+        * { color: #262626; font-style: inherit; line-height: inherit; list-style: none; text-decoration: none; vertical-align: top; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        #default header h1 {}
+        #default header h2 { color: #f63407; text-transform: capitalize; float: left; display: block; font-weight: 800; }
+        #default table { table-layout: fixed; width: 100%; border-collapse: inherit; }
+        #default .item th, #default tfoot tr th { border: 0; font-weight: normal !important; }
+        #default { overflow: auto; position: relative; padding: 0; margin: 0 auto; width: 50%; }
+        #default body { letter-spacing: 0; position: relative; min-height: 100%; }
+        #default header { background: #fff; position: relative; display: block; overflow: hidden; clear: both; float: left; width: 100%; }
+        .font-12 { font-size: 12px !important; }
+        .font-13 { font-size: 13px !important; }
+        .font-11 { font-size: 11px !important; }
+        .pull-right tr td { text-align: right !important; }
+        #default .meta tbody tr td { line-height: 17px; }
+        #default header figure { display: block; overflow: hidden; margin: 0; }
+        #default header figure p { margin: 0 0 0.25em; }
+        #default header span, header img { display: block; float: right; }
+        #default header span { margin: 0 0 1em 1em; max-height: 25%; max-width: 60%; position: relative; }
+        #default header img { max-width: 160px; max-height: 100px; height: 100px; }
+        #default header table tr td { border: 0; padding: 3px 0; }
+        #default article:after { clear: both; content: ""; display: table; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        #default table.item { clear: both; width: 100%; table-layout: auto; }
+        #default table.item tfoot tr th, #default table.item th { position: relative; padding: 14px 7px; line-height: 19px; font-weight: normal; text-transform: capitalize; border-top: 1px dashed; padding-bottom: 14px; padding-right: 0; padding-left: 0; }
+        #default table.item td { border-radius: 0; text-transform: capitalize; padding-left: 0; padding-right: 0; }
+        #default table.item td p { color: #595959; }
+        #default table.balance { width: 100%; margin: 0 auto; }
+        #default table.balance td, #default table.balance th { width: 100%; }
+        #default table.balance th { padding: 0 7px; }
+        .footerTableDiv { border-bottom: 1px dashed !important; }
+        #default footer { padding: 15px 0; margin: 8px 10.0px 10.0px; background: #fff; padding-top: 0; margin-top: 0; }
+        #default aside { line-height: 19px; }
+        #default .subfooter { padding: 0; margin-top: 10px; }
+        #default .signature hr { width: 300px; margin: 3px auto; height: 1px; border: 0; }
+        #default .subfooter h6 { color: #f63407; margin: 10px 0 0; }
+        #default p { margin: 0; word-wrap: break-word; overflow-wrap: break-word; }
+        #default h2 { margin: 0; font-size: inherit; }
+        .disabled-area { position: relative; }
+        .disabled-area:after { content: ' '; position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(204, 204, 204, 0.5); border: 1px dashed; }
+        .font-normal, .font-normal th { font-weight: normal !important; }
+        .page { page-break-after: always; }
+        .entryDiv { width: 100% !important; position: relative; }
+        .entryDiv table tr th { border-bottom: 1px dashed !important; }
+        .meta_header { width: 100% !important; overflow: hidden; float: left !important; }
+        .cargoDetail, .meta { width: 100%; }
+        #Template-header #client { border-collapse: collapse; }
+        #Template-header #client tbody tr td { padding: 5px 0 5px 0; }
+        #hsnTable.hsn-table tfoot tr th { border-bottom: 1px dashed; }
+        #lastRow { page-break-before: always !important; clear: both; }
+        @@page { margin: 0; padding: 10.0px 10.0px 0; size: A4 portrait; @@top-center { content: element(pageHeader); } }
+        @@media print { #lastRow { page-break-before: always !important; clear: both; } .page-break { page-break-before: always !important; clear: both; } #default table.item tfoot tr th, #default table.item th { position: relative; padding: 14px 10px; line-height: 19px; } #default footer { float: left; width: 100%; } #default header table { margin-top: 10px; } #default .subfooter { margin: 0 10.0px; width: 100%; } .content_wrap { position: relative; } }
+        .company_name { width: 100%; }
+        .company_name h2 { margin: 0; }
+        .clogo_figure { overflow: hidden; margin-bottom: 5px; }
+        .clogo { float: left; max-width: 110px; }
+        .bold { font-weight: bold; }
+        .table-details tr td { background: #F2F2F2; padding: 6px !important; display: block; }
+        .no-wrap { white-space: nowrap; }
+        .word-break { word-wrap: break-word !important; }
+        .total-in-words { border-bottom: 1px dashed; }
+        .description2 { width: 150px !important; }
+        #last_txn tr th {}
+        #client, .bifurcation-table { padding-left: 20px; padding-right: 20px; display: table; box-sizing: border-box; }
+        .p-0 { padding: 0 !important; }
+        .p-b0 { padding-bottom: 0 !important; }
+        .p-t0 { padding-top: 0 !important; }
+        .br0 { border-right: 0 !important; }
+        .bl0 { border-left: 0 !important; }
+        .text-muted { color: #9a9a9a !important; }
+        .text-light { color: #7c7c7c !important; }
+        .d-block { display: block; }
+        .d-inline { display: inline; }
+        .d-inline-block { display: inline-block; }
+        .pr-3 { padding-right: 3px; }
+        .table-auto { padding-right: 15px; padding-left: 15px; margin-bottom: 10px; margin-top: 10px; }
+        .table-auto tbody tr td { padding: 0 !important; line-height: 16px !important; }
+        @@media print { table { page-break-after: auto; } tr { page-break-inside: avoid; page-break-after: auto; } td { page-break-inside: avoid; page-break-after: auto; } thead { display: table-header-group; } tfoot { display: table-footer-group; } }
+        .capitalize { text-transform: capitalize; }
+        .pull-left { float: left; }
+        .pull-right { float: right; }
+        .warehouse-table { width: 100%; border-bottom: 1px dashed; margin-bottom: 10px; padding-bottom: 5px; }
+        .warehouse-table tbody tr td { padding: 5px 30px 5px 15px; }
+        html { overflow: auto; padding: 0; }
+        table { page-break-inside: auto; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
+        #content_wrap { margin-top: 0; height: auto; }
+        #Template-footer .subfooter .footer-text p { word-wrap: break-word; overflow-wrap: break-word; }
+        .subfooter hr { width: 100%; border-bottom: 1px dashed; margin: 3px 0; }
+        .subfooter h4 { margin-top: 5px; margin-bottom: 5px; }
+        .subfooter { padding-top: 15px; }
+        footer { padding: 5px 0 10px; background: #fff; }
+        #qr-code-section { width: 30%; margin: 0 auto; }
+        #footerTable { border-top: 1px dashed; padding-top: 15px !important; margin-top: 0 !important; }
+        #product_table td { padding-top: 15px !important; padding-bottom: 15px !important; }
+        .bottom-top { margin:0 auto; width: 100%; border-bottom:1px dashed; margin-bottom :10px; }
+    </style>
+</head>
+<body>
+    <div class="bottom-top"></div>
+    <div class="content_wrap" id='body'>
+        <div id="Template-header">
+            <table id="client" class="meta cargoDetail" cellspacing="0" cellpadding="0" style="width:100%;">
+                <tbody>
+                    <tr>
+                        <td class="text-left">
+                            @if (HasKey(Model, "customerName") && !string.IsNullOrEmpty(Model?.customerName?.ToString()))
+                            {
+                                <p>@Model?.customerName</p>
+                            }
+                            @if (HasKey(Model, "billingAddress") && Model?.billingAddress != null)
+                            {
+                                @foreach (var address in Model?.billingAddress)
+                                {
+                                    @if (!string.IsNullOrEmpty(address?.ToString()))
+                                    {
+                                        <p>@address</p>
+                                    }
+                                }
+                            }
+                        </td>
+                        <td class="text-right">
+                            @if (HasKey(Model?.label, "invoiceDate") && !string.IsNullOrEmpty(Model?.label?.invoiceDate?.ToString()))
+                            {
+                                <p>@Model?.label?.invoiceDate @(HasKey(Model, "invoiceDate") ? Model?.invoiceDate : "")</p>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">
+                            @if (HasKey(Model?.label, "billingGstin") && !string.IsNullOrEmpty(Model?.label?.billingGstin?.ToString()))
+                            {
+                                <p style="float:left; padding-right:5px">@Model?.label?.billingGstin</p>
+                                <p style="float:left">@(HasKey(Model, "billingGstin") ? Model?.billingGstin : "")</p>
+                            }
+                        </td>
+                        <td class="text-right">
+                            @if (HasKey(Model?.label, "invoiceNumber") && !string.IsNullOrEmpty(Model?.label?.invoiceNumber?.ToString()))
+                            {
+                                <p>@Model?.label?.invoiceNumber @(HasKey(Model, "invoiceNumber") ? Model?.invoiceNumber : "")</p>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="Template-table" class="entryDiv">
+            <article>
+                <table class="item" id="product_table" cellpadding="0" cellspacing="0">
+                    <thead id="product_thead" cellpadding="0" cellspacing="0">
+                        <tr class="font-normal" id="tfoot">
+                            @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                            {
+                                <th class="text-left description2 word-break">@Model?.label?.item</th>
+                            }
+                            @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                            {
+                                <th class="text-right">@Model?.label?.quantity</th>
+                            }
+                            @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                            {
+                                <th class="text-right word-break">@Model?.label?.rate</th>
+                            }
+                            @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                            {
+                                <th class="text-right no-wrap">@Model?.label?.total</th>
+                            }
+                        </tr>
+                        <div class="bottom-line" style="border-bottom:1px dashed;float: left;width: 100%;position: absolute;top: 45px;"></div>
+                    </thead>
+                    <tbody style="margin-top:10px">
+                        @{
+                            int serial = 0;
+                        }
+                        @if (HasKey(Model, "entries") && Model?.entries != null)
+                        {
+                            @foreach (var entryss in Model?.entries)
+                            {
+                                @if (entryss != null)
+                                {
+                                    @foreach (var entry in entryss)
+                                    {
+                                        @if (HasKey(entry, "transactions") && entry?.transactions != null)
+                                        {
+                                            @foreach (var tr in entry?.transactions)
+                                            {
+                                                serial++;
+                                                <tr>
+                                                    @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                                                    {
+                                                        <td class="text-left description2">
+                                                            @if (HasKey(tr?.stock, "name") && tr?.stock?.name != null)
+                                                            {
+                                                                <span class="particular-name word-break" style="display: block;">@tr?.stock?.name</span>
+                                                            }
+                                                            else if (HasKey(tr?.account, "name") && tr?.account?.name != null)
+                                                            {
+                                                                <span class="particular-name word-break" style="display: block;">@tr?.account?.name</span>
+                                                            }
+                                                        </td>
+                                                    }
+                                                    @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                                                    {
+                                                        <td class="text-right no-wrap">
+                                                            @if (HasKey(tr?.stock, "quantity") && tr?.stock?.quantity != null)
+                                                            {
+                                                                @tr?.stock?.quantity
+                                                                @if (HasKey(tr?.stock?.stockUnit, "code") && tr?.stock?.stockUnit?.code != null)
+                                                                {
+                                                                    <span>@tr?.stock?.stockUnit?.code</span>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    }
+                                                    @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                                                    {
+                                                        <td class="text-right vertical-top no-wrap">
+                                                            @if (HasKey(tr, "stock") && HasKey(tr?.stock, "rate") && HasKey(tr?.stock?.rate, "rateForAccount") && tr?.stock?.rate?.rateForAccount != null)
+                                                            {
+                                                                <span class="pull-right">
+                                                                    <div class="d-block text-right">
+                                                                        <div class="pull-right">@tr?.stock?.rate?.rateForAccount</div>
+                                                                    </div>
+                                                                </span>
+                                                            }
+                                                        </td>
+                                                    }
+                                                    @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                                                    {
+                                                        <td class="text-right no-wrap vertical-top">
+                                                            @if (HasKey(entry?.entryTotalWithoutTcsTds, "amountForAccount") && entry?.entryTotalWithoutTcsTds?.amountForAccount != null)
+                                                            {
+                                                                <span class="pull-right">
+                                                                    <div class="d-inline-block">@entry?.entryTotalWithoutTcsTds?.amountForAccount</div>
+                                                                </span>
+                                                            }
+                                                            else if (HasKey(tr, "amount") && HasKey(tr?.amount, "amountForAccount") && tr?.amount?.amountForAccount != null)
+                                                            {
+                                                                @tr?.amount?.amountForAccount
+                                                            }
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </article>
+        </div>
+
+        <div style="display: block; float: none; overflow: hidden; margin-top:10px;" id='footerTable'>
+            <table id="footer-table">
+                <tbody>
+                    <tr class="font-normal" style="border-top:1px dashed; margin-top:10px">
+                        <td class="text-left">
+                            @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                            {
+                                <span>@Model?.label?.quantity</span>
+                            }
+                        </td>
+                        <td class="text-left">
+                            @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                            {
+                                <span>@(HasKey(Model, "totalQuantity") ? Model?.totalQuantity : "")</span>
+                            }
+                        </td>
+                        <td class="text-right">
+                            @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
+                            {
+                                <span>@Model?.label?.discount</span>
+                            }
+                        </td>
+                        <td class="text-right no-wrap">
+                            @if (HasKey(Model, "entries") && Model?.entries != null)
+                            {
+                                @foreach (var entryss in Model?.entries)
+                                {
+                                    @if (entryss != null)
+                                    {
+                                        @foreach (var entry in entryss)
+                                        {
+                                            @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
+                                            {
+                                                <span>@(HasKey(entry?.discountTotal, "amountForAccount") ? entry?.discountTotal?.amountForAccount : "")</span>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="balance" style="width:100%;">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">
+                        @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()) && HasKey(Model, "totalTax") && Model?.totalTax != null)
+                        {
+                            <span>@Model?.label?.taxableValue</span>
+                        }
+                    </td>
+                    <td class="text-right">
+                        @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()) && HasKey(Model, "totalTax") && Model?.totalTax != null)
+                        {
+                            <span>@(HasKey(Model?.totalTax, "amountForAccount") ? Model?.totalTax?.amountForAccount : "")</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">
+                        @if (HasKey(Model?.label, "totalDue") && !string.IsNullOrEmpty(Model?.label?.totalDue?.ToString()))
+                        {
+                            <span>@Model?.label?.totalDue</span>
+                        }
+                    </td>
+                    <td class="text-right">
+                        @if (HasKey(Model?.label, "totalDue") && !string.IsNullOrEmpty(Model?.label?.totalDue?.ToString()))
+                        {
+                            <span>@(HasKey(Model?.grandTotal, "amountForAccount") ? Model?.grandTotal?.amountForAccount : "")</span>
+                        }
+                    </td>
+                </tr>
+            </table>
+            <div class="footerTableDiv text-center" style="margin-top:15px; float: left !important ; width:100% !important;">
+                @if (HasKey(Model?.label, "totalInWords") && !string.IsNullOrEmpty(Model?.label?.totalInWords?.ToString()) && HasKey(Model, "totalInWords") && HasKey(Model?.totalInWords, "amountForAccount") && Model?.totalInWords?.amountForAccount != null)
+                {
+                    <h2 style="font-size:14px !important; padding-bottom:10px !important;">@Model?.totalInWords?.amountForAccount</h2>
+                }
+                else
+                {
+                    <h2></h2>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div id="content_wrap">
+        <div id="Template-footer">
+            <div id="qr-code-section">
+                @if (HasKey(Model, "showQrCode") && Model?.showQrCode == true && HasKey(Model, "qrCodeBase64") && !string.IsNullOrEmpty(Model?.qrCodeBase64?.ToString()))
+                {
+                    <img id="qr-code" src="data:image/png;base64,@Model?.qrCodeBase64" width="100%"/>
+                }
+            </div>
+            <table cellpadding="0" cellspacing="0" class="subfooter" style="text-align: left;table-layout: fixed; height: auto;vertical-align: top; clear:both; float: none; overflow: hidden; padding-left:15px; padding-right:15px;">
+                <tbody>
+                    <tr>
+                        <td style="text-align:left;">
+                            <h4 class="bold">
+                                @if (HasKey(Model, "thanks") && !string.IsNullOrEmpty(Model?.thanks?.ToString()))
+                                {
+                                    @Model?.thanks
+                                }
+                            </h4>
+                        </td>
+                        <td class="text-right">
+                            @if (HasKey(Model?.label, "footerCompanyName") && !string.IsNullOrEmpty(Model?.label?.footerCompanyName?.ToString()))
+                            {
+                                <strong>@(HasKey(Model, "footerCompanyName") ? Model?.footerCompanyName : "")</strong>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <footer>
+                <table style="width:100%;">
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" style="vertical-align: top;">
+                                @if (HasKey(Model, "message1") && !string.IsNullOrEmpty(Model?.message1?.ToString()))
+                                {
+                                    <span>@Model?.message1</span>
+                                }
+                            </td>
+                            <td class="text-right"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

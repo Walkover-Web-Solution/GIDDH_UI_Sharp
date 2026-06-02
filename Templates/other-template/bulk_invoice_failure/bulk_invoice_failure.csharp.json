@@ -1,0 +1,13 @@
+{
+  "templateType": "bulk_invoice_failure",
+  "invoices": [
+    {
+      "invoiceNumber": "INV-001",
+      "reason": "Invalid amount"
+    },
+    {
+      "invoiceNumber": "INV-002",
+      "reason": "Missing customer details"
+    }
+  ]
+}

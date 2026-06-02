@@ -1,0 +1,17 @@
+{
+    "templateType": "ledger_view_condensed",
+    "account": {
+        "name": "Sales Account"
+    },
+    "fromDate": "01-06-2026",
+    "toDate": "30-06-2026",
+    "entries": [
+        {
+            "date": "01-06-2026",
+            "particulars": "Opening",
+            "debit": "50000",
+            "credit": "0",
+            "balance": "50000"
+        }
+    ]
+}

@@ -1,0 +1,129 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<div>
+<html>
+<head>
+  <style>
+    body {
+      height: 100% !important;
+      width: 100% !important;
+      font-size: 14px !important;
+      margin: 0;
+      padding: 10px;
+    }
+
+    p {
+      margin: 0 0 15px 0;
+      font-size: 14px;
+    }
+
+    .failure-table-wrapper {
+      width: 100%;
+    }
+
+    .failure-table-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #d9d9d9;
+    }
+
+    .failure-table-wrapper th {
+      border: 1px solid #d9d9d9;
+      padding: 12px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: bold;
+      background-color: #f5f5f5;
+      vertical-align: top;
+    }
+
+    .failure-table-wrapper td {
+      border: 1px solid #d9d9d9;
+      padding: 12px;
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    .failure-table-wrapper tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    * {
+      -ms-text-size-adjust: 100%;
+    }
+
+    table,
+    td {
+      mso-table-lspace: 0pt !important;
+      mso-table-rspace: 0pt !important;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .for-mobile {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    @@media only screen and (min-width:991px) {
+      .for-desktop {
+        display: table !important;
+      }
+    }
+
+    @@media only screen and (max-width:990px) {
+      .failure-table-wrapper {
+        overflow-x: auto;
+      }
+
+      .failure-table-wrapper th {
+        min-width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="failure-table-wrapper">
+<p>
+Below is the list of failure invoices(@(HasKey(Model, "invoices") ? Model?.invoices?.Count : 0)) with reason:
+</p>
+<table>
+<thead>
+    <tr>
+        <th>Invoice number</th>
+        <th>Failure reason</th>
+    </tr>
+</thead>
+<tbody>
+    @if (HasKey(Model, "invoices") && Model?.invoices != null)
+    {
+        @foreach (var invoice in Model?.invoices)
+        {
+            <tr>
+                <td>@(HasKey(invoice, "invoiceNumber") ? invoice?.invoiceNumber : "")</td>
+                <td>@(HasKey(invoice, "reason") ? invoice?.reason : "")</td>
+            </tr>
+        }
+    }
+</tbody>
+</table>
+</div>
+</body>
+</html>
+</div>

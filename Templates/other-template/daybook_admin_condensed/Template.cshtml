@@ -1,0 +1,122 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            table thead th, table tbody td {
+                   font-size: 12px;
+            }
+            table {
+                table-layout: auto;
+            }
+            table.giddh-table {
+                border: 1px solid #999999;
+                border-collapse: collapse;    
+            }
+            table.giddh-table td {
+                padding: 2px 4px 2px 4px;
+                border: 1px solid #999999;  
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            table.giddh-table td.bdr-bottom-none{
+                border: none !important;
+            }
+            body {
+                margin: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <table cellspacing="0"  class="giddh-table" style="width:100%">
+  
+            <tbody>
+    
+                <tr>
+                    <td colspan="6" class="bdr-bottom-none" style="border-bottom: 0;">
+                        <br/>
+                        <strong>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</strong>
+                        <br/>
+                        @(HasKey(Model, "companyAddress") ? Model?.companyAddress : "")
+                        <br/>
+                        <br/>
+                        <strong>Day Book</strong>
+                        <br/>
+                        @(HasKey(Model, "fromDate") ? Model?.fromDate : "") to @(HasKey(Model, "toDate") ? Model?.toDate : "")
+                        <br/>
+                    </td>
+                </tr>    
+  
+                <tr>
+                    <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;"><strong>Date</strong></td>
+                    <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "><strong>Particulars</strong></td>
+                    <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "><strong>Vch Type</strong></td>
+                    <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "><strong>Vch No.</strong></td>
+                    <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "><strong>Debit</strong></td>
+                    <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "><strong>Credit</strong></td>
+                </tr>
+
+                @if (HasKey(Model, "entries") && Model?.entries != null)
+                {
+                    @foreach (var entry in Model?.entries)
+                    {
+                        <tr>
+                            <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:12%; ">@(HasKey(entry, "entryDate") ? entry?.entryDate : "")</td>
+                            <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; width:26%;">@(HasKey(entry, "particular") && HasKey(entry?.particular, "name") ? entry?.particular?.name : "")</td>
+                            <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; width:8%;">@(HasKey(entry, "voucherName") ? entry?.voucherName : "")</td>
+                            @if (HasKey(entry, "voucherNo") && !string.IsNullOrEmpty(entry?.voucherNo?.ToString()))
+                            {
+                                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; width:8%;">@entry?.voucherNo</td>
+                            }
+                            else
+                            {
+                                <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; width:8%;"> </td>
+                            }
+                            @if (!HasKey(entry, "creditAmount") || entry?.creditAmount == null)
+                            {
+                                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:15%; ">@(HasKey(entry, "debitAmount") ? entry?.debitAmount : "")</td>
+                            }
+                            else
+                            {
+                                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:15%; "> </td>
+                            }
+                            @if (!HasKey(entry, "debitAmount") || entry?.debitAmount == null)
+                            {
+                                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:15%; ">@(HasKey(entry, "creditAmount") ? entry?.creditAmount : "")</td>
+                            }
+                            else
+                            {
+                                <td align="right" style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:15%; "> </td>
+                            }
+                        </tr>
+                    }
+                }
+
+                <tr>
+                    <td colspan="7" style="padding: 10px 4px 5px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "></td>
+                </tr>
+
+                <tr>
+                    <td colspan="7" style="padding: 10px 4px 5px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif; "></td>
+                </tr>
+
+            </tbody>
+
+        </table>
+    </body>
+</html>

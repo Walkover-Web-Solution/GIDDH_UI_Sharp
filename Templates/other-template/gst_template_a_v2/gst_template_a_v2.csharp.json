@@ -1,0 +1,152 @@
+{
+  "templateType": "gst_template_a_v2",
+  "font": false,
+  "primaryColor": "#E14926",
+  "secondaryColor": "#f5f5f5",
+  "showlogo": true,
+  "logopath": "https://example.com/logo.png",
+  "companyName": "ABC Pvt Ltd",
+  "gstin": "18AABCT1234H1Z0",
+  "label": {
+    "gstin": "GSTIN",
+    "typeOfInvoice": "Type of Invoice",
+    "invoiceDate": "Invoice Date",
+    "invoiceNumber": "Invoice Number",
+    "formNameInvoice": "INVOICE",
+    "formNameTaxInvoice": "TAX INVOICE",
+    "billingAddress": "Billing Address",
+    "shippingAddress": "Shipping Address",
+    "dueDate": "Due Date",
+    "billingGstin": "Billing GSTIN",
+    "shippingGstin": "Shipping GSTIN",
+    "shippingDate": "Shipping Date",
+    "shippedVia": "Shipped Via",
+    "trackingNumber": "Tracking Number",
+    "customField1": "Custom Field 1",
+    "customField2": "Custom Field 2",
+    "customField3": "Custom Field 3",
+    "sNo": "S No.",
+    "date": "Date",
+    "item": "Item",
+    "hsnSac": "HSN/SAC",
+    "quantity": "Quantity",
+    "rate": "Rate",
+    "discount": "Discount",
+    "taxableValue": "Taxable Value",
+    "taxes": "Taxes",
+    "total": "Total",
+    "previousDue": "Previous Due",
+    "taxableAmount": "Taxable Amount",
+    "totalTax": "Total Tax",
+    "grandTotal": "Grand Total",
+    "totalInWords": "Total In Words",
+    "totalDue": "Total Due",
+    "imageSignature": "Image Signature"
+  },
+  "typeOfInvoice": "Tax Invoice",
+  "invoiceDate": "01-06-2026",
+  "invoiceNumber": "INV-001",
+  "customerName": "Customer Name",
+  "customerEmail": "customer@example.com",
+  "customerMobileNumber": "9876543210",
+  "attentionTo": "Attention To",
+  "billingAddress": ["123 Business Street", "City, State 12345"],
+  "billingState": "State Name",
+  "billingGstin": "18AABCT1234H1Z0",
+  "shippingAddress": ["456 Shipping Lane", "City, State 67890"],
+  "shippingState": "State Name",
+  "shippingGstin": "18AABCT1234H1Z0",
+  "dueDate": "15-06-2026",
+  "shippingDate": "01-06-2026",
+  "shippedVia": "Courier",
+  "trackingNumber": "TRK123456",
+  "customField1": "Custom Value 1",
+  "customField2": "Custom Value 2",
+  "customField3": "Custom Value 3",
+  "manageInventory": true,
+  "entries": [
+    [
+      {
+        "entryDate": "01-06-2026",
+        "transactions": [
+          {
+            "stockDetails": {
+              "name": "Product A"
+            },
+            "accountName": "Sales Account",
+            "description": "High quality item",
+            "hsnNumber": "1001",
+            "sacNumber": null,
+            "quantity": 10,
+            "stockUnit": "pcs",
+            "rate": 500,
+            "category": "other",
+            "amount": 5000
+          },
+          {
+            "stockDetails": {
+              "name": "Product B"
+            },
+            "accountName": "Sales Account",
+            "description": "Premium quality",
+            "hsnNumber": "1002",
+            "sacNumber": null,
+            "quantity": 5,
+            "stockUnit": "pcs",
+            "rate": 600,
+            "category": "other",
+            "amount": 3000
+          }
+        ],
+        "discounts": [],
+        "taxes": [
+          {
+            "accountUniqueName": "cgst",
+            "amount": 720,
+            "rate": 9
+          },
+          {
+            "accountUniqueName": "sgst",
+            "amount": 720,
+            "rate": 9
+          }
+        ]
+      }
+    ]
+  ],
+  "gstTaxesTotal": [
+    {
+      "name": "CGST",
+      "uniqueName": "cgst",
+      "total": 720
+    },
+    {
+      "name": "SGST",
+      "uniqueName": "sgst",
+      "total": 720
+    }
+  ],
+  "taxableAmount": 8000,
+  "taxableTotal": 8000,
+  "totalTax": 1440,
+  "gstEntriesTotal": 9440,
+  "commonDiscountEntries": [],
+  "otherDiscount": 0,
+  "roundOff": 0.25,
+  "grandTotal": 11840.25,
+  "paidAmount": 0,
+  "balance": 11840.25,
+  "totalInWords": "Eleven Thousand Eight Hundred Forty Rupees and Twenty Five Paise",
+  "totalDue": 11840.25,
+  "currency": "INR",
+  "message1": "Thank you for your business",
+  "message2": "Please make payment within 30 days",
+  "name": "Authorized Signatory",
+  "virtualBankAcc": "1234567890",
+  "ifscCode": "BANK0001234",
+  "thanks": true,
+  "sealPath": "https://example.com/seal.png",
+  "imageSignature": "https://example.com/signature.png",
+  "slogan": "Quality is our priority",
+  "companyAddress": ["123 Business Street", "City, State 12345", "Phone: 1234567890"]
+}

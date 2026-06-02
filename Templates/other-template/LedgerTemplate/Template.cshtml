@@ -1,0 +1,65 @@
+@using System.Collections.Generic;
+@{
+    // Helper function to check if key exists in dynamic object
+    bool HasKey(dynamic obj, string propertyName)
+    {
+        try
+        {
+            if (obj == null) return false;
+            var dict = (IDictionary<string, object>)obj;
+            return dict.ContainsKey(propertyName);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>@(HasKey(Model, "title") ? Model?.title : "")</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Particulars</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (HasKey(Model, "entries") && Model?.entries != null)
+            {
+                @foreach (var entry in Model?.entries)
+                {
+                    <tr>
+                        <td>@(HasKey(entry, "date") ? entry?.date : "")</td>
+                        <td>@(HasKey(entry, "particulars") ? entry?.particulars : "")</td>
+                        <td>@(HasKey(entry, "debit") ? entry?.debit : "")</td>
+                        <td>@(HasKey(entry, "credit") ? entry?.credit : "")</td>
+                        <td>@(HasKey(entry, "balance") ? entry?.balance : "")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+</html>

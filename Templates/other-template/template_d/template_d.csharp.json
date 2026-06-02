@@ -1,0 +1,74 @@
+{
+  "templateType": "template_d",
+  "type": "invoice",
+  "invoiceDetails": {
+    "invoiceDate": "30-05-2026",
+    "invoiceNumber": "INV-001"
+  },
+  "proformaDate": "30-05-2026",
+  "proformaNumber": "PRO-001",
+  "dueDate": "15-06-2026",
+  "company": {
+    "name": "ABC Pvt Ltd",
+    "data": [
+      "123 Business Street",
+      "City, State 12345",
+      "Country"
+    ]
+  },
+  "account": {
+    "name": "Customer Name",
+    "attentionTo": "John Doe",
+    "email": "customer@example.com",
+    "mobileNumber": "9876543210",
+    "data": [
+      "Customer Address Line 1",
+      "Customer Address Line 2"
+    ]
+  },
+  "entries": [
+    {
+      "transactions": [
+        {
+          "description": "Product A - High quality item",
+          "amount": 5000
+        },
+        {
+          "description": "Product B - Premium quality",
+          "amount": 3000
+        }
+      ]
+    }
+  ],
+  "discountTotal": 500,
+  "subTotal": 8000,
+  "taxes": [
+    {
+      "accountName": "CGST",
+      "taxRate": 9,
+      "amount": 720
+    },
+    {
+      "accountName": "SGST",
+      "taxRate": 9,
+      "amount": 720
+    }
+  ],
+  "commonDiscountEntries": [
+    {
+      "accountName": "Trade Discount",
+      "amount": 100
+    }
+  ],
+  "roundOff": 0.25,
+  "grandTotal": 9440.25,
+  "amountInWords": "Nine Thousand Four Hundred Forty Rupees and Twenty Five Paise Only",
+  "seal": "company-seal.png",
+  "companyIdentities": {
+    "data": "GSTIN:22AAAAA0000A1Z5,PAN:AAAAA0000A"
+  },
+  "signature": {
+    "name": "Authorized Signatory",
+    "data": "Digital Signature"
+  }
+}
