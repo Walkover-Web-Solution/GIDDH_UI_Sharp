@@ -6,9 +6,21 @@
     <title>Invoice</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <style>
-        @@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
+        *, *:before, *:after{box-sizing:border-box}
+        .container{margin-right:auto;margin-left:auto;width:750px}
+        .clearfix:before,.clearfix:after{display:table;content:" "}
+        .clearfix:after{clear:both}
+        .text-center{text-align:center}
+        .text-right{text-align:right}
+        .small,small{font-size:85%}
+        .text-muted{color:#777}
+        table{border-spacing:0;border-collapse:collapse;background-color:transparent}
+        th{text-align:left}
+        .table{width:100%;max-width:100%;margin-bottom:20px}
+        .table>thead>tr>th,.table>tbody>tr>th,.table>tfoot>tr>th,.table>thead>tr>td,.table>tbody>tr>td,.table>tfoot>tr>td{padding:8px;line-height:1.42857143;vertical-align:top;border-top:1px solid #ddd}
+        .table>thead>tr>th{vertical-align:bottom;border-bottom:2px solid #ddd}
+        .table>caption+thead>tr:first-child>th,.table>colgroup+thead>tr:first-child>th,.table>thead:first-child>tr:first-child>th,.table>caption+thead>tr:first-child>td,.table>colgroup+thead>tr:first-child>td,.table>thead:first-child>tr:first-child>td{border-top:0}
         body{font-family: 'Open Sans', sans-serif; font-size:13px; font-weight:400; background:#272c30}
         .container{ border:0px solid #eee; box-shadow: 0 2px 6px #000; background:#fff;padding:0 !important;}
         h3{font-weight:700; margin-bottom:20px; font-size:17px;}
