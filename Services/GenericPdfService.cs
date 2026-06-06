@@ -101,7 +101,11 @@ namespace GiddhTemplate.Services
                 var styles = await LoadStylesAsync(templatePath);
 
                 string templateFile = "Template.cshtml";
-                string html = await RenderTemplate(Path.Combine(templatePath, templateFile), request);
+                string templateFilePath = Path.Combine(templatePath, templateFile);
+                Console.WriteLine($"[GenericPdfService] Starting dynamic PDF template rendering from payload. Template: {templateFilePath}, Payload: {SerializePayloadForLog(request)}");
+                string html = await RenderTemplate(templateFilePath, request);
+                html = await InjectInterFontCssAsync(html);
+                Console.WriteLine($"[GenericPdfService] Dynamic PDF template rendering completed with local Inter font. Template: {templateFilePath}, HTML length: {html?.Length ?? 0}");
 
                 var tempPath = Path.Combine(Path.GetTempPath(), "GiddhPdfs");
                 Directory.CreateDirectory(tempPath);
@@ -136,7 +140,11 @@ namespace GiddhTemplate.Services
                         }
                     };
 
-                    await page.SetContentAsync(html, new NavigationOptions { WaitUntil = new[] { WaitUntilNavigation.Networkidle2 } });
+                    await page.SetContentAsync(html, new NavigationOptions
+                    {
+                        Timeout = 15000,
+                        WaitUntil = new[] { WaitUntilNavigation.DOMContentLoaded }
+                    });
                     await page.EmulateMediaTypeAsync(MediaType.Print);
                     await page.PdfAsync(tempFilePath, new PdfOptions
                     {
@@ -242,6 +250,40 @@ namespace GiddhTemplate.Services
         {
             var invalidChars = Path.GetInvalidFileNameChars();
             return new string(fileName.Where(c => !invalidChars.Contains(c)).ToArray());
+        }
+
+        private async Task<string> InjectInterFontCssAsync(string html)
+        {
+            var interFontCss = await _pdfService.LoadFontCSSAsync("Inter");
+
+            if (string.IsNullOrWhiteSpace(interFontCss))
+            {
+                return html;
+            }
+
+            var style = $"<style>{interFontCss}html, body, body * {{ font-family: 'Inter', Arial, sans-serif !important; }}</style>";
+            var headEndIndex = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
+
+            return headEndIndex >= 0
+                ? html.Insert(headEndIndex, style)
+                : $"{style}{html}";
+        }
+
+        private string SerializePayloadForLog<T>(T payload)
+        {
+            try
+            {
+                var serializedPayload = JsonSerializer.Serialize(payload);
+                const int maxPayloadLogLength = 2000;
+
+                return serializedPayload.Length > maxPayloadLogLength
+                    ? $"{serializedPayload.Substring(0, maxPayloadLogLength)}... [truncated]"
+                    : serializedPayload;
+            }
+            catch (Exception ex)
+            {
+                return $"[Unable to serialize payload: {ex.Message}]";
+            }
         }
 
         private void CheckMemoryPressure()
