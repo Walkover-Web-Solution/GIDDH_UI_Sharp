@@ -73,6 +73,7 @@ namespace GiddhTemplate.Services
                     "LEDGER_VIEW_CONDENSED" => "other-template/ledger_view_condensed",
                     "LEDGER_VIEW_DETAILED" => "other-template/ledger_view_detailed",
                     "LEDGER_TEMPLATE_UPPER" => "other-template/LedgerTemplate",
+                    "LEDGERTEMPLATE" => "other-template/LedgerTemplate",
                     "PURCHASE_ORDER_EMAIL_TEMPLATE" => "other-template/purchase_order_email_template",
                     "RECEIPT" => "other-template/receipt",
                     "STOCK_REPORT_V2" => "other-template/stock_report_v2",
