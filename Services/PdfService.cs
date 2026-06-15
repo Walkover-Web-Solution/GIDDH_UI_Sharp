@@ -20,9 +20,9 @@ namespace GiddhTemplate.Services
         private static readonly ConcurrentDictionary<string, (string Common, string Header, string Footer, string Body, string Background)> _stylesCache = new();
 
         private static readonly SemaphoreSlim _browserLock = new(1, 1);
-        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(2, 2); // 2 concurrent PDF generations
+        private static readonly SemaphoreSlim _pdfGenerationSemaphore = new(1, 1); // Single concurrent PDF generation (low-RAM safe)
         private static IBrowser? _browser;
-        private static int _maxConcurrentPdfs = 2; // Dynamically adjusted based on memory pressure
+        private static int _maxConcurrentPdfs = 1; // Fixed at 1 — only one Chrome render at a time
         private static DateTime _lastMemoryCheck = DateTime.MinValue;
         private static bool _startupLogged = false;
 
@@ -85,7 +85,7 @@ namespace GiddhTemplate.Services
                                 "--disable-hang-monitor",
                                 "--renderer-process-limit=1",
                                 "--single-process",
-                                "--js-flags=--max-old-space-size=256 --max-semi-space-size=16 --max-heap-size=256",
+                                "--js-flags=--max-old-space-size=96 --max-semi-space-size=1 --max-heap-size=96",
                                 "--memory-pressure-off",
                                 "--max-gum-fps=5",
                                 "--disable-canvas-aa",
@@ -357,7 +357,7 @@ namespace GiddhTemplate.Services
                 string envType = totalAvailableMB >= 1700 ? "PROD (2GB+ RAM)" : 
                                  totalAvailableMB >= 1200 ? "STAGING (1.5GB RAM)" : 
                                  "TEST (1GB RAM)";
-                Console.WriteLine($"[PdfService] Environment detected: {envType}. Total available: {totalAvailableMB}MB. Starting with 2 concurrent PDFs (will auto-adjust based on memory pressure).");
+                Console.WriteLine($"[PdfService] Environment detected: {envType}. Total available: {totalAvailableMB}MB. Running with 1 concurrent PDF (single-instance mode).");
             }
             
             // Check memory every 30 seconds
@@ -373,23 +373,10 @@ namespace GiddhTemplate.Services
             long highThresholdMB = (long)(totalAvailableMB * 0.70);
             long lowThresholdMB = (long)(totalAvailableMB * 0.50);
             
-            // If memory pressure is high, reduce to 1 concurrent
+            // Single-instance mode: just log memory pressure for visibility, do not change concurrency
             if (totalMemoryMB > highThresholdMB)
             {
-                if (_maxConcurrentPdfs == 2)
-                {
-                    _maxConcurrentPdfs = 1;
-                    Console.WriteLine($"[PdfService] ⚠️ High memory pressure detected ({totalMemoryMB}MB / {totalAvailableMB}MB total). Reducing to 1 concurrent PDF generation.");
-                }
-            }
-            // If memory is healthy, restore to 2 concurrent
-            else if (totalMemoryMB < lowThresholdMB)
-            {
-                if (_maxConcurrentPdfs == 1)
-                {
-                    _maxConcurrentPdfs = 2;
-                    Console.WriteLine($"[PdfService] ✅ Memory pressure normalized ({totalMemoryMB}MB / {totalAvailableMB}MB total). Restoring to 2 concurrent PDF generations.");
-                }
+                Console.WriteLine($"[PdfService] ⚠️ High memory pressure ({totalMemoryMB}MB / {totalAvailableMB}MB total). Concurrency already at 1.");
             }
         }
 
@@ -407,16 +394,7 @@ namespace GiddhTemplate.Services
             }
             
             var waitDuration = (DateTime.UtcNow - semaphoreWaitStart).TotalSeconds;
-            int activeSlots = 2 - _pdfGenerationSemaphore.CurrentCount;
-            
-            // If memory pressure mode is active (max=1) but we have 2 slots, reject the 2nd concurrent request
-            if (_maxConcurrentPdfs == 1 && activeSlots > 1)
-            {
-                _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] Memory pressure mode active - rejecting request to stay at 1 concurrent.");
-                throw new TimeoutException("PDF generation service is under memory pressure. Please retry after a few seconds.");
-            }
-            
+            int activeSlots = 1 - _pdfGenerationSemaphore.CurrentCount;
             Console.WriteLine($"[PdfService] PDF generation started. Waited {waitDuration:F2}s for slot. Active: {activeSlots}/{_maxConcurrentPdfs}, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
 
             using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
@@ -659,7 +637,7 @@ namespace GiddhTemplate.Services
                 }
                 
                 _pdfGenerationSemaphore.Release();
-                Console.WriteLine($"[PdfService] PDF generation completed. Active: {2 - _pdfGenerationSemaphore.CurrentCount}/2, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
+                Console.WriteLine($"[PdfService] PDF generation completed. Active: {1 - _pdfGenerationSemaphore.CurrentCount}/1, Available slots: {_pdfGenerationSemaphore.CurrentCount}");
             }
         }
     }
