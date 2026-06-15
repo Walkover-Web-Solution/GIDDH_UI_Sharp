@@ -12,8 +12,8 @@ namespace GiddhTemplate.Services
     {
         private readonly GenericRazorTemplateService _razorTemplateService;
         private readonly PdfService _pdfService;
-        private static SemaphoreSlim _pdfGenerationSemaphore = new SemaphoreSlim(2);
-        private static int _maxConcurrentPdfs = 2;
+        private static SemaphoreSlim _pdfGenerationSemaphore = new SemaphoreSlim(1, 1); // Single concurrent PDF generation (low-RAM safe)
+        private static int _maxConcurrentPdfs = 1; // Fixed at 1 — only one Chrome render at a time
 
         public GenericPdfService(GenericRazorTemplateService razorTemplateService, PdfService pdfService)
         {
@@ -40,7 +40,7 @@ namespace GiddhTemplate.Services
             }
             
             var waitDuration = (DateTime.UtcNow - semaphoreWaitStart).TotalSeconds;
-            int activeSlots = 2 - _pdfGenerationSemaphore.CurrentCount;
+            int activeSlots = 1 - _pdfGenerationSemaphore.CurrentCount;
             Console.WriteLine($"[GenericPdfService] Acquired semaphore slot (waited {waitDuration:F2}s, {activeSlots} active slots)");
 
             try
@@ -296,21 +296,10 @@ namespace GiddhTemplate.Services
             const int highThresholdMB = 800;
             const int lowThresholdMB = 400;
 
+            // Single-instance mode: log memory pressure only; concurrency is fixed at 1.
             if (totalMemoryMB > highThresholdMB)
             {
-                if (_maxConcurrentPdfs > 1)
-                {
-                    _maxConcurrentPdfs = 1;
-                    Console.WriteLine($"[GenericPdfService] ⚠️ High memory pressure ({totalMemoryMB}MB / {totalAvailableMB}MB total). Limiting to 1 concurrent PDF generation.");
-                }
-            }
-            else if (totalMemoryMB < lowThresholdMB)
-            {
-                if (_maxConcurrentPdfs == 1)
-                {
-                    _maxConcurrentPdfs = 2;
-                    Console.WriteLine($"[GenericPdfService] ✅ Memory pressure normalized ({totalMemoryMB}MB / {totalAvailableMB}MB total). Restoring to 2 concurrent PDF generations.");
-                }
+                Console.WriteLine($"[GenericPdfService] ⚠️ High memory pressure ({totalMemoryMB}MB / {totalAvailableMB}MB total). Concurrency already at 1.");
             }
         }
 
