@@ -25,8 +25,6 @@ namespace GiddhTemplate.Services
         private static int _maxConcurrentPdfs = 1; // Fixed at 1 — only one Chrome render at a time
         private static DateTime _lastMemoryCheck = DateTime.MinValue;
         private static bool _startupLogged = false;
-        private static int _pdfGenerationCount = 0;
-        private const int _browserRecycleAfter = 10;
 
         private readonly int decreaseFontSize = 2;
 
@@ -89,8 +87,6 @@ namespace GiddhTemplate.Services
                                 "--single-process",
                                 "--js-flags=--max-old-space-size=96 --max-semi-space-size=1 --max-heap-size=96",
                                 "--memory-pressure-off",
-                                "--disk-cache-size=0",
-                                "--media-cache-size=0",
                                 "--max-gum-fps=5",
                                 "--disable-canvas-aa",
                                 "--disable-2d-canvas-clip-aa",
@@ -638,15 +634,6 @@ namespace GiddhTemplate.Services
                     {
                         Console.WriteLine($"[PdfService] Error closing page: {ex.Message}");
                     }
-                }
-
-                // Recycle browser every N generations to prevent long-term cache bloat
-                var currentCount = Interlocked.Increment(ref _pdfGenerationCount);
-                if (currentCount >= _browserRecycleAfter)
-                {
-                    Interlocked.Exchange(ref _pdfGenerationCount, 0);
-                    Console.WriteLine($"[PdfService] Recycling browser after {_browserRecycleAfter} PDF generations...");
-                    try { await DisposeBrowserAsync(); } catch { }
                 }
                 
                 _pdfGenerationSemaphore.Release();

@@ -32,24 +32,24 @@ namespace GiddhTemplate.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GeneratePdfAsync([FromBody] JsonElement requestObj)
+        public async Task<IActionResult> GeneratePdfAsync([FromBody] object requestObj)
         {
             string? tempFilePath = null;
             
             try
             {
-                // Deserialize request directly from JsonElement (avoids double roundtrip)
-                Root? request;
-                    var options = new JsonSerializerOptions
+                // Deserialize request
+                var jsonString = JsonSerializer.Serialize(requestObj);
+                Root request = JsonSerializer.Deserialize<Root>(jsonString,
+                    new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
                         Converters = { new GiddhTemplate.Converters.NumberToStringConverter() }
-                    };
-                    request = requestObj.Deserialize<Root>(options);
+                    });
 
                 if (request == null || string.IsNullOrEmpty(request.Company?.Name))
                 {
-                    return BadRequest(new { error = "Invalid request data. Ensure payload matches expected format." });
+                    return BadRequest("Invalid request data. Ensure payload matches expected format.");
                 }
 
                 // Generate PDF to temporary file (reduces RAM usage)
@@ -68,7 +68,7 @@ namespace GiddhTemplate.Controllers
                 }
 
                 // Stream PDF from disk (memory efficient)
-                using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
+                var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
                 return File(fileStream, "application/pdf", "invoice.pdf");
             }
             catch
