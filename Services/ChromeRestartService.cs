@@ -40,39 +40,87 @@ namespace GiddhTemplate.Services
                     await Task.Delay(delay, stoppingToken);
 
                     _logger.LogInformation("[ChromeRestartService] Scheduled Chrome restart initiated...");
-                    
-                    // Step 1: Dispose old browser connection (but don't kill process yet)
-                    await PdfService.DisposeBrowserAsync();
-                    
-                    // Step 2: Launch new Chrome instance
-                    _logger.LogInformation("[ChromeRestartService] Launching new Chrome instance...");
-                    await _pdfService.GetBrowserAsync();
-                    _logger.LogInformation("[ChromeRestartService] New Chrome instance launched successfully.");
-                    
-                    // Step 3: Kill all old Chrome processes
-                    _logger.LogInformation("[ChromeRestartService] Killing old Chrome processes...");
+
+                    // Step 1: Capture PID of existing Chrome before anything else
+                    int? oldPid = null;
                     try
                     {
-                        var killProcess = new System.Diagnostics.Process
+                        var pidProcess = new System.Diagnostics.Process
                         {
                             StartInfo = new System.Diagnostics.ProcessStartInfo
                             {
                                 FileName = "/bin/bash",
-                                Arguments = "-c \"pkill -9 -f 'google-chrome.*headless'\"",
+                                Arguments = "-c \"pgrep -f 'google-chrome.*headless' | head -n 1\"",
                                 RedirectStandardOutput = true,
-                                RedirectStandardError = true,
                                 UseShellExecute = false,
                                 CreateNoWindow = true
                             }
                         };
-                        killProcess.Start();
-                        await killProcess.WaitForExitAsync();
-                        _logger.LogInformation("[ChromeRestartService] Old Chrome processes killed. Restart complete.");
+                        pidProcess.Start();
+                        var output = await pidProcess.StandardOutput.ReadToEndAsync();
+                        await pidProcess.WaitForExitAsync();
+                        if (int.TryParse(output.Trim(), out var parsedPid) && parsedPid > 0)
+                        {
+                            oldPid = parsedPid;
+                            _logger.LogInformation("[ChromeRestartService] Captured old Chrome PID: {Pid}", oldPid);
+                        }
                     }
-                    catch (Exception killEx)
+                    catch (Exception pidEx)
                     {
-                        _logger.LogWarning(killEx, "[ChromeRestartService] Could not kill old Chrome processes: {Message}", killEx.Message);
+                        _logger.LogWarning(pidEx, "[ChromeRestartService] Could not capture old Chrome PID.");
                     }
+                    
+                    // Step 2: Dispose old browser connection
+                    await PdfService.DisposeBrowserAsync();
+
+                    // Step 3: If we captured a PID, wait for the old process to die before launching new one
+                    if (oldPid.HasValue)
+                    {
+                        _logger.LogInformation("[ChromeRestartService] Waiting for old Chrome (PID {Pid}) to terminate...", oldPid.Value);
+                        var killTimeout = DateTime.UtcNow.AddSeconds(15);
+                        while (System.Diagnostics.Process.GetProcesses().Any(p => p.Id == oldPid.Value && !p.HasExited))
+                        {
+                            if (DateTime.UtcNow > killTimeout)
+                            {
+                                try
+                                {
+                                    var proc = System.Diagnostics.Process.GetProcessById(oldPid.Value);
+                                    proc.Kill();
+                                    _logger.LogWarning("[ChromeRestartService] Forced kill on old Chrome PID {Pid}.", oldPid.Value);
+                                }
+                                catch { }
+                                break;
+                            }
+                            await Task.Delay(200, stoppingToken);
+                        }
+                    }
+                    else
+                    {
+                        // Fallback: pkill if we couldn't get a PID
+                        try
+                        {
+                            var killProcess = new System.Diagnostics.Process
+                            {
+                                StartInfo = new System.Diagnostics.ProcessStartInfo
+                                {
+                                    FileName = "/bin/bash",
+                                    Arguments = "-c \"pkill -9 -f 'google-chrome.*headless'\"",
+                                    RedirectStandardOutput = true,
+                                    UseShellExecute = false,
+                                    CreateNoWindow = true
+                                }
+                            };
+                            killProcess.Start();
+                            await killProcess.WaitForExitAsync();
+                            _logger.LogInformation("[ChromeRestartService] Old Chrome processes killed via pkill.");
+                        }
+                        catch { }
+                    }
+                    
+                    // Step 4: Launch new Chrome instance
+                    _logger.LogInformation("[ChromeRestartService] Launching new Chrome instance...");
+                    await _pdfService.GetBrowserAsync();
+                    _logger.LogInformation("[ChromeRestartService] New Chrome instance launched successfully.");
                     
                     _logger.LogInformation("[ChromeRestartService] Chrome browser restarted successfully. Next restart tomorrow at 9:00 AM IST.");
                 }
