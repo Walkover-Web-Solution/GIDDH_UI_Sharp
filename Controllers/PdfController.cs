@@ -68,7 +68,7 @@ namespace GiddhTemplate.Controllers
                 }
 
                 // Stream PDF from disk (memory efficient)
-                using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
+                var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
                 return File(fileStream, "application/pdf", "invoice.pdf");
             }
             catch
