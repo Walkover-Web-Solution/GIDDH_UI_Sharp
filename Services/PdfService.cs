@@ -162,9 +162,11 @@ namespace GiddhTemplate.Services
         {
             if (_stylesCache.TryGetValue(basePath, out var cachedStyles))
             {
+                Console.WriteLine($"[PdfService] Styles cache hit for '{basePath}'. Background.css length: {cachedStyles.Background?.Length ?? 0}");
                 return cachedStyles;
             }
 
+            Console.WriteLine($"[PdfService] Styles cache miss for '{basePath}'. Loading from disk...");
             var tasks = new[]
             {
                 LoadFileContentAsync(Path.Combine(basePath, "Styles", "Styles.css")),
@@ -184,6 +186,7 @@ namespace GiddhTemplate.Services
                 Background: tasks[4].Result
             );
 
+            Console.WriteLine($"[PdfService] Styles loaded: Common={styles.Common?.Length ?? 0}, Header={styles.Header?.Length ?? 0}, Footer={styles.Footer?.Length ?? 0}, Body={styles.Body?.Length ?? 0}, Background={styles.Background?.Length ?? 0}");
             _stylesCache[basePath] = styles;
             return styles;
         }
@@ -297,6 +300,8 @@ namespace GiddhTemplate.Services
             Root request,
             string backgroundStyles)
         {
+            Console.WriteLine($"[PdfService] CreatePdfDocumentAsync called. backgroundStyles length: {backgroundStyles?.Length ?? 0}, repeatHeaderFooter: {request?.ShowSectionsInline != true}");
+            
             var themeCSS = new StringBuilder();
 
             themeCSS.Append(await LoadFontCSSAsync(request?.Theme?.Font?.Family ?? string.Empty));
@@ -330,7 +335,9 @@ namespace GiddhTemplate.Services
 
             bool repeatHeaderFooter = request?.ShowSectionsInline != true;
 
-            return $@"
+            Console.WriteLine($"[PdfService] repeatHeaderFooter={repeatHeaderFooter}, backgroundStyles will be included: {repeatHeaderFooter}");
+
+            var html = $@"
             <html>
                 <head>
                     <style>
@@ -346,6 +353,9 @@ namespace GiddhTemplate.Services
                     </div>
                 </body>
             </html>";
+
+            Console.WriteLine($"[PdfService] HTML assembled. Total length: {html.Length}, backgroundStyles included: {repeatHeaderFooter}");
+            return html;
         }
 
         private static void CheckMemoryPressure()
@@ -539,6 +549,8 @@ namespace GiddhTemplate.Services
                     request,
                     styles.Background
                 );
+
+                Console.WriteLine($"[PdfService] Styles lengths — Common: {styles.Common?.Length ?? 0}, Header: {styles.Header?.Length ?? 0}, Footer: {styles.Footer?.Length ?? 0}, Body: {styles.Body?.Length ?? 0}, Background: {styles.Background?.Length ?? 0}");
 
                 // Free large intermediate strings immediately — Chrome has its own copy after SetContentAsync
                 header = null; footer = null; body = null;
