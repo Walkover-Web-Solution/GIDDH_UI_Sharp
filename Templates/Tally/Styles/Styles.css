@@ -286,6 +286,13 @@ table.table-row-height tr td {
   object-position: center;
 }
 
+/* Allow text to wrap within the container.*/
+.text-wrap-pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 /* Print Media CSS */
 @media print {
   table {
