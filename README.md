@@ -1,4 +1,4 @@
-# GiddhTemplate - PDF Generation Service 
+# GiddhTemplate - PDF Generation Service
 
 A .NET 8.0 web application for generating PDF documents from HTML templates using PuppeteerSharp and Razor templating engine.
 
