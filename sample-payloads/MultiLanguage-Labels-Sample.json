@@ -979,20 +979,12 @@
         }
     ],
     "accountTaxType": "TRN",
-    "message2": "This is the note created at the time of voucher creation from voucher page.", // Now This Used in placs of ShowMessage2 Label
-    "message1": "We declare that this invoice shows the actual price of the services rendered and that all particulars are true and correct.", // Now This Used in placs of message1 Label from Settings key
+    "message2": "This is the note created at the time of voucher creation from voucher page.",
+    "message1": "We declare that this invoice shows the actual price of the services rendered and that all particulars are true and correct.",
     "RoundOff": "10.22",
     "EInvoiceDetails": {
         "IrnNumber": "dbshjdbsbdbxxjbxhbszzzzssassasahs7ysas8as",
         "AcknowledgementNumber": 232233333232333232,
         "AcknowledgementDate": "12.10.2027"
-    },
-    "LabelDisplayConfig": {
-        "ShowLabel": true,
-        "ShowSecondaryLabel": true,
-        "SecondaryLabelFirst": false,
-        "Separator": " ",
-        "LabelLanguage":"en",
-        "SecondaryLabelLanguage":"hi"
     }
 }
