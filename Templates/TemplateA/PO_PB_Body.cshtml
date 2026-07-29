@@ -875,7 +875,7 @@
                                                                 <tr class="border-bottom border-top">
                                                                     @if (Model?.Settings?.TaxBifurcation?.Label == "hsnSac")
                                                                     {
-                                                                        <td class="text-right border-right"><strong>@Model?.Settings?.TaxBifurcationTotal</strong></td>
+                                                                        <td class="text-right border-right"><strong>@Model?.Settings?.TaxBifurcationTotal?.Label</strong></td>
                                                                     }
 
                                                                     <td class="text-right border-right"><strong>@taxableTotalForTax</strong></td>
