@@ -324,17 +324,9 @@ table tr td {
   align-items: baseline;
 }
 
-.lbl-multi.lbl-inline.lbl-rev {
-  flex-direction: row-reverse;
-}
-
 /* Table headers stack both languages vertically (top to bottom) */
 .lbl-multi.lbl-stack {
   flex-direction: column;
-}
-
-.lbl-multi.lbl-stack.lbl-rev {
-  flex-direction: column-reverse;
 }
 
 .lbl-sep {

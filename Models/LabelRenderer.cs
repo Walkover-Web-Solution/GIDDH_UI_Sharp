@@ -54,7 +54,9 @@ namespace InvoiceData
         /// <summary>
         /// Label markup. When a single language is printed the output is plain text, i.e. byte for byte
         /// identical to the previous single language behaviour. Only when both languages are printed the
-        /// inline-flex wrapper is emitted so the order can be flipped through CSS.
+        /// inline-flex wrapper is emitted, with the two languages placed in the markup in their actual
+        /// display order (rather than flipped through CSS flex-direction, which breaks once the label
+        /// wraps onto a second line).
         /// </summary>
         public static IRawString Html(Setting? setting, LabelDisplayConfig? config, LabelLayout layout = LabelLayout.Inline)
         {
@@ -72,25 +74,29 @@ namespace InvoiceData
                     : Encode(only.Value));
             }
 
+            var first = parts[0];
+            var second = parts[1];
+            if (config?.SecondaryLabelFirst == true)
+            {
+                first = parts[1];
+                second = parts[0];
+            }
+
             var builder = new StringBuilder();
             builder.Append("<span class=\"lbl-multi");
             builder.Append(layout == LabelLayout.Stacked ? " lbl-stack" : " lbl-inline");
-            if (config?.SecondaryLabelFirst == true)
-            {
-                builder.Append(" lbl-rev");
-            }
             builder.Append("\">");
 
-            builder.Append("<span class=\"lbl-1\"").Append(LanguageAttributes(parts[0].Language)).Append('>')
-                   .Append(Encode(parts[0].Value)).Append("</span>");
+            builder.Append("<span class=\"lbl-1\"").Append(LanguageAttributes(first.Language)).Append('>')
+                   .Append(Encode(first.Value)).Append("</span>");
 
             if (layout == LabelLayout.Inline)
             {
                 builder.Append("<span class=\"lbl-sep\">").Append(Encode(Separator(config))).Append("</span>");
             }
 
-            builder.Append("<span class=\"lbl-2\"").Append(LanguageAttributes(parts[1].Language)).Append('>')
-                   .Append(Encode(parts[1].Value)).Append("</span>");
+            builder.Append("<span class=\"lbl-2\"").Append(LanguageAttributes(second.Language)).Append('>')
+                   .Append(Encode(second.Value)).Append("</span>");
 
             builder.Append("</span>");
             return new RawString(builder.ToString());
@@ -109,8 +115,10 @@ namespace InvoiceData
         }
 
         /// <summary>
-        /// Builds the ordered list of languages that must be printed. Never returns an empty label when at
-        /// least one of the two languages has text: the other language is used as a fallback.
+        /// Builds the list of languages that must be printed, primary first and secondary second.
+        /// Callers (<see cref="Text"/> and <see cref="Html"/>) reorder these two parts for display when
+        /// <see cref="LabelDisplayConfig.SecondaryLabelFirst"/> is set. Never returns an empty label when
+        /// at least one of the two languages has text: the other language is used as a fallback.
         /// </summary>
         private static List<LabelPart> Resolve(Setting? setting, LabelDisplayConfig? config)
         {
