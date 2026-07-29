@@ -148,6 +148,8 @@ namespace InvoiceData
         /// <summary>Print the primary label (language 1). Defaults to true to keep the existing behaviour.</summary>
         public bool? ShowLabel { get; set; } = true;
 
+        public bool? EnableSecondaryLanguage { get; set; }
+
         /// <summary>Print the secondary label (language 2).</summary>
         public bool? ShowSecondaryLabel { get; set; }
 
@@ -391,7 +393,24 @@ namespace InvoiceData
     public class Root
     {
         public Settings? Settings { get; set; }
-        public LabelDisplayConfig? LabelDisplay { get; set; }
+        public bool? DisplayLanguage1 { get; set; }
+        public bool? DisplayLanguage2 { get; set; }
+        public bool? EnableSecondaryLanguage { get; set; }
+        public bool? ShowLanguage2DisplayedFirst { get; set; }
+        public string? Language1Code { get; set; }
+        public string? Language2Code { get; set; }
+        public string? Separator { get; set; }
+        public LabelDisplayConfig LabelDisplay => new LabelDisplayConfig
+        {
+            ShowLabel = DisplayLanguage1 ?? true,
+            EnableSecondaryLanguage = EnableSecondaryLanguage ?? false,
+            ShowSecondaryLabel = DisplayLanguage2 ?? false,
+            SecondaryLabelFirst = ShowLanguage2DisplayedFirst ?? false,
+            LabelLanguage = Language1Code,
+            SecondaryLabelLanguage = Language2Code,
+            Separator = Separator ?? "  "
+        };
+
         public Company? Company { get; set; }
         public string? VoucherNumber { get; set; }
         public string? VoucherDate { get; set; }

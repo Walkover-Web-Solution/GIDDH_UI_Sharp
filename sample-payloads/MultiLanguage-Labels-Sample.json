@@ -1,13 +1,12 @@
 {
     "templateType": "TALLY",
-    "labelDisplay": {
-        "showLabel": true,
-        "showSecondaryLabel": true,
-        "secondaryLabelFirst": false,
-        "labelLanguage": "en",
-        "secondaryLabelLanguage": "hi",
-        "separator": " "
-    },
+    "enableSecondaryLanguage": false,
+    "displayLanguage1": true,
+    "displayLanguage2": false,
+    "showLanguage2DisplayedFirst": false,
+    "language1Code": "en",
+    "language2Code": "hi",
+    "separator": "  ",
     "sourceOfSupply": "Abu Dhabi",
     "customField1": "My ABC 1",
     "stockQuantityWithUnit": "200 nos",
@@ -127,9 +126,9 @@
             "secondaryLabel": ""
         },
         "showMessage2": {
-            "label": "Remark (टिप्पणी):",
+            "label": "Remark:",
             "display": true,
-            "secondaryLabel": ""
+            "secondaryLabel": "टिप्पणी:"
         },
         "tcs": {
             "label": "TCS",
@@ -162,9 +161,9 @@
             "secondaryLabel": "चालान कुल राशि"
         },
         "totalInWordsInAccountsCurrency": {
-            "label": "Invoice Total (In words) (चालान कुल राशि (शब्दों में))",
+            "label": "Invoice Total (In words)",
             "display": true,
-            "secondaryLabel": ""
+            "secondaryLabel": "(चालान कुल राशि (शब्दों में))"
         },
         "totalTax": {
             "label": "Total Tax*",
@@ -187,9 +186,9 @@
             "secondaryLabel": "कर विवरण"
         },
         "totalInWords": {
-            "label": "Amount Chargeable (in words) (प्रभार योग्य राशि (शब्दों में))",
+            "label": "Amount Chargeable (in words)",
             "display": true,
-            "secondaryLabel": ""
+            "secondaryLabel": "प्रभार योग्य राशि (शब्दों मे)"
         },
         "companyAddress": {
             "label": "Company Address",
@@ -207,9 +206,9 @@
             "secondaryLabel": "स्लोगन"
         },
         "message1": {
-            "label": "Declaration (घोषणा):",
+            "label": "Declaration:",
             "display": true,
-            "secondaryLabel": ""
+            "secondaryLabel": "घोषणा:"
         },
         "warehouseAddress": {
             "label": "Shipped From",
@@ -312,9 +311,9 @@
             "secondaryLabel": "एलयूटी संख्या"
         },
         "showCompanyAddress": {
-            "label": "Company Details (कंपनी का विवरण):",
+            "label": "Company Details:",
             "display": true,
-            "secondaryLabel": ""
+            "secondaryLabel": "कंपनी का विवरण:"
         },
         "pan": {
             "label": "PAN",
@@ -514,12 +513,12 @@
         "hsnIndicator": {
             "label": "(H)",
             "display": true,
-            "secondaryLabel": "एच"
+            "secondaryLabel": "(एच)"
         },
         "sacIndicator": {
             "label": "(S)",
             "display": true,
-            "secondaryLabel": "एस"
+            "secondaryLabel": "(एस)"
         },
         "purchaseOrderShortLabel": {
             "label": "PO",
@@ -987,4 +986,5 @@
         "AcknowledgementNumber": 232233333232333232,
         "AcknowledgementDate": "12.10.2027"
     }
+
 }
