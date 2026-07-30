@@ -2,6 +2,26 @@
 @using InvoiceData;
 @using System.Collections.Generic;
 
+@functions {
+    /* Label markup honouring Label / SecondaryLabel, printed side by side. */
+    public RazorLight.Text.IRawString Lbl(Setting setting)
+    {
+        return LabelRenderer.Html(setting, Model?.LabelDisplay, LabelLayout.Inline);
+    }
+
+    /* Table header label markup, both languages stacked vertically (top to bottom). */
+    public RazorLight.Text.IRawString LblStack(Setting setting)
+    {
+        return LabelRenderer.Html(setting, Model?.LabelDisplay, LabelLayout.Stacked);
+    }
+
+    /* Plain text label, use it for comparisons, emptiness checks and string interpolation. */
+    public string LblText(Setting setting)
+    {
+        return LabelRenderer.Text(setting, Model?.LabelDisplay);
+    }
+}
+
 <header id="header">
     <table>
         <tbody>
@@ -30,15 +50,15 @@
                                     }
                                     @if (Model?.Settings?.HeaderCompanyName?.Display == true)
                                     {
-                                        <p class="mr-t1 color-light"><strong>@Model?.Settings?.HeaderCompanyName?.Label</strong></p>
+                                        <p class="mr-t1 color-light"><strong>@Lbl(Model?.Settings?.HeaderCompanyName)</strong></p>
                                     }
                                     @if (Model?.Settings?.CompanyTaxNumber?.Display == true)
                                     {
-                                        <p><strong>@Model?.Settings?.CompanyTaxNumber?.Label</strong> @Model?.Company?.TaxNumber</p>
+                                        <p><strong>@Lbl(Model?.Settings?.CompanyTaxNumber)</strong> @Model?.Company?.TaxNumber</p>
                                     }
-                                    @if (Model?.Settings?.GstComposition?.Display == true && !string.IsNullOrEmpty(Model?.Settings?.GstComposition?.Label))
+                                    @if (Model?.Settings?.GstComposition?.Display == true && !string.IsNullOrEmpty(LblText(Model?.Settings?.GstComposition)))
                                     {
-                                        <p>@Model.Settings.GstComposition.Label</p>
+                                        <p>@Lbl(Model.Settings.GstComposition)</p>
                                     }
                                 </td>
 
@@ -49,14 +69,14 @@
                                             @if (Model?.Settings?.VoucherDate?.Display == true)
                                             {
                                                 <tr>
-                                                    <td><strong>@Model?.Settings?.VoucherDate?.Label</strong></td>
+                                                    <td><strong>@Lbl(Model?.Settings?.VoucherDate)</strong></td>
                                                     <td class="text-right">@Model?.VoucherDate</td>
                                                 </tr>
                                             }
                                             @if (Model?.Settings?.VoucherNumber?.Display == true)
                                             {
                                                 <tr>
-                                                    <td><strong>@Model?.Settings?.VoucherNumber?.Label</strong></td>
+                                                    <td><strong>@Lbl(Model?.Settings?.VoucherNumber)</strong></td>
                                                     <td class="text-right">@Model?.VoucherNumber</td>
                                                 </tr>
                                             }
@@ -81,8 +101,8 @@
                                     @if (Model?.Settings?.FormNameInvoice?.Display == true || Model?.Settings?.FormNameTaxInvoice?.Display == true)
                                     {
                                         <p class="invoice-title color-primary">
-                                            <strong>@(Model?.Settings?.FormNameInvoice?.Display == true && Model?.IsTaxesApplied == false ? Model?.Settings?.FormNameInvoice?.Label :
-                                                        Model?.Settings?.FormNameTaxInvoice?.Label)</strong>
+                                            <strong>@(Model?.Settings?.FormNameInvoice?.Display == true && Model?.IsTaxesApplied == false ? Lbl(Model?.Settings?.FormNameInvoice) :
+                                                        Lbl(Model?.Settings?.FormNameTaxInvoice))</strong>
                                         </p>
                                     }
                                 </td>

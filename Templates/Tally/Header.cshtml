@@ -5,24 +5,40 @@
 @functions {
     private readonly Dictionary<string, Setting> _settingCache = new Dictionary<string, Setting>();
 
-    public string GetLabel(string settingName)
+    public Setting GetSetting(string settingName)
     {
         if (!_settingCache.TryGetValue(settingName, out var setting))
         {
             setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
             _settingCache[settingName] = setting ??= new Setting();
         }
-        return setting?.Display == true ? setting?.Label ?? string.Empty : string.Empty;
+        return setting;
+    }
+
+    /* Label markup honouring Label / SecondaryLabel, printed side by side. */
+    public RazorLight.Text.IRawString GetLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return LabelRenderer.Html(setting?.Display == true ? setting : null, Model?.LabelDisplay, LabelLayout.Inline);
+    }
+
+    /* Table header label markup, both languages stacked vertically (top to bottom). */
+    public RazorLight.Text.IRawString GetHeaderLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return LabelRenderer.Html(setting?.Display == true ? setting : null, Model?.LabelDisplay, LabelLayout.Stacked);
+    }
+
+    /* Plain text label, use it for comparisons, emptiness checks and string interpolation. */
+    public string GetLabelText(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true ? LabelRenderer.Text(setting, Model?.LabelDisplay) : string.Empty;
     }
 
     public bool GetDisplayStatus(string settingName)
     {
-        if (!_settingCache.TryGetValue(settingName, out var setting))
-        {
-            setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
-            _settingCache[settingName] = setting ??= new Setting();
-        }
-        return setting?.Display == true;
+        return GetSetting(settingName)?.Display == true;
     }
 }
 
