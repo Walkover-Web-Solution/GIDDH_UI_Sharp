@@ -94,15 +94,12 @@ namespace InvoiceData
         public Setting? RoundOff { get; set; }
         public Setting? HsnIndicator { get; set; }
         public Setting? SacIndicator { get; set; }
-        public Setting? PurchaseOrderShortLabel { get; set; }
-        public Setting? PurchaseBillShortLabel { get; set; }
         public Setting? ShowElectronicInvoiceIdentifier { get; set; }
         public Setting? ShowElectronicInvoiceReference { get; set; }
         public Setting? ShowElectronicInvoiceDate { get; set; }
         public Setting? EOE { get; set; }
         public Setting? EntrySummaryPaid { get; set; }
         public Setting? EntrySummaryDueAmount { get; set; }
-        public Setting? GstSchemeData { get; set; }
 
         // Initialize all static keys dynamically
         public void InitializeStaticKeys()
