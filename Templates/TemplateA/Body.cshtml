@@ -23,6 +23,12 @@
     {
         return LabelRenderer.Text(setting, Model?.LabelDisplay);
     }
+
+    /* Markup for a value sent in both languages, one paragraph per language. */
+    public RazorLight.Text.IRawString LblValue(string? primary, string? secondary, string? cssClass = null)
+    {
+        return LabelRenderer.HtmlBlocks(primary, secondary, Model?.LabelDisplay, "p", cssClass);
+    }
 }
 
 <table class="repeated-header repeated-footer pd-l1">
@@ -1077,19 +1083,22 @@
                                                             }
                                                             @if (Model?.Settings?.ShowNotesAtLastPage?.Display == true)
                                                             {
-                                                                @if (Model?.Settings?.Message1?.Display == true && !string.IsNullOrEmpty(LblText(Model?.Settings?.Message1)))
+                                                                @if (Model?.Settings?.Message1?.Display == true)
                                                                 {
-                                                                    <tr>
-                                                                        <td>
-                                                                            <p class="text-wrap-pre">@Lbl(Model.Settings.Message1)</p>
-                                                                        </td>
-                                                                    </tr>
+                                                                    @if (!string.IsNullOrEmpty(Model?.Message1) || !string.IsNullOrEmpty(Model?.SecondaryMessage1))
+                                                                    {
+                                                                        <tr>
+                                                                            <td>
+                                                                                @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre")
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
                                                                 }
-                                                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(LblText(Model?.Settings?.ShowMessage2)))
+                                                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(Model?.Message2))
                                                                 {
                                                                     <tr>
                                                                         <td>
-                                                                            <p class="text-wrap-pre">@Lbl(Model.Settings.ShowMessage2)</p>
+                                                                            <p class="text-wrap-pre">@Model?.Message2</p>
                                                                         </td>
                                                                     </tr>
                                                                 }
