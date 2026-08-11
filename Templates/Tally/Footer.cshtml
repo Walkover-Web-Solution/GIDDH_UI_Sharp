@@ -40,6 +40,12 @@
     {
         return GetSetting(settingName)?.Display == true;
     }
+
+    /* Markup for a value sent in both languages, one paragraph per language. */
+    public RazorLight.Text.IRawString LblValue(string? primary, string? secondary, string? cssClass = null)
+    {
+        return LabelRenderer.HtmlBlocks(primary, secondary, Model?.LabelDisplay, "p", cssClass);
+    }
 }
 
 <footer id="footer" style="@(Model?.ShowSectionsInline == true ? "flex-grow: 1" : "")">
@@ -66,7 +72,7 @@
                                                 @if (GetDisplayStatus("Message1"))
                                                 {
                                                     <u>@GetLabel("Message1")</u>
-                                                    <p class="margin-0 text-wrap-pre">@Model?.Message1</p>
+                                                    @LblValue(Model?.Message1, Model?.SecondaryMessage1, "margin-0 text-wrap-pre")
                                                 }
                                             </td>
                                             @if (GetDisplayStatus("FooterCompanyName"))

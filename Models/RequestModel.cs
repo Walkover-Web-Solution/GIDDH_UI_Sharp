@@ -446,6 +446,7 @@ namespace InvoiceData
         public string? GstComposition { get; set; }
         public string? Message2 { get; set; }
         public string? Message1 { get; set; }
+        public string? SecondaryMessage1 { get; set; }
         public string? StockQuantityWithUnit { get; set; }
         public string? DueDate { get; set; }
         public Currency? AccountCurrency { get; set; }

@@ -102,6 +102,40 @@ namespace InvoiceData
             return new RawString(builder.ToString());
         }
 
+        /// <summary>
+        /// Plain text of a value that is sent in both languages, e.g. Message1 / SecondaryMessage1.
+        /// Use it for emptiness checks before emitting the surrounding markup.
+        /// </summary>
+        public static string Text(string? primary, string? secondary, LabelDisplayConfig? config)
+        {
+            return Text(Pair(primary, secondary), config);
+        }
+
+        /// <summary>
+        /// Markup for a value that is sent in both languages, e.g. Message1 / SecondaryMessage1. Each language
+        /// gets its own block element because such a value can span multiple lines, which the inline-flex
+        /// wrapper built by <see cref="Html"/> does not handle. Languages are emitted in display order.
+        /// </summary>
+        public static IRawString HtmlBlocks(string? primary, string? secondary, LabelDisplayConfig? config, string tag = "p", string? cssClass = null)
+        {
+            var parts = Ordered(Pair(primary, secondary), config);
+            if (parts.Count == 0)
+            {
+                return new RawString(string.Empty);
+            }
+
+            var classAttribute = string.IsNullOrWhiteSpace(cssClass) ? string.Empty : $" class=\"{Encode(cssClass)}\"";
+            var builder = new StringBuilder();
+            foreach (var part in parts)
+            {
+                builder.Append('<').Append(tag).Append(classAttribute).Append(LanguageAttributes(part.Language)).Append('>')
+                       .Append(Encode(part.Value))
+                       .Append("</").Append(tag).Append('>');
+            }
+
+            return new RawString(builder.ToString());
+        }
+
         /// <summary>True when the given language code is written right to left.</summary>
         public static bool IsRightToLeft(string? language)
         {
@@ -128,8 +162,8 @@ namespace InvoiceData
                 return parts;
             }
 
-            var primary = setting.Label ?? string.Empty;
-            var secondary = setting.SecondaryLabel ?? string.Empty;
+            var primary = (setting.Label ?? string.Empty).Trim();
+            var secondary = (setting.SecondaryLabel ?? string.Empty).Trim();
             var hasPrimary = !string.IsNullOrWhiteSpace(primary);
             var hasSecondary = !string.IsNullOrWhiteSpace(secondary);
 
@@ -165,7 +199,31 @@ namespace InvoiceData
                 parts.Add(new LabelPart(secondary, config?.SecondaryLabelLanguage));
             }
 
+            // Identical text in both languages: print once, do not duplicate.
+            if (parts.Count == 2 && string.Equals(parts[0].Value, parts[1].Value, StringComparison.Ordinal))
+            {
+                parts.RemoveAt(1);
+            }
+
             return parts;
+        }
+
+        /// <summary>Same as <see cref="Resolve"/>, but already reordered into the actual display order.</summary>
+        private static List<LabelPart> Ordered(Setting? setting, LabelDisplayConfig? config)
+        {
+            var parts = Resolve(setting, config);
+            if (parts.Count == 2 && config?.SecondaryLabelFirst == true)
+            {
+                return new List<LabelPart> { parts[1], parts[0] };
+            }
+
+            return parts;
+        }
+
+        /// <summary>Wraps two raw strings so they can go through the same resolution as a setting's labels.</summary>
+        private static Setting Pair(string? primary, string? secondary)
+        {
+            return new Setting { Label = primary, SecondaryLabel = secondary };
         }
 
         private static string Separator(LabelDisplayConfig? config)
