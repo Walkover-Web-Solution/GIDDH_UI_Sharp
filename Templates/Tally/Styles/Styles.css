@@ -293,6 +293,37 @@ table.table-row-height tr td {
   overflow-wrap: break-word;
 }
 
+/* Multi language labels (Label + SecondaryLabel) */
+.lbl-multi {
+  display: inline-flex;
+}
+
+.lbl-multi.lbl-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+/* Table headers stack both languages vertically (top to bottom) */
+.lbl-multi.lbl-stack {
+  flex-direction: column;
+}
+
+.lbl-sep {
+  white-space: pre;
+}
+
+/* Keep the stacked labels aligned with the cell's own text alignment */
+.text-center > .lbl-multi.lbl-stack,
+.text-center .lbl-multi.lbl-stack {
+  align-items: center;
+}
+
+.text-right > .lbl-multi.lbl-stack,
+.text-right .lbl-multi.lbl-stack {
+  align-items: flex-end;
+}
+
 /* Print Media CSS */
 @media print {
   table {

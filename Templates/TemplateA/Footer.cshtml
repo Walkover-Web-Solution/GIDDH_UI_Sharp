@@ -2,6 +2,32 @@
 @using InvoiceData;
 @using System.Collections.Generic;
 
+@functions {
+    /* Label markup honouring Label / SecondaryLabel, printed side by side. */
+    public RazorLight.Text.IRawString Lbl(Setting setting)
+    {
+        return LabelRenderer.Html(setting, Model?.LabelDisplay, LabelLayout.Inline);
+    }
+
+    /* Table header label markup, both languages stacked vertically (top to bottom). */
+    public RazorLight.Text.IRawString LblStack(Setting setting)
+    {
+        return LabelRenderer.Html(setting, Model?.LabelDisplay, LabelLayout.Stacked);
+    }
+
+    /* Plain text label, use it for comparisons, emptiness checks and string interpolation. */
+    public string LblText(Setting setting)
+    {
+        return LabelRenderer.Text(setting, Model?.LabelDisplay);
+    }
+
+    /* Markup for a value sent in both languages, one paragraph per language. */
+    public RazorLight.Text.IRawString LblValue(string? primary, string? secondary, string? cssClass = null)
+    {
+        return LabelRenderer.HtmlBlocks(primary, secondary, Model?.LabelDisplay, "p", cssClass);
+    }
+}
+
 <footer id="footer" style="@(Model?.ShowSectionsInline == true ? "flex-grow: 1" : "")">
     <table class="page-break-inside-avoid h-100">
         <tbody>
@@ -11,19 +37,22 @@
                         <tbody>
                             @if (Model?.Settings?.ShowNotesAtLastPage?.Display != true)
                             {
-                                @if (Model?.Settings?.Message1?.Display == true && !string.IsNullOrEmpty(Model?.Settings?.Message1?.Label))
+                                @if (Model?.Settings?.Message1?.Display == true)
                                 {
-                                    <tr>
-                                        <td>
-                                            <p class="text-wrap-pre">@Model.Settings.Message1.Label</p>
-                                        </td>
-                                    </tr>
+                                    @if (!string.IsNullOrEmpty(Model?.Message1) || !string.IsNullOrEmpty(Model?.SecondaryMessage1))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre")
+                                            </td>
+                                        </tr>
+                                    }
                                 }
-                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(Model?.Settings?.ShowMessage2?.Label))
+                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(Model?.Message2))
                                 {
                                     <tr>
                                         <td>
-                                            <p class="text-wrap-pre">@Model.Settings.ShowMessage2.Label</p>
+                                            <p class="text-wrap-pre">@Model?.Message2</p>
                                         </td>
                                     </tr>
                                 }
@@ -32,7 +61,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <strong class="color-primary">@(!string.IsNullOrEmpty(Model?.Settings?.Thanks?.Label) ? Model.Settings.Thanks.Label : "")</strong>
+                                        <strong class="color-primary">@Lbl(Model?.Settings?.Thanks)</strong>
                                     </td>
                                 </tr>
                             }
@@ -50,23 +79,23 @@
                     @if (Model?.DigitalSignature == true) {
                           <div class="digital-signature-container" style="width:180pt; height:45pt; color:#FFFFFF; font-size:6pt; line-height:45pt; overflow:hidden;">@@GIDDH_DSC@@</div>
                     } else {
-                        @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true) {
+                        @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true)
+                        {
                             <div class="border-bottom" style="padding-bottom: 5px;">
                                 @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
                                 {
                                     <figure class="m-0">
                                         <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
                                     </figure>
-                                } else if (Model.Settings.Slogan.Display == true && Model?.Settings?.Slogan?.Label != null)
+                                } else if (Model.Settings.Slogan.Display == true && !string.IsNullOrEmpty(LblText(Model.Settings.Slogan)))
                                 {
-                                    <p>@Model.Settings.Slogan.Label</p>
-                            }
+                                    <p>@Lbl(Model.Settings.Slogan)</p>
+                                }
                             </div>
                         }
                         @if (Model?.Settings?.TextUnderSlogan?.Display == true)
                         {
-                            <p class="text-under-signature mr-t1">@Model?.Settings?.TextUnderSlogan?.Label</p> @* Added class and spacing
-                        class *@
+                            <p class="text-under-signature mr-t1">@Lbl(Model?.Settings?.TextUnderSlogan)</p>
                         }
                     }
                 </td>
@@ -80,11 +109,11 @@
                 <td colspan="100%" class="text-center">
                     @if (Model?.Settings?.FooterCompanyName?.Display == true)
                     {
-                        <p class="font-weight-500">@Model.Settings.FooterCompanyName.Label</p>
+                        <p class="font-weight-500">@Lbl(Model.Settings.FooterCompanyName)</p>
                     }
                     @if (Model?.Settings?.CompanyAddress?.Display == true)
                     {
-                        <address>@Model?.Settings?.CompanyAddress?.Label</address>
+                        <address>@Lbl(Model?.Settings?.CompanyAddress)</address>
                     }
                 </td>
             </tr>
