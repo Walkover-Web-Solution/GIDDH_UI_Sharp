@@ -77,7 +77,7 @@
                 </td>
                 <td class="vertical-align-bottom text-center" width="33%">
                     @if (Model?.DigitalSignature == true) {
-                          <div class="digital-signature-container" style="width:180pt; height:45pt; color:#FFFFFF; font-size:6pt; line-height:45pt; overflow:hidden;">@@GIDDH_DSC@@</div>
+                          <div class="digital-signature-container">@@GIDDH_DSC@@</div>
                     } else {
                         @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true)
                         {
