@@ -47,24 +47,27 @@
                     }
                 </td>
                 <td class="vertical-align-bottom text-center" width="33%">
-                    @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true)
-                    {
-                        <div class="border-bottom" style="padding-bottom: 5px;"> @* Added class and inline style *@
-                            @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
-                            {
-                                <figure class="m-0">
-                                    <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
-                                </figure>
-                            } else if (Model.Settings.Slogan.Display == true && Model?.Settings?.Slogan?.Label != null)
-                            {
-                                <p>@Model.Settings.Slogan.Label</p>
+                    @if (Model?.DigitalSignature == true) {
+                          <div class="digital-signature-container" style="width:180pt; height:45pt; color:#FFFFFF; font-size:6pt; line-height:45pt; overflow:hidden;">@@GIDDH_DSC@@</div>
+                    } else {
+                        @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true) {
+                            <div class="border-bottom" style="padding-bottom: 5px;">
+                                @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
+                                {
+                                    <figure class="m-0">
+                                        <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
+                                    </figure>
+                                } else if (Model.Settings.Slogan.Display == true && Model?.Settings?.Slogan?.Label != null)
+                                {
+                                    <p>@Model.Settings.Slogan.Label</p>
                             }
-                        </div>
-                    }
-                    @if (Model?.Settings?.TextUnderSlogan?.Display == true)
-                    {
-                        <p class="text-under-signature mr-t1">@Model?.Settings?.TextUnderSlogan?.Label</p> @* Added class and spacing
-                    class *@
+                            </div>
+                        }
+                        @if (Model?.Settings?.TextUnderSlogan?.Display == true)
+                        {
+                            <p class="text-under-signature mr-t1">@Model?.Settings?.TextUnderSlogan?.Label</p> @* Added class and spacing
+                        class *@
+                        }
                     }
                 </td>
             </tr>

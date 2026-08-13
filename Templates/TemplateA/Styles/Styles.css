@@ -362,3 +362,11 @@ table tr td {
      margin-bottom: 0;
   }
 }
+
+.digital-signature-container {
+  width: 200pt;
+  height: 50pt;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
