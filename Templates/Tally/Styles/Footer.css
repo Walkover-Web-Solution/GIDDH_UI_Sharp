@@ -19,7 +19,7 @@ body.repeat-header-footer footer {
 
 .digital-signature-container {
   font-size: 6pt; 
-  color: #FFFFFF; 
+  color: transparent; 
   width: 200pt;
   height: 50pt;
   line-height: 50pt; 
