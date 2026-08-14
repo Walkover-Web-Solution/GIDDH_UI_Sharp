@@ -48,11 +48,11 @@
                                         </tr>
                                     }
                                 }
-                                @if (Model?.Settings?.ShowMessage2?.Display == true && !string.IsNullOrEmpty(Model?.Message2))
+                                @if (Model?.Settings?.ShowMessage2?.Display == true)
                                 {
                                     <tr>
                                         <td>
-                                            <p class="text-wrap-pre">@Model?.Message2</p>
+                                            <p class="text-wrap-pre">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "Your Voucher Note will display here")</p>
                                         </td>
                                     </tr>
                                 }
