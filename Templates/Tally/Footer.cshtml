@@ -55,12 +55,12 @@
                 <td class="p-0 border-none border-bottom vertical-align-bottom @(Model?.ShowSectionsInline == true ? "border-left border-right" : "")">
                     <table style="margin-top: 50px;">
                         <tbody>
-                            @if (GetDisplayStatus("ShowMessage2") && !string.IsNullOrEmpty(GetLabelText("ShowMessage2")))
+                            @if (GetDisplayStatus("ShowMessage2"))
                             {
                                 <tr>
                                     <td class="border-none" colspan="2">
                                         <u>@GetLabel("ShowMessage2")</u>
-                                        <p class="margin-0 text-wrap-pre">@Model?.Message2</p>
+                                        <p class="margin-0 text-wrap-pre">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "Your Voucher Note will display here")</p>
                                     </td>
                                 </tr>
                             }
