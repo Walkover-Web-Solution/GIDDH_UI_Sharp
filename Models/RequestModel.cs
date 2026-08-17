@@ -495,5 +495,6 @@ namespace InvoiceData
         public string? PaymentTotal { get; set; }
         public string? ChequeNumber { get; set; }
         public List<LabelValue>? AccountCustomFields { get; set; }
+        public bool? DigitalSignature { get; set; }
     }
 }

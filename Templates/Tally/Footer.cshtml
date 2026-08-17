@@ -82,20 +82,25 @@
                                                 </td>
                                             }
                                         </tr>
-                                        @if (GetDisplayStatus("TextUnderSlogan") || GetDisplayStatus("ImageSignature"))
+                                        
+                                        @if (GetDisplayStatus("TextUnderSlogan") || GetDisplayStatus("ImageSignature") || Model?.DigitalSignature == true)
                                         {
                                             <tr>
                                                 <td class="border-none pd-r1 text-right">
-                                                    @if (GetDisplayStatus("ImageSignature") && !string.IsNullOrEmpty(Model?.ImageSignature))
-                                                    {
-                                                    <div>
-                                                        <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
-                                                    </div>
-                                                    }
+                                                    @if (Model?.DigitalSignature == true) {
+                                                        <div class="digital-signature-container">@@GIDDH_DSC@@</div>
+                                                    } else {
+                                                        @if (GetDisplayStatus("ImageSignature") && !string.IsNullOrEmpty(Model?.ImageSignature))
+                                                        {
+                                                        <div>
+                                                            <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
+                                                        </div>
+                                                        }
 
-                                                    @if (GetDisplayStatus("TextUnderSlogan"))
-                                                    {
-                                                        @GetLabel("TextUnderSlogan")
+                                                        @if (GetDisplayStatus("TextUnderSlogan"))
+                                                        {
+                                                            @GetLabel("TextUnderSlogan")
+                                                        }
                                                     }
                                                 </td>
                                             </tr>
