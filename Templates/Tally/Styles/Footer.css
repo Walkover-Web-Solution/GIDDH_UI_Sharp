@@ -16,12 +16,3 @@ body.repeat-header-footer footer {
 .signature-image {
   max-width: 160px;
 }
-
-.digital-signature-container {
-  font-size: 6pt; 
-  color: transparent; 
-  width: 200pt;
-  height: 50pt;
-  line-height: 50pt; 
-  overflow:hidden;
-}
