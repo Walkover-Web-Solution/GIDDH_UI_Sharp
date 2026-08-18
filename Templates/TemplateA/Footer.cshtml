@@ -76,27 +76,23 @@
                     }
                 </td>
                 <td class="vertical-align-bottom text-center" width="33%">
-                    @if (Model?.DigitalSignature == true) {
-                          <div class="digital-signature-container">@@GIDDH_DSC@@</div>
-                    } else {
-                        @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true)
-                        {
-                            <div class="border-bottom" style="padding-bottom: 5px;">
-                                @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
-                                {
-                                    <figure class="m-0">
-                                        <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
-                                    </figure>
-                                } else if (Model.Settings.Slogan.Display == true && !string.IsNullOrEmpty(LblText(Model.Settings.Slogan)))
-                                {
-                                    <p>@Lbl(Model.Settings.Slogan)</p>
-                                }
-                            </div>
-                        }
-                        @if (Model?.Settings?.TextUnderSlogan?.Display == true)
-                        {
-                            <p class="text-under-signature mr-t1">@Lbl(Model?.Settings?.TextUnderSlogan)</p>
-                        }
+                    @if (Model?.Settings?.Slogan?.Display == true || Model?.Settings?.ImageSignature?.Display == true)
+                    {
+                        <div class="border-bottom" style="padding-bottom: 5px;">
+                            @if (Model?.Settings?.ImageSignature?.Display == true && !string.IsNullOrEmpty(Model?.ImageSignature))
+                            {
+                                <figure class="m-0">
+                                    <img src="@Model.ImageSignature" height="60px" width="auto" class="signature-image" />
+                                </figure>
+                            } else if (Model.Settings.Slogan.Display == true && !string.IsNullOrEmpty(LblText(Model.Settings.Slogan)))
+                            {
+                                <p>@Lbl(Model.Settings.Slogan)</p>
+                            }
+                        </div>
+                    }
+                    @if (Model?.Settings?.TextUnderSlogan?.Display == true)
+                    {
+                        <p class="text-under-signature mr-t1">@Lbl(Model?.Settings?.TextUnderSlogan)</p>
                     }
                 </td>
             </tr>
