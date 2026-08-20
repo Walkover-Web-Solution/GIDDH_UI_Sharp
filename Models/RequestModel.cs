@@ -84,6 +84,24 @@ namespace InvoiceData
         public Setting? PreviousDue { get; set; }
         public Setting? AmountBeforeDiscount { get; set; }
         public Setting? SkuCode { get; set; }
+        public Setting? Unit { get; set; }
+        public Setting? TaxBifurcationHsnSac { get; set; }
+        public Setting? TaxBifurcationTaxableValue { get; set; }
+        public Setting? TaxBifurcationRate { get; set; }
+        public Setting? TaxBifurcationAmount { get; set; }
+        public Setting? TaxBifurcationTotalTaxAmount { get; set; }
+        public Setting? TaxBifurcationTotal { get; set; }
+        public Setting? RoundOff { get; set; }
+        public Setting? HsnIndicator { get; set; }
+        public Setting? SacIndicator { get; set; }
+        public Setting? PurchaseOrderShortLabel { get; set; }
+        public Setting? PurchaseBillShortLabel { get; set; }
+        public Setting? ShowElectronicInvoiceIdentifier { get; set; }
+        public Setting? ShowElectronicInvoiceReference { get; set; }
+        public Setting? ShowElectronicInvoiceDate { get; set; }
+        public Setting? EOE { get; set; }
+        public Setting? EntrySummaryPaid { get; set; }
+        public Setting? EntrySummaryDueAmount { get; set; }
         public Setting? GstSchemeData { get; set; }
 
         // Initialize all static keys dynamically

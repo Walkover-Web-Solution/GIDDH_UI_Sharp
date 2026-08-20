@@ -34,7 +34,7 @@
                                                     eInvoiceDetailsVisible = true;
                                                     <tr>
                                                         <td class="px-0" colspan="100%">
-                                                            IRN: @Model?.EInvoiceDetails?.IrnNumber
+                                                            @Model?.Settings?.ShowElectronicInvoiceIdentifier?.Label: @Model?.EInvoiceDetails?.IrnNumber
                                                         </td>
                                                     </tr>
                                                 }
@@ -45,14 +45,14 @@
                                                         {
                                                             eInvoiceDetailsVisible = true;
                                                             <td class="px-0">
-                                                                Ack No: @Model?.EInvoiceDetails?.AcknowledgementNumber
+                                                                @Model?.Settings?.ShowElectronicInvoiceReference?.Label: @Model?.EInvoiceDetails?.AcknowledgementNumber
                                                             </td>
                                                         }
                                                         @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
                                                         {
                                                             eInvoiceDetailsVisible = true;
                                                             <td class="px-0 text-right">
-                                                                Ack Date: @Model?.EInvoiceDetails?.AcknowledgementDate
+                                                                @Model?.Settings?.ShowElectronicInvoiceDate?.Label: @Model?.EInvoiceDetails?.AcknowledgementDate
                                                             </td>
                                                         }
                                                     </tr>
@@ -74,7 +74,7 @@
                                                             <table>
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td>Company Details:</td>
+                                                                        <td>@Model?.Settings?.ShowCompanyAddress?.Label</td>
                                                                     </tr>
                                                                         @if (!string.IsNullOrEmpty(Model?.Company?.HeaderCompanyName))
                                                                         {
@@ -110,7 +110,7 @@
                                                             <table>
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td>Shipped From:</td>
+                                                                        <td>@Model?.Settings?.WarehouseAddress?.Label</td>
                                                                     </tr>
                                                                     @if (!string.IsNullOrEmpty(Model?.WarehouseDetails?.Name))
                                                                     {
@@ -468,10 +468,10 @@
                                                                                 @if (!string.IsNullOrEmpty(Entry?.HsnNumber))
                                                                                 {
                                                                                     <p>@Entry?.HsnNumber</p>
-                                                                                    <p class="font-size-small">(H)</p>
+                                                                                    <p class="font-size-small">@Model?.Settings?.HsnIndicator?.Label</p>
                                                                                 } else if (!string.IsNullOrEmpty(Entry?.SacNumber)){
                                                                                     <p>@Entry?.SacNumber</p>
-                                                                                    <p class="font-size-small">(S)</p>
+                                                                                    <p class="font-size-small">@Model?.Settings?.SacIndicator?.Label</p>
                                                                                 }
                                                                             </td>
                                                                         }
@@ -717,7 +717,7 @@
                                                                             @if (Model?.RoundOff != null)
                                                                             {
                                                                                 <tr class="p-0 m-0 line-height-10">
-                                                                                    <td class="p-0 text-right" width="50%">RoundOff</td>
+                                                                                    <td class="p-0 text-right" width="50%">@Model?.Settings?.RoundOff?.Label</td>
                                                                                     <td class="text-right p-0">
                                                                                         @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model?.RoundOff
                                                                                     </td>
@@ -785,13 +785,13 @@
                                                                             @if (Model?.PaidAmount?.AmountForAccount > 0 && @Model?.Balance != null)
                                                                             {
                                                                                 <tr class="line-height-10">
-                                                                                    <td class="p-0 text-right" width="50%" >Paid</td>
+                                                                                    <td class="p-0 text-right" width="50%" >@Model?.Settings?.EntrySummaryPaid?.Label</td>
                                                                                     <td class="text-right p-0">
                                                                                         @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.PaidAmount.AmountForAccount
                                                                                     </td>
                                                                                 </tr>
                                                                                 <tr class="line-height-10">
-                                                                                    <td class="p-0 text-right" width="50%">Due Amount</td>
+                                                                                    <td class="p-0 text-right" width="50%">@Model?.Settings?.EntrySummaryDueAmount?.Label</td>
                                                                                     <td class="text-right p-0">
                                                                                         @(Model?.CurrencyFormat == "CODE" ? Model?.AccountCurrency?.Code : WebUtility.HtmlDecode(Model?.AccountCurrency?.Symbol))@Model.Balance.AmountForAccount
                                                                                     </td>
@@ -883,18 +883,18 @@
                                                                     
                                                                     @if (Model?.Settings?.TaxBifurcation?.Label == "hsnSac")
                                                                     {
-                                                                        <th class="text-left"><strong>HSN/SAC</strong></th>
+                                                                        <th class="text-left"><strong>@Model?.Settings?.TaxBifurcationHsnSac?.Label</strong></th>
                                                                     }
 
-                                                                    <th class="text-right"><strong>Taxable Amt.</strong></th>
+                                                                    <th class="text-right"><strong>@Model?.Settings?.TaxBifurcationTaxableValue?.Label</strong></th>
 
                                                                     @if (Model?.GstTaxesTotalOnly?.Any() == true)
                                                                     {
                                                                         @foreach (var tax in Model.GstTaxesTotalOnly)
                                                                         {
                                                                             taxKeys.Add(tax?.Key);
-                                                                            <th class="text-right"><strong>@tax?.AccountName%</strong></th>
-                                                                            <th class="text-right"><strong>@tax?.AccountName Amt.</strong></th>
+                                                                            <th class="text-right"><strong>@tax?.AccountName %</strong></th>
+                                                                            <th class="text-right"><strong>@tax?.AccountName</strong></th>
                                                                         }
                                                                     }
 
@@ -916,7 +916,7 @@
                                                                         }
                                                                     }
                                                                     <!-- Total -->
-                                                                    <th class="text-right"><strong>Total Amt.</strong></th>
+                                                                    <th class="text-right"><strong>@Model?.Settings?.TaxBifurcationTotal?.Label</strong></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -939,7 +939,7 @@
                                                                         {
                                                                             <td class="text-left border-right">@bifurcation?.HsnSc
                                                                                 <small>
-                                                                                    @(!string.IsNullOrEmpty(bifurcation?.HsnSc) ? bifurcation?.HsnStatus == true ? "(H)" : "(S)" : "")
+                                                                                    @(!string.IsNullOrEmpty(bifurcation?.HsnSc) ? bifurcation?.HsnStatus == true ? $"({Model?.Settings?.HsnIndicator?.Label})" : $"({Model?.Settings?.SacIndicator?.Label})" : "")
                                                                                 </small>
                                                                             </td>
                                                                         }
@@ -989,7 +989,7 @@
                                                                 <tr class="border-bottom border-top">
                                                                     @if (Model?.Settings?.TaxBifurcation?.Label == "hsnSac")
                                                                     {
-                                                                        <td class="text-right border-right"><strong>Total</strong></td>
+                                                                        <td class="text-right border-right"><strong>@Model?.Settings?.TaxBifurcationTotal?.Label</strong></td>
                                                                     }
 
                                                                     <td class="text-right border-right"><strong>@taxableTotalForTax</strong></td>
