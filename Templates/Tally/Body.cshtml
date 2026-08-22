@@ -1,4 +1,4 @@
-@model InvoiceData.Root;
+﻿@model InvoiceData.Root;
 @using InvoiceData;
 @using System;
 @using System.Net;
@@ -10,24 +10,40 @@
 @functions {
     private readonly Dictionary<string, Setting> _settingCache = new Dictionary<string, Setting>();
 
-    public string GetLabel(string settingName)
+    public Setting GetSetting(string settingName)
     {
         if (!_settingCache.TryGetValue(settingName, out var setting))
         {
             setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
             _settingCache[settingName] = setting ??= new Setting();
         }
-        return setting?.Display == true ? setting?.Label ?? string.Empty : string.Empty;
+        return setting;
+    }
+
+    /* Label markup honouring Label / SecondaryLabel, printed side by side. */
+    public RazorLight.Text.IRawString GetLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return LabelRenderer.Html(setting?.Display == true ? setting : null, Model?.LabelDisplay, LabelLayout.Inline);
+    }
+
+    /* Table header label markup, both languages stacked vertically (top to bottom). */
+    public RazorLight.Text.IRawString GetHeaderLabel(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return LabelRenderer.Html(setting?.Display == true ? setting : null, Model?.LabelDisplay, LabelLayout.Stacked);
+    }
+
+    /* Plain text label, use it for comparisons, emptiness checks and string interpolation. */
+    public string GetLabelText(string settingName)
+    {
+        var setting = GetSetting(settingName);
+        return setting?.Display == true ? LabelRenderer.Text(setting, Model?.LabelDisplay) : string.Empty;
     }
 
     public bool GetDisplayStatus(string settingName)
     {
-        if (!_settingCache.TryGetValue(settingName, out var setting))
-        {
-            setting = Model.Settings?.GetType().GetProperty(settingName)?.GetValue(Model.Settings) as Setting;
-            _settingCache[settingName] = setting ??= new Setting();
-        }
-        return setting?.Display == true;
+        return GetSetting(settingName)?.Display == true;
     }
 
     public string GetAccountCurrencyCodeOrSymbol()
@@ -97,14 +113,14 @@
                                                                 @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.IrnNumber))
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">IRN</td>
+                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceIdentifier")</td>
                                                                         <td class="border-none p-0">: @Model?.EInvoiceDetails?.IrnNumber</td>
                                                                     </tr>
                                                                 }
                                                                 @if (Model?.EInvoiceDetails?.AcknowledgementNumber != null)
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">Ack No</td>
+                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceReference")</td>
                                                                         <td class="border-none p-0">:
                                                                             @Model?.EInvoiceDetails?.AcknowledgementNumber</td>
                                                                     </tr>
@@ -112,7 +128,7 @@
                                                                 @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">Ack Date</td>
+                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceDate")</td>
                                                                         <td class="border-none p-0">:
                                                                             @Model?.EInvoiceDetails?.AcknowledgementDate</td>
                                                                     </tr>
@@ -544,35 +560,37 @@
                                                         <tr>
                                                             @if (GetDisplayStatus("SNo"))
                                                             {
-                                                                <th class="text-center">@GetLabel("SNo")</th>
+                                                                <th class="text-center">@GetHeaderLabel("SNo")</th>
                                                             }
                                                             @if (GetDisplayStatus("Item"))
                                                             {
-                                                                <th width="35%">@GetLabel("Item")</th>
+                                                                <th width="35%">@GetHeaderLabel("Item")</th>
                                                             }
                                                             @if (GetDisplayStatus("HsnSac"))
                                                             {
-                                                                <th class="text-center">@GetLabel("HsnSac")</th>
+                                                                <th class="text-center">@GetHeaderLabel("HsnSac")</th>
                                                             }
                                                             @if (GetDisplayStatus("Quantity"))
                                                             {
-                                                                <th class="text-center">@GetLabel("Quantity")</th>
+                                                                <th class="text-center">@GetHeaderLabel("Quantity")</th>
                                                             }
                                                             @if (GetDisplayStatus("Rate"))
                                                             {
-                                                                <th class="text-right">@GetLabel("Rate")</th>
+                                                                <th class="text-right">@GetHeaderLabel("Rate")</th>
                                                             }
-
-                                                            <th class="text-center">per</th>
+                                                            @if (GetDisplayStatus("Unit"))
+                                                            {
+                                                            <th class="text-center">@GetHeaderLabel("Unit")</th>
+                                                            }
 
                                                             @if (GetDisplayStatus("Discount"))
                                                             {
-                                                                <th class="text-center">@GetLabel("Discount")</th>
+                                                                <th class="text-center">@GetHeaderLabel("Discount")</th>
                                                             }
                                                               @if (GetDisplayStatus("Total"))
                                                             {
                                                                 <th class="text-right no-wrap">
-                                                                    @GetLabel("Total")
+                                                                    @GetHeaderLabel("Total")
                                                                 </th>
                                                             }
                                                           
@@ -630,7 +648,7 @@
                                                                             @if (GetDisplayStatus("SkuCode") && !string.IsNullOrEmpty(Entry.Stock.Sku))
                                                                             {
                                                                                 <p class="color-light word-break">
-                                                                                    SKU Code: @Entry.Stock?.Sku
+                                                                                    @GetLabel("SkuCode"): @Entry.Stock?.Sku
                                                                                 </p>
                                                                             }
 
@@ -861,7 +879,7 @@
                                                             {
                                                                 <td class="border-none border-right text-right">
                                                                     <strong>
-                                                                        Round Off
+                                                                        @GetLabel("RoundOff")
                                                                     </strong>
                                                                 </td>
                                                             }
@@ -903,7 +921,7 @@
                                                             }
                                                             @if (GetDisplayStatus("Item"))
                                                             {
-                                                                <td class="text-right">Total</td>
+                                                                <td class="text-right">@GetLabel("Total")</td>
                                                             }
                                                             @if (GetDisplayStatus("HsnSac"))
                                                             {
@@ -949,8 +967,8 @@
                                             <td class="p-0 border-none @(GetDisplayStatus("TaxBifurcation") ? "" : "border-bottom")">
                                                 <table class="remove-left-right-border">
                                                     <tr>
-                                                        <td class="border-none border-left" width="50%">Amount Chargeable (in words)</td>
-                                                        <td class="border-none border-right text-right" width="50%">E. & O.E</td>
+                                                        <td class="border-none border-left" width="50%">@GetLabel("TotalInWords")</td>
+                                                        <td class="border-none border-right text-right" width="50%">@GetLabel("EOE")</td>
                                                     </tr>
                                                     <tr>
                                                         <td class="border-none border-left border-right" colspan="100%">
@@ -989,10 +1007,10 @@
                                                             }
                                                             <tr>
                                                                 <th class="vertical-align-top text-center border-top-none" rowspan="2">
-                                                                    HSN/SAC
+                                                                    @GetHeaderLabel("TaxBifurcationHsnSac")
                                                                 </th>
                                                                 <th class="vertical-align-top text-center border-top-none" rowspan="2">
-                                                                    Taxable Value
+                                                                    @GetHeaderLabel("TaxBifurcationTaxableValue")
                                                                 </th>
                                                                 @* IGST/ (CGST/SGST) / VAT  *@
                                                                 @if (Model?.GstTaxesTotalOnly != null && Model.GstTaxesTotalOnly.Any())
@@ -1044,7 +1062,7 @@
                                                                 }
 
                                                                 <th class="text-right vertical-align-top border-top-none" rowspan="2">
-                                                                    Total Tax Amount
+                                                                    @GetHeaderLabel("TaxBifurcationTotalTaxAmount")
                                                                 </th>
                                                             </tr>
                                                             @if (Model?.GstTaxesTotal != null && Model.GstTaxesTotal.Any())
@@ -1052,8 +1070,8 @@
                                                             <tr>
                                                                 @for(int i = 0; i < taxCount; i++)
                                                                 {
-                                                                    <th class="text-center" style="width: clamp(60px, 20%, 80px);">Rate</th>
-                                                                    <th class="text-center" style="width: clamp(60px, 20%, 80px);">Amount</th>
+                                                                    <th class="text-center" style="width: clamp(60px, 20%, 80px);">@GetHeaderLabel("TaxBifurcationRate")</th>
+                                                                    <th class="text-center" style="width: clamp(60px, 20%, 80px);">@GetHeaderLabel("TaxBifurcationAmount")</th>
                                                                 }
                                                             </tr>
                                                             }
@@ -1169,7 +1187,7 @@
                                                         <tfoot>
                                                             <tr>
                                                                 <td class="text-right border-bottom-none">
-                                                                    <strong>Total</strong>
+                                                                    <strong>@GetLabel("TaxBifurcationTotal")</strong>
                                                                 </td>
 
                                                                 <td class="text-center border-bottom-none">

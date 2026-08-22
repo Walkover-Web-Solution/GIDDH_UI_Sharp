@@ -84,7 +84,22 @@ namespace InvoiceData
         public Setting? PreviousDue { get; set; }
         public Setting? AmountBeforeDiscount { get; set; }
         public Setting? SkuCode { get; set; }
-        public Setting? GstSchemeData { get; set; }
+        public Setting? Unit { get; set; }
+        public Setting? TaxBifurcationHsnSac { get; set; }
+        public Setting? TaxBifurcationTaxableValue { get; set; }
+        public Setting? TaxBifurcationRate { get; set; }
+        public Setting? TaxBifurcationAmount { get; set; }
+        public Setting? TaxBifurcationTotalTaxAmount { get; set; }
+        public Setting? TaxBifurcationTotal { get; set; }
+        public Setting? RoundOff { get; set; }
+        public Setting? HsnIndicator { get; set; }
+        public Setting? SacIndicator { get; set; }
+        public Setting? ShowElectronicInvoiceIdentifier { get; set; }
+        public Setting? ShowElectronicInvoiceReference { get; set; }
+        public Setting? ShowElectronicInvoiceDate { get; set; }
+        public Setting? EOE { get; set; }
+        public Setting? EntrySummaryPaid { get; set; }
+        public Setting? EntrySummaryDueAmount { get; set; }
 
         // Initialize all static keys dynamically
         public void InitializeStaticKeys()
@@ -113,7 +128,39 @@ namespace InvoiceData
     public class Setting
     {
         public string? Label { get; set; } = string.Empty;
+        public string? SecondaryLabel { get; set; } = string.Empty;
         public bool? Display { get; set; }
+    }
+
+    /// <summary>
+    /// Controls how the two languages of every setting label (Label / SecondaryLabel) are printed.
+    /// ShowLabel + ShowSecondaryLabel + SecondaryLabelFirst together cover all supported states:
+    ///   Label only              -> ShowLabel = true,  ShowSecondaryLabel = false
+    ///   SecondaryLabel only     -> ShowLabel = false, ShowSecondaryLabel = true
+    ///   Label SecondaryLabel    -> ShowLabel = true,  ShowSecondaryLabel = true,  SecondaryLabelFirst = false
+    ///   SecondaryLabel Label    -> ShowLabel = true,  ShowSecondaryLabel = true,  SecondaryLabelFirst = true
+    /// </summary>
+    public class LabelDisplayConfig
+    {
+        /// <summary>Print the primary label (language 1). Defaults to true to keep the existing behaviour.</summary>
+        public bool? ShowLabel { get; set; } = true;
+
+        public bool? EnableSecondaryLanguage { get; set; }
+
+        /// <summary>Print the secondary label (language 2).</summary>
+        public bool? ShowSecondaryLabel { get; set; }
+
+        /// <summary>Print the secondary label before the primary label.</summary>
+        public bool? SecondaryLabelFirst { get; set; }
+
+        /// <summary>Text placed between both labels when they are printed side by side. Defaults to a single space.</summary>
+        public string? Separator { get; set; }
+
+        /// <summary>ISO language code of the primary label, e.g. "en". Drives the lang/dir attributes.</summary>
+        public string? LabelLanguage { get; set; }
+
+        /// <summary>ISO language code of the secondary label, e.g. "ar". Drives the lang/dir attributes.</summary>
+        public string? SecondaryLabelLanguage { get; set; }
     }
 
     public class LabelValue
@@ -343,6 +390,24 @@ namespace InvoiceData
     public class Root
     {
         public Settings? Settings { get; set; }
+        public bool? DisplayLanguage1 { get; set; }
+        public bool? DisplayLanguage2 { get; set; }
+        public bool? EnableSecondaryLanguage { get; set; }
+        public bool? ShowLanguage2DisplayedFirst { get; set; }
+        public string? Language1Code { get; set; }
+        public string? Language2Code { get; set; }
+        public string? Separator { get; set; }
+        public LabelDisplayConfig LabelDisplay => new LabelDisplayConfig
+        {
+            ShowLabel = DisplayLanguage1 ?? true,
+            EnableSecondaryLanguage = EnableSecondaryLanguage ?? false,
+            ShowSecondaryLabel = DisplayLanguage2 ?? false,
+            SecondaryLabelFirst = ShowLanguage2DisplayedFirst ?? false,
+            LabelLanguage = Language1Code,
+            SecondaryLabelLanguage = Language2Code,
+            Separator = Separator ?? "  "
+        };
+
         public Company? Company { get; set; }
         public string? VoucherNumber { get; set; }
         public string? VoucherDate { get; set; }
@@ -378,6 +443,7 @@ namespace InvoiceData
         public string? GstComposition { get; set; }
         public string? Message2 { get; set; }
         public string? Message1 { get; set; }
+        public string? SecondaryMessage1 { get; set; }
         public string? StockQuantityWithUnit { get; set; }
         public string? DueDate { get; set; }
         public Currency? AccountCurrency { get; set; }

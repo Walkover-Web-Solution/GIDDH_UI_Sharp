@@ -1,0 +1,990 @@
+{
+    "templateType": "TALLY",
+    "enableSecondaryLanguage": false,
+    "displayLanguage1": true,
+    "displayLanguage2": false,
+    "showLanguage2DisplayedFirst": false,
+    "language1Code": "en",
+    "language2Code": "hi",
+    "separator": "  ",
+    "sourceOfSupply": "Abu Dhabi",
+    "customField1": "My ABC 1",
+    "stockQuantityWithUnit": "200 nos",
+    "customField2": "My XYZ 2",
+    "shippedVia": "Truck",
+    "customField3": "My PQR 3",
+    "dueDate": "21-07-2026",
+    "accountCurrency": {
+        "code": "AED",
+        "symbol": "&#x062f;&#x002e;&#x0625;"
+    },
+    "tcsTaxes": "",
+    "companyTaxType": "TRN",
+    "warehouseDetails": {
+        "name": "Arab warehouse",
+        "address": "Company address, any floor, 404002"
+    },
+    "billing": {
+        "country": "United Arab Emirates",
+        "address": "",
+        "pinCode": "",
+        "taxNumber": "",
+        "stateCounty": "Abu Dhabi"
+    },
+    "totalTax": {
+        "amountForAccount": 1259880.00,
+        "amountForCompany": 1259880.00
+    },
+    "otherTotal": [],
+    "taxBifurcation": [
+        {
+            "qty": 0.00,
+            "entryTotal": 900.00,
+            "desc": "Sales",
+            "iamt": null,
+            "camt": null,
+            "samt": null,
+            "utgstAmount": null,
+            "taxableValue": 900.00,
+            "gstOrVatTaxRate": 0.00,
+            "csTaxRate": 0.00,
+            "hsn_sc": "",
+            "hsnSc": "",
+            "cessUniqueName": null,
+            "vatamt": null,
+            "salesTaxAmount": null,
+            "salesTaxRate": 0.00,
+            "othTaxRate": 0.00,
+            "entryTaxTotal": null,
+            "csAmountList": [],
+            "othAmountList": [],
+            "hsnStatus": false
+        },
+        {
+            "qty": 200.00,
+            "entryTotal": 7559280.00,
+            "desc": "Sales",
+            "iamt": null,
+            "camt": null,
+            "samt": null,
+            "utgstAmount": null,
+            "taxableValue": 6299400.00,
+            "gstOrVatTaxRate": 20.00,
+            "csTaxRate": 0.00,
+            "hsn_sc": "",
+            "hsnSc": "",
+            "cessUniqueName": null,
+            "vatamt": 1259880.00,
+            "salesTaxAmount": null,
+            "salesTaxRate": 0.00,
+            "othTaxRate": 0.00,
+            "entryTaxTotal": 1259880.00,
+            "csAmountList": [],
+            "othAmountList": [],
+            "hsnStatus": true
+        }
+    ],
+    "balance": {
+        "amountForAccount": 7560180.00,
+        "amountForCompany": 7560180.00
+    },
+    "shipping": {
+        "country": "United Arab Emirates",
+        "address": "",
+        "pinCode": "",
+        "taxNumber": "",
+        "stateCounty": "Abu Dhabi"
+    },
+    "totalInWords": {
+        "amountForAccount": "Seventy Five Lakh Sixty Thousand One Hundred Eighty Only",
+        "amountForCompany": "Seventy Five Lakh Sixty Thousand One Hundred Eighty Only"
+    },
+    "customerEmail": "divyanshu@gmail.com",
+    "voucherDate": "21-07-2026",
+    "attentionTo": "Divyanshu Sir",
+    "trackingNumber": "MP092026",
+    "placeOfSupply": "Abu Dhabi",
+    "settings": {
+        "taxableAmount": {
+            "label": "Taxable Amount",
+            "display": true,
+            "secondaryLabel": "कर योग्य राशि"
+        },
+        "showNotesAtLastPage": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "tds": {
+            "label": "TDS",
+            "display": false,
+            "secondaryLabel": ""
+        },
+        "imageSignature": {
+            "label": "1784659610878c54uqmedgi",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "showMessage2": {
+            "label": "Remark:",
+            "display": true,
+            "secondaryLabel": "टिप्पणी:"
+        },
+        "tcs": {
+            "label": "TCS",
+            "display": false,
+            "secondaryLabel": "स्रोत पर कर संग्रह"
+        },
+        "grandTotal": {
+            "label": "Invoice Total",
+            "display": true,
+            "secondaryLabel": "चालान कुल राशि"
+        },
+        "totalDue": {
+            "label": "Total Due",
+            "display": false,
+            "secondaryLabel": "कुल बकाया"
+        },
+        "footerCompanyName": {
+            "label": "Arabic Template",
+            "display": true,
+            "secondaryLabel": "अरबी टेम्पलेट"
+        },
+        "displayExportMessage": {
+            "label": "",
+            "display": false,
+            "secondaryLabel": ""
+        },
+        "grandTotalInAccountsCurrency": {
+            "label": "Invoice Total",
+            "display": true,
+            "secondaryLabel": "चालान कुल राशि"
+        },
+        "totalInWordsInAccountsCurrency": {
+            "label": "Invoice Total (In words)",
+            "display": true,
+            "secondaryLabel": "(चालान कुल राशि (शब्दों में))"
+        },
+        "totalTax": {
+            "label": "Total Tax*",
+            "display": true,
+            "secondaryLabel": "कुल कर*"
+        },
+        "thanks": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "otherDeduction": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "taxBifurcation": {
+            "label": "Tax Bifurcation",
+            "display": true,
+            "secondaryLabel": "कर विवरण"
+        },
+        "totalInWords": {
+            "label": "Amount Chargeable (in words)",
+            "display": true,
+            "secondaryLabel": "प्रभार योग्य राशि (शब्दों मे)"
+        },
+        "companyAddress": {
+            "label": "Company Address",
+            "display": true,
+            "secondaryLabel": "कंपनी का पता"
+        },
+        "textUnderSlogan": {
+            "label": "Text Under Slogan",
+            "display": true,
+            "secondaryLabel": "स्लोगन के नीचे का पाठ"
+        },
+        "slogan": {
+            "label": "Slogan",
+            "display": false,
+            "secondaryLabel": "स्लोगन"
+        },
+        "message1": {
+            "label": "Declaration:",
+            "display": true,
+            "secondaryLabel": "घोषणा:"
+        },
+        "warehouseAddress": {
+            "label": "Shipped From",
+            "display": false,
+            "secondaryLabel": "जहाँ से प्रेषित"
+        },
+        "shippingDate": {
+            "label": "Ship Date",
+            "display": true,
+            "secondaryLabel": "प्रेषण तिथि"
+        },
+        "customField1": {
+            "label": "Custom Field 1",
+            "display": true,
+            "secondaryLabel": "कस्टम फ़ील्ड 1"
+        },
+        "customField2": {
+            "label": "Custom Field 2",
+            "display": true,
+            "secondaryLabel": "कस्टम फ़ील्ड 2"
+        },
+        "shippedVia": {
+            "label": "Ship Via",
+            "display": true,
+            "secondaryLabel": "प्रेषण माध्यम"
+        },
+        "customField3": {
+            "label": "Custom Field 3",
+            "display": true,
+            "secondaryLabel": "कस्टम फ़ील्ड 3"
+        },
+        "headerCompanyName": {
+            "label": "Arabic Template",
+            "display": true,
+            "secondaryLabel": "अरबी टेम्पलेट"
+        },
+        "dueDate": {
+            "label": "Due Date",
+            "display": true,
+            "secondaryLabel": "देय तिथि"
+        },
+        "displayExchangeRate": {
+            "label": "Exchange/Conversion Rate",
+            "display": true,
+            "secondaryLabel": "विनिमय/रूपांतरण दर"
+        },
+        "companyTaxNumber": {
+            "label": "TRN",
+            "display": true,
+            "secondaryLabel": "कर पंजीकरण संख्या"
+        },
+        "displayPlaceOfSupply": {
+            "label": "Place of Supply",
+            "display": true,
+            "secondaryLabel": "आपूर्ति का स्थान"
+        },
+        "displayPlaceOfCountry": {
+            "label": "Country of Supply",
+            "display": true,
+            "secondaryLabel": "आपूर्ति का देश"
+        },
+        "shippingTaxNumber": {
+            "label": "TRN",
+            "display": true,
+            "secondaryLabel": "कर पंजीकरण संख्या"
+        },
+        "voucherNumber": {
+            "label": "Invoice No.",
+            "display": true,
+            "secondaryLabel": "चालान संख्या"
+        },
+        "customerEmail": {
+            "label": "Email",
+            "display": true,
+            "secondaryLabel": "ईमेल"
+        },
+        "showQrCode": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "voucherDate": {
+            "label": "Invoice Date",
+            "display": true,
+            "secondaryLabel": "चालान दिनांक"
+        },
+        "customerContactNumber": {
+            "label": "Contact",
+            "display": true,
+            "secondaryLabel": "संपर्क"
+        },
+        "attentionTo": {
+            "label": "Attention To",
+            "display": true,
+            "secondaryLabel": "ध्यानार्थ"
+        },
+        "displayLutNumber": {
+            "label": "LUT Number",
+            "display": true,
+            "secondaryLabel": "एलयूटी संख्या"
+        },
+        "showCompanyAddress": {
+            "label": "Company Details:",
+            "display": true,
+            "secondaryLabel": "कंपनी का विवरण:"
+        },
+        "pan": {
+            "label": "PAN",
+            "display": true,
+            "secondaryLabel": "स्थायी खाता संख्या"
+        },
+        "trackingNumber": {
+            "label": "Tracking No.",
+            "display": true,
+            "secondaryLabel": "ट्रैकिंग संख्या"
+        },
+        "shippingStateCounty": {
+            "label": "State",
+            "display": true,
+            "secondaryLabel": "राज्य"
+        },
+        "formNameInvoice": {
+            "label": "INVOICE",
+            "display": true,
+            "secondaryLabel": "चालान"
+        },
+        "billingTaxNumber": {
+            "label": "TRN",
+            "display": true,
+            "secondaryLabel": "कर पंजीकरण संख्या"
+        },
+        "showEInvoiceDetails": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "address": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "billingStateCounty": {
+            "label": "State",
+            "display": true,
+            "secondaryLabel": "राज्य"
+        },
+        "customerName": {
+            "label": "Customer Name",
+            "display": true,
+            "secondaryLabel": "ग्राहक का नाम"
+        },
+        "formNameTaxInvoice": {
+            "label": "TAX INVOICE",
+            "display": true,
+            "secondaryLabel": "कर चालान"
+        },
+        "shippingAddress": {
+            "label": "Shipping Address",
+            "display": true,
+            "secondaryLabel": "शिपिंग पता"
+        },
+        "billingAddress": {
+            "label": "Billing Address",
+            "display": true,
+            "secondaryLabel": "बिलिंग पता"
+        },
+        "date": {
+            "label": "Date",
+            "display": true,
+            "secondaryLabel": "दिनांक"
+        },
+        "displayBaseCurrency": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "item": {
+            "label": "Description",
+            "display": true,
+            "secondaryLabel": "विवरण"
+        },
+        "quantity": {
+            "label": "Qty.",
+            "display": true,
+            "secondaryLabel": "मात्रा"
+        },
+        "otherTaxBifurcation": {
+            "label": "Tax",
+            "display": true,
+            "secondaryLabel": "कर"
+        },
+        "showDescriptionInRows": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "description": {
+            "label": "Description",
+            "display": true,
+            "secondaryLabel": "विवरण"
+        },
+        "discount": {
+            "label": "Dis./ Item",
+            "display": true,
+            "secondaryLabel": "छूट/आइटम"
+        },
+        "taxes": {
+            "label": "Taxes",
+            "display": true,
+            "secondaryLabel": "कर"
+        },
+        "total": {
+            "label": "Total",
+            "display": true,
+            "secondaryLabel": "कुल"
+        },
+        "totalQuantity": {
+            "label": "Total Quantity",
+            "display": true,
+            "secondaryLabel": "कुल मात्रा"
+        },
+        "showVariantImage": {
+            "label": "Image",
+            "display": false,
+            "secondaryLabel": "छवि"
+        },
+        "sNo": {
+            "label": "#",
+            "display": true,
+            "secondaryLabel": "क्रमांक"
+        },
+        "rate": {
+            "label": "Rate/ Item",
+            "display": true,
+            "secondaryLabel": "दर/आइटम"
+        },
+        "taxableValue": {
+            "label": "Taxable Amt.",
+            "display": true,
+            "secondaryLabel": "कर योग्य राशि"
+        },
+        "previousDue": {
+            "label": "Previous Due",
+            "display": true,
+            "secondaryLabel": "पिछला बकाया"
+        },
+        "amountBeforeDiscount": {
+            "label": "Total Before Dis.",
+            "display": true,
+            "secondaryLabel": "छूट से पहले कुल"
+        },
+        "skuCode": {
+            "label": "SKU Code",
+            "display": true,
+            "secondaryLabel": "एसकेयू कोड"
+        },
+        "showlogo": {
+            "label": "",
+            "display": true,
+            "secondaryLabel": ""
+        },
+        "unit": {
+            "label": "Unit",
+            "display": true,
+            "secondaryLabel": "इकाई"
+        },
+        "taxBifurcationHsnSac": {
+            "label": "HSN/SAC",
+            "display": true,
+            "secondaryLabel": "एचएसएन/एसएसी"
+        },
+        "taxBifurcationTaxableValue": {
+            "label": "Taxable Value",
+            "display": true,
+            "secondaryLabel": "कर योग्य राशि"
+        },
+        "taxBifurcationRate": {
+            "label": "Rate",
+            "display": true,
+            "secondaryLabel": "दर"
+        },
+        "taxBifurcationAmount": {
+            "label": "Amount",
+            "display": true,
+            "secondaryLabel": "राशि"
+        },
+        "taxBifurcationTotalTaxAmount": {
+            "label": "Total Tax Amount",
+            "display": true,
+            "secondaryLabel": "कुल कर राशि"
+        },
+        "taxBifurcationTotal": {
+            "label": "Total",
+            "display": true,
+            "secondaryLabel": "कुल"
+        },
+        "roundOff": {
+            "label": "Round Off",
+            "display": true,
+            "secondaryLabel": "राउंड ऑफ"
+        },
+        "hsnIndicator": {
+            "label": "(H)",
+            "display": true,
+            "secondaryLabel": "(एच)"
+        },
+        "sacIndicator": {
+            "label": "(S)",
+            "display": true,
+            "secondaryLabel": "(एस)"
+        },
+        "purchaseOrderShortLabel": {
+            "label": "PO",
+            "display": true,
+            "secondaryLabel": "क्रय आदेश"
+        },
+        "purchaseBillShortLabel": {
+            "label": "PB",
+            "display": true,
+            "secondaryLabel": "क्रय बिल"
+        },
+        "showElectronicInvoiceIdentifier": {
+            "label": "IRN",
+            "display": true,
+            "secondaryLabel": "चालान संदर्भ संख्या"
+        },
+        "showElectronicInvoiceReference": {
+            "label": "ACK NO.",
+            "display": true,
+            "secondaryLabel": "पावती संख्या"
+        },
+        "showElectronicInvoiceDate": {
+            "label": "ACK Date",
+            "display": true,
+            "secondaryLabel": "पावती दिनांक"
+        },
+        "EOE": {
+            "label": "E. & O.E.",
+            "display": true,
+            "secondaryLabel": "त्रुटि एवं चूक को छोड़कर"
+        },
+        "entrySummaryPaid": {
+            "label": "Paid",
+            "display": true,
+            "secondaryLabel": "भुगतान किया गया"
+        },
+        "entrySummaryDueAmount": {
+            "label": "Due Amount",
+            "display": true,
+            "secondaryLabel": "बकाया राशि"
+        }
+    },
+    "gstTaxesTotalOnly": [
+        {
+            "taxType": "commonvat",
+            "accountName": "VAT",
+            "accountUniqueName": "vat",
+            "amount": {
+                "amountForAccount": 1259880.00,
+                "amountForCompany": 1259880.00
+            },
+            "taxPercent": 20.00,
+            "considerInItemTotal": true,
+            "considerInVoucherTotal": true,
+            "showOnVoucher": true,
+            "key": "vatamt"
+        }
+    ],
+    "isTaxesApplied": true,
+    "grandTotal": {
+        "amountForAccount": 7560180.00,
+        "amountForCompany": 7560180.00
+    },
+    "showBankQR": true,
+    "shippingCountyOrStateLabel": "state",
+    "tdsTotalTax": null,
+    "QRCodeBase64String": "iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAQAAAABRBrPYAAAC80lEQVR4Xu2YS47jMAwFeQPe/5a8\ngYb16A4QzgDTu+eF2LGjSOWAfykd5zdSsWf+KRdbcrElF1tysSUXW3KxJQ9WEXH6qspTLSd017Qd\n45XJQq9mZNN917Qd0zJ/LEZDfZ1k+hXYOZHBVZjSEC5+DdY6ywKlQE/9TJsxXr1CyFnFkrZH03ZM\nav8tu2QcmIbKxy5kRtRP2/NZM2Id4lY2VSM9GoseB9sxgkwuKjOLUpb0Zz+WpGLo6szUG3P1MdGI\nBZ5UuDvgWECnmRryYyrgH73JhNJjy70OjHfaDInIYteOQv+sWjGUlvpyL3Uii/qxj4k+LKiU2c7g\n8HbJgtWiHZjUp7so4jQaRqoiN8YpZeKNBfQ/hZ6bHZMrVSj4tZQK6ocf9/uwI8c2jJdRH0s4uCxL\nHVjJuXRqdpJkb8McWuMLMByctBpyQJ+xAnvsWNCNE925HdqNQn++M8SDiWODI9opWE+ujuTASEFV\nSzAqjp7scLFMsGBTwlKawOvBZO47LR3YobWccazKGv11+zLBgskE3o4KRuB5jHFjZGTQ/JqeXz/B\nfyd26E0YSsf8kFDXCc3gcT+G6h3rRH32DyUBxePHWOhxr7FlJMYQ9p9VJ0YOJkeCJN785Gk/tzU5\nXdCL9XRiAvM18Vaafofeg7FIOqqq5102fb7Gh+FfclJ1A8YBlBx4/OvF6CrstK100QdrWvQbMDVj\nzdJq5Gueoc7dGN6VMxlwNlCC0qxXhhgwtKeAe2Mj6vqIUeuYZ8HkUZJyCuVwmJqqeb7FiRXtmMin\nrGCHO1gxkfdi2jDIzCD61PMY8x16C0aE0ViIQo/DaTqzbMUoGW0h9BjMQHn6zxuwGU5/wRAdphjZ\nsdK58+BOBV/7LfbE1IwVO+ourfmUTlLZcx71YyhO0KU2Ryrg4Dz/CkyHJxUNxky5JH36BVjRAJWJ\nQQLQe3r1BdiQyQqOLfUdzHkBRskoGZPQkwczJE/N2P/kYksutuRiSy625GJLLrbkt9gfVPrOXCMj\nBycAAAAASUVORK5CYII=",
+    "taxBifurcationEntryTotal": {
+        "amountForAccount": 7559280.00,
+        "amountForCompany": 7559280.00
+    },
+    "customerName": "Divyanshu AED",
+    "entries": [
+        {
+            "date": "21-07-2026",
+            "discounts": [
+                {
+                    "calculationMethod": "PERCENTAGE",
+                    "accountName": "Discount",
+                    "accountUniqueName": "discount",
+                    "amount": {
+                        "amountForAccount": 100.00,
+                        "amountForCompany": 100.00
+                    },
+                    "discountValue": 10.00
+                }
+            ],
+            "taxes": [],
+            "exchangeRate": 1.00,
+            "subTotal": {
+                "amountForAccount": 1000.00,
+                "amountForCompany": 1000.00
+            },
+            "discountTotal": {
+                "amountForAccount": 100.00,
+                "amountForCompany": 100.00
+            },
+            "entryTotal": {
+                "amountForAccount": 900.00,
+                "amountForCompany": 900.00
+            },
+            "grandTotal": {
+                "amountForAccount": 900.00,
+                "amountForCompany": 900.00
+            },
+            "salesPerson": {},
+            "usedQuantity": 0.00,
+            "sumOfDiscounts": {
+                "amountForCompany": 100.00,
+                "amountForAccount": 100.00
+            },
+            "stock": null,
+            "accountName": "Sales",
+            "amount": {
+                "amountForAccount": 1000.00,
+                "amountForCompany": 1000.00
+            },
+            "taxableValue": {
+                "amountForAccount": 900.00,
+                "amountForCompany": 900.00
+            }
+        },
+        {
+            "description": "This is the description about Skirt Stock ",
+            "date": "21-07-2026",
+            "discounts": [
+                {
+                    "calculationMethod": "FIX_AMOUNT",
+                    "accountName": "Discount",
+                    "accountUniqueName": "discount",
+                    "name": "FLAT-500",
+                    "uniqueName": "nwa1784639484055",
+                    "amount": {
+                        "amountForAccount": 500.00,
+                        "amountForCompany": 500.00
+                    },
+                    "discountValue": 500.00
+                }
+            ],
+            "taxes": [
+                {
+                    "taxType": "commonvat",
+                    "calculationMethod": "OnTaxableAmount",
+                    "accountName": "VAT",
+                    "accountUniqueName": "vat",
+                    "taxAccountUniqueName": "vat",
+                    "uniqueName": "vat20",
+                    "amount": {
+                        "amountForAccount": 59880.00,
+                        "amountForCompany": 59880.00
+                    },
+                    "taxPercent": 20.00,
+                    "considerInItemTotal": true,
+                    "considerInVoucherTotal": true,
+                    "showOnVoucher": true
+                }
+            ],
+            "exchangeRate": 1.00,
+            "subTotal": {
+                "amountForAccount": 299900.00,
+                "amountForCompany": 299900.00
+            },
+            "discountTotal": {
+                "amountForAccount": 500.00,
+                "amountForCompany": 500.00
+            },
+            "taxTotal": {
+                "amountForAccount": 59880.00,
+                "amountForCompany": 59880.00
+            },
+            "entryTotal": {
+                "amountForAccount": 359280.00,
+                "amountForCompany": 359280.00
+            },
+            "grandTotal": {
+                "amountForAccount": 359280.00,
+                "amountForCompany": 359280.00
+            },
+            "salesPerson": {},
+            "usedQuantity": 0.00,
+            "sumOfDiscounts": {
+                "amountForCompany": 500.00,
+                "amountForAccount": 500.00
+            },
+            "stock": {
+                "name": "Skirt",
+                "uniqueName": "skirt",
+                "stockUnit": {
+                    "name": "Number",
+                    "code": "nos",
+                    "uniqueName": "nos"
+                },
+                "variant": {
+                    "name": "XXL",
+                    "uniqueName": "xxl1784658987747omgpcymh0j"
+                },
+                "skuCodeHeading": "SKU Code",
+                "customField1": {
+                    "key": "Custom Field 1",
+                    "value": null
+                },
+                "customField2": {
+                    "key": "Custom Field 2",
+                    "value": null
+                },
+                "quantity": 100,
+                "rate": {
+                    "rateForAccount": 2999.00,
+                    "rateForCompany": 2999.00,
+                    "amountForAccount": 2999.00,
+                    "amountForCompany": 2999.00
+                },
+                "type": "PRODUCT",
+                "taxInclusive": false,
+                "showVariant": true,
+                "hasVariants": false,
+                "unitRates": []
+            },
+            "accountName": "Sales",
+            "amount": {
+                "amountForAccount": 299900.00,
+                "amountForCompany": 299900.00
+            },
+            "taxableValue": {
+                "amountForAccount": 299400.00,
+                "amountForCompany": 299400.00
+            }
+        },
+        {
+            "description": "This is the description about Iphone Stock without variant",
+            "date": "21-07-2026",
+            "discounts": [
+                {
+                    "calculationMethod": "PERCENTAGE",
+                    "accountName": "Discount",
+                    "accountUniqueName": "discount",
+                    "name": "Discount-50%",
+                    "uniqueName": "86d1784639468345",
+                    "amount": {
+                        "amountForAccount": 6000000.00,
+                        "amountForCompany": 6000000.00
+                    },
+                    "discountValue": 50.00
+                }
+            ],
+            "taxes": [
+                {
+                    "taxType": "commonvat",
+                    "calculationMethod": "OnTaxableAmount",
+                    "accountName": "VAT",
+                    "accountUniqueName": "vat",
+                    "taxAccountUniqueName": "vat",
+                    "uniqueName": "vat20",
+                    "amount": {
+                        "amountForAccount": 1200000.00,
+                        "amountForCompany": 1200000.00
+                    },
+                    "taxPercent": 20.00,
+                    "considerInItemTotal": true,
+                    "considerInVoucherTotal": true,
+                    "showOnVoucher": true
+                }
+            ],
+            "exchangeRate": 1.00,
+            "subTotal": {
+                "amountForAccount": 12000000.00,
+                "amountForCompany": 12000000.00
+            },
+            "discountTotal": {
+                "amountForAccount": 6000000.00,
+                "amountForCompany": 6000000.00
+            },
+            "taxTotal": {
+                "amountForAccount": 1200000.00,
+                "amountForCompany": 1200000.00
+            },
+            "entryTotal": {
+                "amountForAccount": 7200000.00,
+                "amountForCompany": 7200000.00
+            },
+            "grandTotal": {
+                "amountForAccount": 7200000.00,
+                "amountForCompany": 7200000.00
+            },
+            "salesPerson": {},
+            "usedQuantity": 0.00,
+            "sumOfDiscounts": {
+                "amountForCompany": 6000000.00,
+                "amountForAccount": 6000000.00
+            },
+            "stock": {
+                "name": "Iphone",
+                "uniqueName": "iphone",
+                "stockUnit": {
+                    "name": "Number",
+                    "code": "nos",
+                    "uniqueName": "nos"
+                },
+                "variant": {
+                    "name": "Iphone",
+                    "uniqueName": "iphone1784658913715nftozpchm2"
+                },
+                "skuCodeHeading": "SKU Code",
+                "customField1": {
+                    "key": "Custom Field 1",
+                    "value": null
+                },
+                "customField2": {
+                    "key": "Custom Field 2",
+                    "value": null
+                },
+                "quantity": 100,
+                "rate": {
+                    "rateForAccount": 120000.00,
+                    "rateForCompany": 120000.00,
+                    "amountForAccount": 120000.00,
+                    "amountForCompany": 120000.00
+                },
+                "type": "PRODUCT",
+                "taxInclusive": false,
+                "showVariant": false,
+                "hasVariants": false,
+                "unitRates": []
+            },
+            "accountName": "Sales",
+            "amount": {
+                "amountForAccount": 12000000.00,
+                "amountForCompany": 12000000.00
+            },
+            "taxableValue": {
+                "amountForAccount": 6000000.00,
+                "amountForCompany": 6000000.00
+            }
+        }
+    ],
+    "billingCountyOrStateLabel": "state",
+    "showVariantImage": false,
+    "reversecharge": false,
+    "showDueMonth": null,
+    "sumOfTaxes": [
+        {
+            "amountForAccount": 1259880.00,
+            "amountForCompany": 1259880.00
+        }
+    ],
+    "taxableTotal": {
+        "amountForAccount": 6300300.00,
+        "amountForCompany": 6300300.00
+    },
+    "tcsTotalTax": null,
+    "paidAmount": {
+        "amountForAccount": 0.00,
+        "amountForCompany": 0.00
+    },
+    "isBusinessToCustomerInvoice": true,
+    "displayBaseCurrency": true,
+    "isMultipleCurrency": false,
+    "shippingDate": "22-07-2026",
+    "showSectionsInline": true,
+    "totalDue": {
+        "amountForAccount": 7560180.00,
+        "amountForCompany": 7560180.00
+    },
+    "gstEntriesTotal": {
+        "amountForAccount": 7560180.00,
+        "amountForCompany": 7560180.00
+    },
+    "currencyFormat": "SYMBOL",
+    "isBusinessToBusinessInvoice": false,
+    "total": {
+        "amountForAccount": 7560180.00,
+        "amountForCompany": 7560180.00
+    },
+    "destinationOfSupply": "Abu Dhabi",
+    "tdsTaxes": "",
+    "voucherNumber": "260721-1",
+    "sealPath": "https://apitest.giddh.com/seal/unpaid",
+    "customerMobileNumber": "919111525164",
+    "company": {
+        "headerCompanyName": "Arabic Template",
+        "address": "Company address, any floor, 404002",
+        "shipping": {
+            "country": "United Arab Emirates",
+            "address": "Company address, any floor, 404002",
+            "taxNumber": "100123456700003",
+            "stateCounty": "Abu Dhabi"
+        },
+        "name": "Arabic Template",
+        "contactNumber": "919111525164",
+        "taxNumber": "100123456700003",
+        "logo": {
+            "url": "https://apitest.giddh.com/company/arabicae1784537959203002fbe/image/izgauopalg1784639779619",
+            "size": "80px"
+        },
+        "currency": {
+            "code": "AED",
+            "symbol": "&#x062f;&#x002e;&#x0625;"
+        },
+        "footerCompanyName": "Arabic Template",
+        "email": "",
+        "defaultAddress": "Company address, any floor, 404002",
+        "billing": {
+            "country": "United Arab Emirates",
+            "address": "Company address, any floor, 404002",
+            "taxNumber": "100123456700003",
+            "stateCounty": "Abu Dhabi"
+        }
+    },
+    "theme": {
+        "margin": {
+            "left": 25.0,
+            "top": 25.0,
+            "right": 25.0,
+            "bottom": 25.0
+        },
+        "primaryColor": "#f63407",
+        "marginEnable": true,
+        "font": {
+            "fontSizeDefault": 14,
+            "fontSizeSmall": 10,
+            "fontSizeMedium": 12,
+            "family": "Open Sans"
+        },
+        "secondaryColor": "#ffffff"
+    },
+    "customerDetails": {
+        "name": "Divyanshu AED",
+        "contactNumber": "919111525164",
+        "email": "divyanshu@gmail.com"
+    },
+    "taxableAmount": {
+        "amountForAccount": 12300900.00,
+        "amountForCompany": 12300900.00
+    },
+    "showSplittedDate": true,
+    "imageSignature": "https://apitest.giddh.com/company/arabicae1784537959203002fbe/image/1784659610878c54uqmedgi",
+    "voucherType": "INVOICE",
+    "cessTotal": [],
+    "showDueDate": true,
+    "bankQRDetails": {
+        "bankQRCodeBase64": "iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQAAAACoxAthAAADd0lEQVR4Xu3YQW7bQAwF0DG08FJH\n0FF8NOtoA/Qg9RG89EKwMv+THMlqLA8TBygCEoEqcf6btDIju0mzu9K28bpSTlbdnO1rnniZ0mnC\nymnGucWC1PMgbaSTYWNYMhtlqxYLEsRNSl9i8oUwk+izcL7EggT5OllGcUJMywY1SJC3kCXMpB53\nxzJIkJdESps2k7i0TXRDjQUJ4iSModh/+rXEggTxEZ02GbnE556NpXZ4uaogSwU5zU2k9JPNHsLJ\nypSULnEseRIkSBPJ7GMU6zSuTiSpJzwGCfIFsl0VJQE267ZYmoME8RMJS1My607dQZNBgrjJzAzC\nE/MyhMxLR63sZk/LIEEaCfoS+zfAjpbsg+F8H1lXkN9LMh9oSY4cvKclU2RPy19Kyp/HbVhqjzz8\nj36pXTJs06xd0m/TrF3y+T9mlxy2adY3iI6lvSJZ6EOUq8yj6iRvyHktXpNuHv3k4idX3gUvuWIE\nyukdk9BAbumUcd8vILraRA7z5eAkab4eltU2ciY5e0i5B83kquSWikbzkWR56NW+kfIthls6F4IY\nd2PyCSmv/p/SHKZ2UmbsL17EiXeggeAvfC6R1JcXpZ0g4iP8qSS5dO0k4zmThmbSYU3IsZH05aXB\ncexzKxnKS+MkvCok97lvI+VhOQo5jp8QXNQ8lrAi76kkA+8ESgL5OSk3ty8/ye3kjjsMkrzk2pV/\nZTMZSA4ugm90w0z/KJncpL8VMmEQmkl3cRJ99e/4yXkTyTjh7Ja+kpFkfnijpcXb6zNyIOFFG8ll\nyJ3kmo4go4Pc0kCy/mjylGjJrcweIpXXn5l+jIx+8vD5r4nwg0KtJvJ4XYkOGzrrdRZJsomV+eQ7\n8h45+wkPP00wb06CEXMSdHyE9Z8QexNERk7eQTI7aNoMSl773EQVAzlIED+RkasBrMqgyg48x6Uu\nBQniJNIxiLDMJ3fQMGdV95TfkAQJ4iFIsiOlS3bEJrKPxIIE8RMoDl7iicTk5CR9K2wSJIiTcE0r\n20xiHwl1yw7atN+QBAnSSHTJVk/rLViMMa+BIEGcpLMlOZn4NspVSdYlKDz9ggRxk/XgsblY4Qiw\nuBQkyBtIPbeYTSkugwT5BrE8AokzKcXV0iQPEsRNpOQEUDo1bxZHLAUJ4iR1oePgcfZKU47M8FJm\nEscgQXwELV99gXwAHlNfR2ZfSIEAAAAASUVORK5CYII="
+    },
+    "gstTaxesTotal": [
+        {
+            "taxType": "commonvat",
+            "accountName": "VAT",
+            "accountUniqueName": "vat",
+            "amount": {
+                "amountForAccount": 1259880.00,
+                "amountForCompany": 1259880.00
+            },
+            "taxPercent": 20.00,
+            "considerInItemTotal": true,
+            "considerInVoucherTotal": true,
+            "showOnVoucher": true,
+            "key": "vatamt"
+        }
+    ],
+    "accountTaxType": "TRN",
+    "message2": "This is the note created at the time of voucher creation from voucher page.",
+    "message1": "We declare that this invoice shows the actual price of the services rendered and that all particulars are true and correct.",
+    "RoundOff": "10.22",
+    "EInvoiceDetails": {
+        "IrnNumber": "dbshjdbsbdbxxjbxhbszzzzssassasahs7ysas8as",
+        "AcknowledgementNumber": 232233333232333232,
+        "AcknowledgementDate": "12.10.2027"
+    }
+
+}
