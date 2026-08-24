@@ -868,6 +868,98 @@
                                                                 </tr>
                                                             }
                                                         }
+
+
+                                                        @if (GetDisplayStatus("Tcs") && Model?.TcsTotalTax?.AmountForAccount != null)
+                                                        {
+                                                            <tr>
+                                                                @if (GetDisplayStatus("SNo"))
+                                                                {
+                                                                    <td class="border-none border-right border-left"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Item"))
+                                                                {
+                                                                    <td class="border-none border-right text-right">
+                                                                        <strong>
+                                                                            @GetLabel("Tcs")
+                                                                        </strong>
+                                                                    </td>
+                                                                }
+                                                                @if (GetDisplayStatus("HsnSac"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Quantity"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Rate"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+
+                                                                <td class="border-none border-right"></td>
+
+                                                                @if (GetDisplayStatus("Discount"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Total"))
+                                                                {
+                                                                    <td class="border-none border-right text-right">
+                                                                        <strong>
+                                                                            @Model?.TcsTotalTax?.AmountForAccount
+                                                                        </strong>
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+
+                                                        @if (GetDisplayStatus("Tds") && Model?.TdsTotalTax?.AmountForAccount != null)
+                                                        {
+                                                            <tr>
+                                                                @if (GetDisplayStatus("SNo"))
+                                                                {
+                                                                    <td class="border-none border-right border-left"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Item"))
+                                                                {
+                                                                    <td class="border-none border-right text-right">
+                                                                        <strong>
+                                                                            @GetLabel("Tds")
+                                                                        </strong>
+                                                                    </td>
+                                                                }
+                                                                @if (GetDisplayStatus("HsnSac"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Quantity"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Rate"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+
+                                                                <td class="border-none border-right"></td>
+
+                                                                @if (GetDisplayStatus("Discount"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
+                                                                @if (GetDisplayStatus("Total"))
+                                                                {
+                                                                    <td class="border-none border-right text-right">
+                                                                        <strong>
+                                                                            @Model?.TdsTotalTax?.AmountForAccount
+                                                                        </strong>
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        
                                                         @if (Model?.RoundOff != null)
                                                         {
                                                         <tr>
