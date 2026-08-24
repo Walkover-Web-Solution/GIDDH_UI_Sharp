@@ -8,10 +8,14 @@ sudo mkdir -p "${ALLOY_CONF_DIR}"
 # ========= Load Environment Variables from EB =========
 GRAFANA_APP_ENV=$(/opt/elasticbeanstalk/bin/get-config environment -k ENVIRONMENT 2>/dev/null || true)
 SERVER_REGION=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVER_REGION 2>/dev/null || true)
+SERVICE_TYPE=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVICE_TYPE 2>/dev/null || true)
+SERVICE_NAME=$(/opt/elasticbeanstalk/bin/get-config environment -k SERVICE_NAME 2>/dev/null || true)
 
 # Fallback
 GRAFANA_APP_ENV="${GRAFANA_APP_ENV:-TEST}"
 SERVER_REGION="${SERVER_REGION:-IN}"
+SERVICE_TYPE="${SERVICE_TYPE:-API}"
+SERVICE_NAME="${SERVICE_NAME:-giddh-template}"
 
 # ============= Create endpoints.json =============
 sudo tee "${ALLOY_CONF_DIR}/endpoints.json" > /dev/null <<EOF
@@ -20,7 +24,8 @@ sudo tee "${ALLOY_CONF_DIR}/endpoints.json" > /dev/null <<EOF
   "server_region": "${SERVER_REGION}",
   "company": "Walkover",
   "product": "Giddh",
-  "service_name": "giddh-template",
+  "service_name": "${SERVICE_NAME:-giddh-template}",
+  "service_type": "${SERVICE_TYPE:-API}",
   "orgId": "14",
   "logs": {
     "url": "http://loghub.msg91.com:3100/loki/api/v1/push"
@@ -77,6 +82,7 @@ loki.process "log_process" {
       company       = json_path(local.file.endpoints.content, ".company")[0],
       product       = json_path(local.file.endpoints.content, ".product")[0],
       service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
+      service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
       instance      = constants.hostname,
     }
   }
@@ -132,6 +138,7 @@ prometheus.remote_write "metrics_write" {
     company       = json_path(local.file.endpoints.content, ".company")[0],
     product       = json_path(local.file.endpoints.content, ".product")[0],
     service_name  = json_path(local.file.endpoints.content, ".service_name")[0],
+    service_type  = json_path(local.file.endpoints.content, ".service_type")[0],
     instance      = constants.hostname,
   }
 }
