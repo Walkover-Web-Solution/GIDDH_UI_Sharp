@@ -870,7 +870,7 @@
                                                         }
 
 
-                                                        @if (GetDisplayStatus("Tcs") && Model?.TcsTotalTax?.AmountForAccount != null)
+                                                        @if (GetDisplayStatus("Tcs") && decimal.TryParse(Model?.TcsTotalTax?.AmountForAccount, out var tcsAmt) && tcsAmt != 0)
                                                         {
                                                             <tr>
                                                                 @if (GetDisplayStatus("SNo"))
@@ -915,7 +915,7 @@
                                                             </tr>
                                                         }
 
-                                                        @if (GetDisplayStatus("Tds") && Model?.TdsTotalTax?.AmountForAccount != null)
+                                                        @if (GetDisplayStatus("Tds") && decimal.TryParse(Model?.TdsTotalTax?.AmountForAccount, out var tdsAmt) && tdsAmt != 0)
                                                         {
                                                             <tr>
                                                                 @if (GetDisplayStatus("SNo"))
