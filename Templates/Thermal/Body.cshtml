@@ -238,7 +238,7 @@
                                     {
                                         <tr>
                                             <td width="60%">@GetLabel("Discount")</td>
-                                            <td class="text-right p-0" width="40%">@Model?.Entries?.Sum(e => decimal.TryParse(e?.SumOfDiscounts?.AmountForAccount, out var sumOfDiscountsAmountForAccount) ? sumOfDiscountsAmountForAccount : 0)</td>
+                                            <td class="text-right p-0" width="40%">@Model?.Entries?.Sum(e => e?.SumOfDiscounts?.AmountForAccount ?? 0)</td>
                                         </tr>
                                     }
                                     @if (GetDisplayStatus("TaxableAmount"))
