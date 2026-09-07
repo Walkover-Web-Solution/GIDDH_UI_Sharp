@@ -253,8 +253,8 @@ namespace InvoiceData
 
     public class Amount
     {
-        public string? AmountForAccount { get; set; }
-        public string? AmountForCompany { get; set; }
+        public double? AmountForAccount { get; set; }
+        public double? AmountForCompany { get; set; }
     }
 
     public class AmountAsString
