@@ -48,8 +48,6 @@ namespace GiddhTemplate.Services
                 string templateType = GetPropertyValue(request, "templateType")?.ToString()?.ToUpper() ?? "DEFAULT";
                 string templateFolderName = templateType switch
                 {
-                    "TALLY" => "Tally",
-                    "THERMAL" => "Thermal",
                     "TEMPLATE_A" => "other-template/template_a",
                     "TEMPLATE_B" => "other-template/template_b",
                     "TEMPLATE_C" => "other-template/template_c",
@@ -103,6 +101,12 @@ namespace GiddhTemplate.Services
 
                 string templateFile = "Template.cshtml";
                 string templateFilePath = Path.Combine(templatePath, templateFile);
+                if (!GenericRazorTemplateService.IsOtherTemplatePath(templateFilePath))
+                {
+                    throw new InvalidOperationException(
+                        $"Generic PDF only supports templates under Templates/other-template. Received templateType '{templateType}'. Use api/v1/pdf for TemplateA, Tally, and Thermal.");
+                }
+
                 Console.WriteLine($"[GenericPdfService] Starting dynamic PDF template rendering from payload. Template: {templateFilePath}, Payload: {SerializePayloadForLog(request)}");
                 string html = await RenderTemplate(templateFilePath, request);
                 html = await InjectInterFontCssAsync(html);
@@ -304,17 +308,24 @@ namespace GiddhTemplate.Services
         }
 
 
-        private object GetPropertyValue<T>(T obj, string propertyName)
+        private object? GetPropertyValue<T>(T obj, string propertyName)
         {
             if (obj == null) return null;
 
             // Handle JsonElement
             if (obj is JsonElement jsonElement)
             {
-                if (jsonElement.ValueKind == JsonValueKind.Object && jsonElement.TryGetProperty(propertyName, out var value))
+                if (jsonElement.ValueKind == JsonValueKind.Object)
                 {
-                    return value;
+                    foreach (var jsonProperty in jsonElement.EnumerateObject())
+                    {
+                        if (string.Equals(jsonProperty.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return jsonProperty.Value;
+                        }
+                    }
                 }
+
                 return null;
             }
 
@@ -322,18 +333,32 @@ namespace GiddhTemplate.Services
             if (obj is ExpandoObject expandoObj)
             {
                 var dict = (IDictionary<string, object>)expandoObj;
-                return dict.ContainsKey(propertyName) ? dict[propertyName] : null;
+                var match = dict.FirstOrDefault(pair =>
+                    string.Equals(pair.Key, propertyName, StringComparison.OrdinalIgnoreCase));
+
+                return string.IsNullOrEmpty(match.Key) ? null : match.Value;
             }
 
             // Handle Dictionary
             if (obj is IDictionary<string, object> dictObj)
             {
-                return dictObj.ContainsKey(propertyName) ? dictObj[propertyName] : null;
+                var match = dictObj.FirstOrDefault(pair =>
+                    string.Equals(pair.Key, propertyName, StringComparison.OrdinalIgnoreCase));
+
+                return string.IsNullOrEmpty(match.Key) ? null : match.Value;
+            }
+
+            if (obj is IDictionary<string, object?> nullableDictObj)
+            {
+                var match = nullableDictObj.FirstOrDefault(pair =>
+                    string.Equals(pair.Key, propertyName, StringComparison.OrdinalIgnoreCase));
+
+                return string.IsNullOrEmpty(match.Key) ? null : match.Value;
             }
 
             // Handle regular objects via reflection
-            var property = obj.GetType().GetProperty(propertyName, 
-                System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public);
+            var property = obj.GetType().GetProperty(propertyName,
+                System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             return property?.GetValue(obj);
         }
     }
