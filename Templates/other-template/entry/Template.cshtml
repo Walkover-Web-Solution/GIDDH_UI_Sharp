@@ -30,11 +30,11 @@
             int serial = 0;
             if (HasKey(Model, "entries") && Model?.entries != null)
             {
-                foreach (var entry in Model?.entries)
+                foreach (var entry in Items(Model, "entries"))
                 {
                     if (HasKey(entry, "transactions") && entry?.transactions != null)
                     {
-                        foreach (var transaction in entry?.transactions)
+                        foreach (var transaction in Items(entry, "transactions"))
                         {
                             serial++;
                             <tr>
@@ -62,9 +62,9 @@
             <td style="text-align:right; padding:16px 5px 5px;">Sub Total :</td>
             <td style="text-align:right; padding:16px 5px 5px;">@(HasKey(Model, "subTotal") ? Model?.subTotal : "")</td>
         </tr>    
-        @if (HasKey(Model, "taxes") && Model?.taxes != null && Model?.taxes.Count > 0)
+        @if (HasKey(Model, "taxes") && Model?.taxes != null && CountOf(Model, "taxes") > 0)
         {
-            @foreach (var tax in Model?.taxes)
+            @foreach (var tax in Items(Model, "taxes"))
             {
                 <tr>
                     <td style="text-align:right; padding:5px;">&nbsp;</td>

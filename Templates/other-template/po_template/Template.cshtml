@@ -67,7 +67,7 @@
                     <td colspan="3">
                         @if (HasKey(Model, "supplierAddress") && Model?.supplierAddress != null)
                         {
-                            @foreach (var addr in Model?.supplierAddress)
+                            @foreach (var addr in Items(Model, "supplierAddress"))
                             {
                                 <div>@addr</div>
                             }
@@ -102,7 +102,7 @@
                 }
                 @if (HasKey(Model, "items") && Model?.items != null)
                 {
-                    @foreach (var item in Model?.items)
+                    @foreach (var item in Items(Model, "items"))
                     {
                         serial++;
                         <tr>

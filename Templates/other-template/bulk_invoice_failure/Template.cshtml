@@ -101,7 +101,7 @@
 <body>
 <div class="failure-table-wrapper">
 <p>
-Below is the list of failure invoices(@(HasKey(Model, "invoices") ? Model?.invoices?.Count : 0)) with reason:
+Below is the list of failure invoices(@(HasKey(Model, "invoices") ? CountOf(Model, "invoices") : 0)) with reason:
 </p>
 <table>
 <thead>
@@ -113,7 +113,7 @@ Below is the list of failure invoices(@(HasKey(Model, "invoices") ? Model?.invoi
 <tbody>
     @if (HasKey(Model, "invoices") && Model?.invoices != null)
     {
-        @foreach (var invoice in Model?.invoices)
+        @foreach (var invoice in Items(Model, "invoices"))
         {
             <tr>
                 <td>@(HasKey(invoice, "invoiceNumber") ? invoice?.invoiceNumber : "")</td>

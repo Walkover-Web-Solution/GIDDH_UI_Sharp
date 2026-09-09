@@ -62,7 +62,7 @@
 
             @if (HasKey(Model, "transactions") && Model?.transactions != null)
             {
-                @foreach (var transaction in Model?.transactions)
+                @foreach (var transaction in Items(Model, "transactions"))
                 {
                     <tr>
                         <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:12%;">@(HasKey(transaction, "date") ? transaction?.date : "")</td>

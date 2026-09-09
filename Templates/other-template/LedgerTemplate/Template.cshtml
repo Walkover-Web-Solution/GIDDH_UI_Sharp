@@ -48,7 +48,7 @@
         <tbody>
             @if (HasKey(Model, "entries") && Model?.entries != null)
             {
-                @foreach (var entry in Model?.entries)
+                @foreach (var entry in Items(Model, "entries"))
                 {
                     <tr>
                         <td>@(HasKey(entry, "date") ? entry?.date : "")</td>
