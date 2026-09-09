@@ -65,13 +65,13 @@ namespace GiddhTemplate.Services.GenericTemplate
 
             if (binder.Operation == ExpressionType.Equal)
             {
-                result = arg is null or MissingKeyProxy;
+                result = EqualsMissingValue(arg);
                 return true;
             }
 
             if (binder.Operation == ExpressionType.NotEqual)
             {
-                result = arg is not null and not MissingKeyProxy;
+                result = !EqualsMissingValue(arg);
                 return true;
             }
 
@@ -94,6 +94,48 @@ namespace GiddhTemplate.Services.GenericTemplate
         public IEnumerator GetEnumerator() => Array.Empty<object>().GetEnumerator();
 
         public override string ToString() => string.Empty;
-    }
 
+        public override bool Equals(object? obj) => EqualsMissingValue(obj);
+
+        public override int GetHashCode() => 0;
+
+        public static bool operator ==(MissingKeyProxy? left, MissingKeyProxy? right) => true;
+
+        public static bool operator !=(MissingKeyProxy? left, MissingKeyProxy? right) => false;
+
+        public static bool operator ==(MissingKeyProxy? left, string? right) =>
+            string.IsNullOrEmpty(right);
+
+        public static bool operator !=(MissingKeyProxy? left, string? right) =>
+            !string.IsNullOrEmpty(right);
+
+        public static bool operator ==(string? left, MissingKeyProxy? right) =>
+            string.IsNullOrEmpty(left);
+
+        public static bool operator !=(string? left, MissingKeyProxy? right) =>
+            !string.IsNullOrEmpty(left);
+
+        public static bool operator ==(MissingKeyProxy? left, object? right) =>
+            EqualsMissingValue(right);
+
+        public static bool operator !=(MissingKeyProxy? left, object? right) =>
+            !EqualsMissingValue(right);
+
+        public static bool operator ==(object? left, MissingKeyProxy? right) =>
+            EqualsMissingValue(left);
+
+        public static bool operator !=(object? left, MissingKeyProxy? right) =>
+            !EqualsMissingValue(left);
+
+        private static bool EqualsMissingValue(object? value)
+        {
+            return value switch
+            {
+                null or MissingKeyProxy => true,
+                string text => string.IsNullOrEmpty(text),
+                IEnumerable enumerable => !enumerable.Cast<object?>().Any(),
+                _ => false
+            };
+        }
+    }
 }

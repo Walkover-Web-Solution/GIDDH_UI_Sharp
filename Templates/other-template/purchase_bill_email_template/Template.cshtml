@@ -164,7 +164,7 @@
                                                     {
                                                         <span style="display:block;">@entry?.accountName</span>
                                                     }
-                                                    @if (HasKey(entry, "description") && !string.IsNullOrEmpty(entry?.description?.ToString()) && entry?.description != entry?.stock?.name && entry?.description != entry?.accountName)
+                                                    @if (HasKey(entry, "description") && ShouldShowDescription(entry?.description, entry?.stock?.name, entry?.accountName))
                                                     {
                                                         <span style="display:block; padding: 2px 0;">@entry?.description</span>
                                                     }

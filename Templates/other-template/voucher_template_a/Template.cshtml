@@ -167,12 +167,13 @@
                     <th class="text-left">Description</th>
                     @{
                         bool hasQuantity = false;
-                        if (Model?.entries != null && Model.entries.Count > 0)
+                        var entryList = AsList(Get(Model, "entries")).Cast<object?>().ToList();
+                        if (entryList.Count > 0)
                         {
-                            var firstEntry = Model.entries[0];
-                            if (firstEntry?.transactions != null && firstEntry.transactions.Count > 0)
+                            var txList = AsList(Get(entryList[0], "transactions")).Cast<object?>().ToList();
+                            if (txList.Count > 0 && HasKey(txList[0], "quantity"))
                             {
-                                hasQuantity = firstEntry.transactions[0]?.quantity != null;
+                                hasQuantity = IsNotEmpty(Get(txList[0], "quantity"));
                             }
                         }
                     }
@@ -220,7 +221,7 @@
                                     }
                                     <td>@(HasKey(transaction, "amount") ? transaction?.amount : "")</td>
                                 </tr>
-                                @if (HasKey(transaction, "description") && !string.IsNullOrEmpty(transaction?.description?.ToString()) && transaction?.description != transaction?.stockDetails?.name && transaction?.description != transaction?.accountName)
+                                @if (HasKey(transaction, "description") && ShouldShowDescription(transaction?.description, transaction?.stockDetails?.name, transaction?.accountName))
                                 {
                                     <tr>
                                         <td class="text-left"></td>
