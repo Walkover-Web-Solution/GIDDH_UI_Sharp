@@ -190,7 +190,34 @@ namespace GiddhTemplate.Services
                 throw new FileNotFoundException($"Template file not found: {templatePath}");
             }
 
-            return await _razorTemplateService.RenderTemplateAsync(templatePath, data);
+            try
+            {
+                return await _razorTemplateService.RenderTemplateAsync(templatePath, data);
+            }
+            catch (Exception ex)
+            {
+                // A render failure must never block the document: emit a minimal page so the
+                // caller still receives a PDF, and log the cause for follow up.
+                Console.WriteLine($"[GenericPdfService] Template rendering failed for {templatePath}: {ex.GetType().Name} - {ex.Message}");
+                Console.WriteLine($"[GenericPdfService] Stack trace: {ex.StackTrace}");
+
+                return BuildFallbackHtml(templatePath);
+            }
+        }
+
+        private static string BuildFallbackHtml(string templatePath)
+        {
+            var templateName = System.Net.WebUtility.HtmlEncode(
+                Path.GetFileName(Path.GetDirectoryName(templatePath)) ?? "document");
+
+            return "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Document</title>"
+                + "<style>body{font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:24px;color:#262626;}"
+                + "h1{font-size:16px;margin:0 0 12px;}p{margin:0 0 8px;}</style></head><body>"
+                + "<h1>Document could not be rendered completely</h1>"
+                + "<p>Some of the data required by this document was missing or in an unexpected format.</p>"
+                + $"<p>Template: {templateName}</p>"
+                + $"<p>Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</p>"
+                + "</body></html>";
         }
 
         private async Task<string> CreatePdfDocumentAsync(string header, string body, string footer, string commonStyles, string headerStyles, string footerStyles, string bodyStyles, dynamic data, string backgroundStyles)

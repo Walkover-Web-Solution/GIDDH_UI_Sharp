@@ -114,7 +114,7 @@
                             <p style="font-weight:bold;">@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</p>
                             @if (HasKey(Model?.company, "data") && Model?.company?.data != null)
                             {
-                                @foreach (var companyData in Model?.company?.data)
+                                @foreach (var companyData in Items(Model, "company.data"))
                                 {
                                     @if (!string.IsNullOrEmpty(companyData?.ToString()))
                                     {
@@ -135,7 +135,7 @@
                             }
                             @if (HasKey(Model?.account, "data") && Model?.account?.data != null)
                             {
-                                @foreach (var accountData in Model?.account?.data)
+                                @foreach (var accountData in Items(Model, "account.data"))
                                 {
                                     @if (!string.IsNullOrEmpty(accountData?.ToString()))
                                     {
@@ -168,11 +168,11 @@
                             <th style="border-bottom: 1px solid #e0e0e0;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;padding:8px 5px; text-align: left;width:75%">Taxable Value(&#8377;)</th>
                             @if (HasKey(Model, "entriesGST") && Model?.entriesGST != null)
                             {
-                                @foreach (var entry in Model?.entriesGST)
+                                @foreach (var entry in Items(Model, "entriesGST"))
                                 {
                                     @if (HasKey(entry, "taxes") && entry?.taxes != null)
                                     {
-                                        @foreach (var tax in entry?.taxes)
+                                        @foreach (var tax in Items(entry, "taxes"))
                                         {
                                             <th style="border-bottom: 1px solid #e0e0e0;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;padding:8px 5px; text-align: left;width:75%">@(HasKey(tax, "accountName") ? tax?.accountName : "")</th>
                                         }
@@ -187,11 +187,11 @@
                         }
                         @if (HasKey(Model, "entriesGST") && Model?.entriesGST != null)
                         {
-                            @foreach (var entry in Model?.entriesGST)
+                            @foreach (var entry in Items(Model, "entriesGST"))
                             {
                                 @if (HasKey(entry, "transactions") && entry?.transactions != null)
                                 {
-                                    @foreach (var transaction in entry?.transactions)
+                                    @foreach (var transaction in Items(entry, "transactions"))
                                     {
                                         serial++;
                                         <tr>
@@ -203,7 +203,7 @@
                                             <td style="border-left:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; padding:8px 5px;">@(HasKey(entry, "taxableValue") ? entry?.taxableValue : "")</td>
                                             @if (HasKey(entry, "taxes") && entry?.taxes != null)
                                             {
-                                                @foreach (var tax in entry?.taxes)
+                                                @foreach (var tax in Items(entry, "taxes"))
                                                 {
                                                     <td style="border-left:1px solid #e0e0e0; padding:8px 5px; border-bottom:1px solid #e0e0e0;">@(HasKey(tax, "amount") ? tax?.amount : "") @@ @(HasKey(tax, "rate") ? tax?.rate : "")</td>
                                                 }
@@ -232,7 +232,7 @@
                         </tr>
                         @if (HasKey(Model, "taxes") && Model?.taxes != null)
                         {
-                            @foreach (var tax in Model?.taxes)
+                            @foreach (var tax in Items(Model, "taxes"))
                             {
                                 <tr>
                                     <td style="text-align:right; padding:5px;"></td>
@@ -243,7 +243,7 @@
                         }
                         @if (HasKey(Model, "commonDiscountEntries") && Model?.commonDiscountEntries != null)
                         {
-                            @foreach (var commonDiscountEntry in Model?.commonDiscountEntries)
+                            @foreach (var commonDiscountEntry in Items(Model, "commonDiscountEntries"))
                             {
                                 <tr>
                                     <td style="text-align:right; padding:5px;"></td>
@@ -286,7 +286,7 @@
                     <td style="width: 50%">
                         @if (HasKey(Model?.companyIdentities, "data") && !string.IsNullOrEmpty(Model?.companyIdentities?.data?.ToString()))
                         {
-                            @foreach (var identity in Model?.companyIdentities?.data?.ToString().Split(","))
+                            @foreach (var identity in Split(Model, "companyIdentities.data"))
                             {
                                 @if (!string.IsNullOrEmpty(identity))
                                 {
@@ -316,12 +316,12 @@
             <div style="height:10px; width:100%"></div>
         </div>
 
-        @if (HasKey(Model, "terms") && Model?.terms != null && Model?.terms.Count > 0)
+        @if (HasKey(Model, "terms") && Model?.terms != null && CountOf(Model, "terms") > 0)
         {
             <div id="terms" style="padding:10px 0; overflow:hidden">
                 <div id="tc" style="width:100%">
                     <p style="font-weight:bold;">Terms and Conditions:</p>
-                    @foreach (var term in Model?.terms)
+                    @foreach (var term in Items(Model, "terms"))
                     {
                         @if (!string.IsNullOrEmpty(term?.ToString()))
                         {

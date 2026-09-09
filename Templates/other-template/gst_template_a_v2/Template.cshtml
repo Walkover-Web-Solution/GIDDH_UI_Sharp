@@ -403,7 +403,7 @@
       }
       @if (HasKey(Model, "entries") && Model?.entries != null)
       {
-         @foreach (var entryss in Model?.entries)
+         @foreach (var entryss in Items(Model, "entries"))
          {
             tableCount++;
             <div id="content_wrap" class="height-100">
@@ -529,7 +529,7 @@
                                     }
                                     @if (HasKey(Model, "billingAddress") && Model?.billingAddress != null)
                                     {
-                                       @foreach (var address in Model?.billingAddress)
+                                       @foreach (var address in Items(Model, "billingAddress"))
                                        {
                                           @if (!string.IsNullOrEmpty(address?.ToString()))
                                           {
@@ -555,7 +555,7 @@
                                     }
                                     @if (HasKey(Model, "shippingAddress") && Model?.shippingAddress != null)
                                     {
-                                       @foreach (var address in Model?.shippingAddress)
+                                       @foreach (var address in Items(Model, "shippingAddress"))
                                        {
                                           @if (!string.IsNullOrEmpty(address?.ToString()))
                                           {
@@ -654,66 +654,61 @@
                   <table class="item" cellpadding="0" cellspacing="0">
                      <thead>
                         <tr class="font-normal">
-                           @if (HasKey(Model?.label, "sNo") && !string.IsNullOrEmpty(Model?.label?.sNo?.ToString()))
+                           @if (ShowCol(Model, "sNo"))
                            {
                               colspancount++;
-                              <th class="text-left">@Model?.label?.sNo</th>
+                              <th class="text-left">@ColLbl(Model, "sNo", "S No.")</th>
                            }
-                           else
+                           @if (ShowCol(Model, "date"))
                            {
                               colspancount++;
-                              <th class="text-left">S No.</th>
+                              <th class="text-left">@ColLbl(Model, "date", "Date")</th>
                            }
-                           @if (HasKey(Model?.label, "date") && !string.IsNullOrEmpty(Model?.label?.date?.ToString()))
+                           @if (ShowCol(Model, "item"))
                            {
                               colspancount++;
-                              <th class="text-left">@Model?.label?.date</th>
+                              <th class="text-left">@ColLbl(Model, "item", "Item")</th>
                            }
-                           @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                           @if (ShowCol(Model, "hsnSac"))
                            {
                               colspancount++;
-                              <th class="text-left">@Model?.label?.item</th>
+                              <th class="text-right">@ColLbl(Model, "hsnSac", "HSN/SAC")</th>
                            }
-                           @if (HasKey(Model?.label, "hsnSac") && !string.IsNullOrEmpty(Model?.label?.hsnSac?.ToString()))
+                           @if (ShowCol(Model, "quantity"))
                            {
                               colspancount++;
-                              <th class="text-right">@Model?.label?.hsnSac</th>
+                              <th class="text-right">@ColLbl(Model, "quantity", "Qty")</th>
                            }
-                           @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                           @if (ShowCol(Model, "rate"))
                            {
                               colspancount++;
-                              <th class="text-right">@Model?.label?.quantity</th>
+                              <th class="text-right">@ColLbl(Model, "rate", "Rate")</th>
                            }
-                           @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                           @if (ShowCol(Model, "discount"))
                            {
                               colspancount++;
-                              <th class="text-right">@Model?.label?.rate</th>
+                              <th class="text-right">@ColLbl(Model, "discount", "Discount")</th>
                            }
-                           @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
+                           @if (ShowCol(Model, "taxableValue"))
                            {
                               colspancount++;
-                              <th class="text-right">@Model?.label?.discount</th>
+                              <th class="text-right">@ColLbl(Model, "taxableValue", "Taxable")</th>
                            }
-                           @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()))
-                           {
-                              colspancount++;
-                              <th class="text-right">@Model?.label?.taxableValue</th>
-                           }
-                           @if (HasKey(Model?.label, "taxes") && !string.IsNullOrEmpty(Model?.label?.taxes?.ToString()))
+                           @if (ShowCol(Model, "taxes"))
                            {
                               @if (HasKey(Model, "gstTaxesTotal") && Model?.gstTaxesTotal != null)
                               {
-                                 @foreach (var tax in Model?.gstTaxesTotal)
+                                 @foreach (var tax in Items(Model, "gstTaxesTotal"))
                                  {
                                     colspancount++;
                                     <th class="text-right" style="text-transform: uppercase;">@(HasKey(tax, "name") ? tax?.name : "")</th>
                                  }
                               }
                            }
-                           @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                           @if (ShowCol(Model, "total"))
                            {
                               colspancount++;
-                              <th colspan="2" class="text-right">@Model?.label?.total</th>
+                              <th colspan="2" class="text-right">@ColLbl(Model, "total", "Total")</th>
                            }
                         </tr>
                      </thead>
@@ -727,26 +722,26 @@
                         }
                         @if (entryss != null)
                         {
-                           @foreach (var entry in entryss)
+                           @foreach (var entry in Items(entryss))
                            {
                               @if (HasKey(entry, "transactions") && entry?.transactions != null)
                               {
-                                 @foreach (var tr in entry?.transactions)
+                                 @foreach (var tr in Items(entry, "transactions"))
                                  {
                                     serial++;
                                     decimal distTotal = 0;
                                     string category = "other";
                                     decimal txTotal = 0;
                                     <tr>
-                                       @if (HasKey(Model?.label, "sNo") && !string.IsNullOrEmpty(Model?.label?.sNo?.ToString()))
+                                       @if (ShowCol(Model, "sNo"))
                                        {
                                           <td class="text-left">@serial</td>
                                        }
-                                       @if (HasKey(Model?.label, "date") && !string.IsNullOrEmpty(Model?.label?.date?.ToString()))
+                                       @if (ShowCol(Model, "date"))
                                        {
                                           <td class="text-left">@(HasKey(entry, "entryDate") ? entry?.entryDate : "")</td>
                                        }
-                                       @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                                       @if (ShowCol(Model, "item"))
                                        {
                                           <td class="text-left" style="max-width:150px;">
                                              @if (HasKey(tr?.stockDetails, "name") && !string.IsNullOrEmpty(tr?.stockDetails?.name?.ToString()))
@@ -763,7 +758,7 @@
                                              }
                                           </td>
                                        }
-                                       @if (HasKey(Model?.label, "hsnSac") && !string.IsNullOrEmpty(Model?.label?.hsnSac?.ToString()))
+                                       @if (ShowCol(Model, "hsnSac"))
                                        {
                                           @if (HasKey(tr, "hsnNumber") && !string.IsNullOrEmpty(tr?.hsnNumber?.ToString()) && HasKey(tr, "sacNumber") && !string.IsNullOrEmpty(tr?.sacNumber?.ToString()))
                                           {
@@ -796,26 +791,26 @@
                                              <td></td>
                                           }
                                        }
-                                       @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                                       @if (ShowCol(Model, "quantity"))
                                        {
                                           <td class="text-right">@if (HasKey(tr, "quantity") && tr?.quantity != null) { @tr?.quantity @(HasKey(tr, "stockUnit") ? tr?.stockUnit : "") }</td>
                                        }
-                                       @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                                       @if (ShowCol(Model, "rate"))
                                        {
                                           <td class="text-right">@if (HasKey(tr, "rate") && tr?.rate != null) { @tr?.rate }</td>
                                        }
-                                       @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()) && (HasKey(entry, "discounts") && (entry?.discounts == null || entry?.discounts.Count < 1)))
+                                       @if (ShowCol(Model, "discount") && (HasKey(entry, "discounts") && (entry?.discounts == null || CountOf(entry, "discounts") < 1)))
                                        {
                                           <td class="text-right"></td>
                                        }
                                        @if (HasKey(entry, "discounts") && entry?.discounts != null)
                                        {
-                                          @foreach (var discount in entry?.discounts)
+                                          @foreach (var discount in Items(entry, "discounts"))
                                           {
-                                             @if (HasKey(tr, "category") && tr?.category != category)
+                                             @if ((!HasKey(tr, "category") || tr?.category != category))
                                              {
-                                                <td class="text-right">@((decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0) * -1)</td>
-                                                distTotal = distTotal + (decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0);
+                                                <td class="text-right">@(Dec(discount, "amount") * -1)</td>
+                                                distTotal = distTotal + Dec(discount, "amount");
                                              }
                                              else
                                              {
@@ -823,40 +818,40 @@
                                              }
                                           }
                                        }
-                                       @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()))
+                                       @if (ShowCol(Model, "taxableValue"))
                                        {
-                                          @if (HasKey(tr, "category") && tr?.category != category)
+                                          @if ((!HasKey(tr, "category") || tr?.category != category))
                                           {
-                                             <td class="text-right">@((HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) - distTotal)</td>
+                                             <td class="text-right">@(Dec(tr, "amount") - distTotal)</td>
                                           }
                                           else
                                           {
                                              <td></td>
                                           }
                                        }
-                                       @if (HasKey(Model?.label, "taxes") && !string.IsNullOrEmpty(Model?.label?.taxes?.ToString()))
+                                       @if (ShowCol(Model, "taxes"))
                                        {
                                           @if (HasKey(Model, "gstTaxesTotal") && Model?.gstTaxesTotal != null)
                                           {
-                                             @foreach (var taxWithTotal in Model?.gstTaxesTotal)
+                                             @foreach (var taxWithTotal in Items(Model, "gstTaxesTotal"))
                                              {
                                                 int foundTax = 0;
                                                 decimal tempTax = 0;
                                                 decimal taxRate = 0;
                                                 if (HasKey(entry, "taxes") && entry?.taxes != null)
                                                 {
-                                                   foreach (var tax in entry?.taxes)
+                                                   foreach (var tax in Items(entry, "taxes"))
                                                    {
                                                       if (HasKey(taxWithTotal, "uniqueName") && HasKey(tax, "accountUniqueName") && taxWithTotal?.uniqueName == tax?.accountUniqueName)
                                                       {
                                                          foundTax = 1;
-                                                         tempTax = (decimal)(HasKey(tax, "amount") ? tax?.amount ?? 0 : 0);
-                                                         taxRate = (decimal)(HasKey(tax, "rate") ? tax?.rate ?? 0 : 0);
+                                                         tempTax = Dec(tax, "amount");
+                                                         taxRate = Dec(tax, "rate");
                                                          txTotal = txTotal + tempTax;
                                                       }
                                                    }
                                                 }
-                                                @if (foundTax == 1 && HasKey(tr, "category") && tr?.category != category)
+                                                @if (foundTax == 1 && (!HasKey(tr, "category") || tr?.category != category))
                                                 {
                                                    <td class="text-right">
                                                       @tempTax
@@ -871,11 +866,11 @@
                                              }
                                           }
                                        }
-                                       @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                                       @if (ShowCol(Model, "total"))
                                        {
-                                          @if (HasKey(tr, "category") && tr?.category != category)
+                                          @if ((!HasKey(tr, "category") || tr?.category != category))
                                           {
-                                             txTotal = (HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) + txTotal - distTotal;
+                                             txTotal = Dec(tr, "amount") + txTotal - distTotal;
                                              <td colspan="2" class="text-right">@txTotal</td>
                                           }
                                           else
@@ -889,53 +884,53 @@
                            }
                         }
                      </tbody>
-                     @if (tableCount == (Model?.entries?.Count ?? 0))
+                     @if (tableCount == CountOf(Model, "entries"))
                      {
                         <tfoot>
                            <tr class="font-normal">
-                              @if (HasKey(Model?.label, "sNo") && !string.IsNullOrEmpty(Model?.label?.sNo?.ToString()))
+                              @if (ShowCol(Model, "sNo"))
                               {
                                  <th class="text-left" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "date") && !string.IsNullOrEmpty(Model?.label?.date?.ToString()))
+                              @if (ShowCol(Model, "date"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                              @if (ShowCol(Model, "item"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "hsnSac") && !string.IsNullOrEmpty(Model?.label?.hsnSac?.ToString()))
+                              @if (ShowCol(Model, "hsnSac"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                              @if (ShowCol(Model, "quantity"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                              @if (ShowCol(Model, "rate"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
+                              @if (ShowCol(Model, "discount"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()))
+                              @if (ShowCol(Model, "taxableValue"))
                               {
                                  <th class="text-right">@(HasKey(Model, "taxableTotal") ? Model?.taxableTotal : "")</th>
                               }
-                              @if (HasKey(Model?.label, "taxes") && !string.IsNullOrEmpty(Model?.label?.taxes?.ToString()))
+                              @if (ShowCol(Model, "taxes"))
                               {
                                  @if (HasKey(Model, "gstTaxesTotal") && Model?.gstTaxesTotal != null)
                                  {
-                                    @foreach (var taxWithTotal in Model?.gstTaxesTotal)
+                                    @foreach (var taxWithTotal in Items(Model, "gstTaxesTotal"))
                                     {
                                        <th class="text-right">@(HasKey(taxWithTotal, "total") ? taxWithTotal?.total : "")</th>
                                     }
                                  }
                               }
-                              @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                              @if (ShowCol(Model, "total"))
                               {
                                  <th class="text-right" colspan="2">@(HasKey(Model, "gstEntriesTotal") ? Model?.gstEntriesTotal : "")</th>
                               }
@@ -946,49 +941,49 @@
                      {
                         <tfoot>
                            <tr>
-                              @if (HasKey(Model?.label, "sNo") && !string.IsNullOrEmpty(Model?.label?.sNo?.ToString()))
+                              @if (ShowCol(Model, "sNo"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "date") && !string.IsNullOrEmpty(Model?.label?.date?.ToString()))
+                              @if (ShowCol(Model, "date"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "item") && !string.IsNullOrEmpty(Model?.label?.item?.ToString()))
+                              @if (ShowCol(Model, "item"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "hsnSac") && !string.IsNullOrEmpty(Model?.label?.hsnSac?.ToString()))
+                              @if (ShowCol(Model, "hsnSac"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "quantity") && !string.IsNullOrEmpty(Model?.label?.quantity?.ToString()))
+                              @if (ShowCol(Model, "quantity"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "rate") && !string.IsNullOrEmpty(Model?.label?.rate?.ToString()))
+                              @if (ShowCol(Model, "rate"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
+                              @if (ShowCol(Model, "discount"))
                               {
                                  <th class="text-right" style="white-space: normal !important;"></th>
                               }
-                              @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()))
+                              @if (ShowCol(Model, "taxableValue"))
                               {
                                  <th class="text-right"></th>
                               }
-                              @if (HasKey(Model?.label, "taxes") && !string.IsNullOrEmpty(Model?.label?.taxes?.ToString()))
+                              @if (ShowCol(Model, "taxes"))
                               {
                                  @if (HasKey(Model, "gstTaxesTotal") && Model?.gstTaxesTotal != null)
                                  {
-                                    @foreach (var taxWithTotal in Model?.gstTaxesTotal)
+                                    @foreach (var taxWithTotal in Items(Model, "gstTaxesTotal"))
                                     {
                                        <th class="text-right"></th>
                                     }
                                  }
                               }
-                              @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
+                              @if (ShowCol(Model, "total"))
                               {
                                  <th class="text-right" colspan="2"></th>
                               }
@@ -996,7 +991,7 @@
                         </tfoot>
                      }
                   </table>
-                  @if (tableCount != (Model?.entries?.Count ?? 0))
+                  @if (tableCount != CountOf(Model, "entries"))
                   {
                      <div style="float:right; margin:20px; font-size: 14px; ">
                         <strong>Continued...</strong>
@@ -1004,7 +999,7 @@
                   }
                </article>
             </div>
-            @if (tableCount == (Model?.entries?.Count ?? 0))
+            @if (tableCount == CountOf(Model, "entries"))
             {
                <div style="width: 100%; display: block; float: none; overflow: hidden;">
                   <table class="balance" style="">
@@ -1032,7 +1027,7 @@
                      }
                      @if (HasKey(Model, "commonDiscountEntries") && Model?.commonDiscountEntries != null)
                      {
-                        @foreach (var commonDiscountEntry in Model?.commonDiscountEntries)
+                        @foreach (var commonDiscountEntry in Items(Model, "commonDiscountEntries"))
                         {
                            <tr>
                               <th>
@@ -1073,7 +1068,7 @@
                            </td>
                         </tr>
                      }
-                     @if (HasKey(Model, "paidAmount") && (Model?.paidAmount ?? 0) > 0)
+                     @if (HasKey(Model, "paidAmount") && Dec(Model, "paidAmount") > 0)
                      {
                         <tr>
                            <th>
@@ -1122,7 +1117,7 @@
                   <tbody>
                      <tr>
                         <td style="text-align:left; padding-left: 15px; width: 37%;">
-                           @if (tableCount == (Model?.entries?.Count ?? 0))
+                           @if (tableCount == CountOf(Model, "entries"))
                            {
                               <div>
                                  @if (HasKey(Model, "message1") && !string.IsNullOrEmpty(Model?.message1?.ToString()))
@@ -1186,7 +1181,7 @@
                   <p class="font-10">
                      @if (HasKey(Model, "companyAddress") && Model?.companyAddress != null)
                      {
-                        @foreach (var address in Model?.companyAddress)
+                        @foreach (var address in Items(Model, "companyAddress"))
                         {
                            @if (!string.IsNullOrEmpty(address?.ToString()))
                            {
@@ -1197,7 +1192,7 @@
                   </p>
                </footer>
             </div>
-            @if (tableCount != (Model?.entries?.Count ?? 0))
+            @if (tableCount != CountOf(Model, "entries"))
             {
                <div class="page"></div>
             }

@@ -11,8 +11,14 @@
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
     <RazorCompileOnBuild>true</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
     <NoWarn>$(NoWarn);CS8602;CS8604;CS8600;CS8601;CS8618</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="GiddhTemplate.Tests/**" />
+    <Content Remove="GiddhTemplate.Tests/**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
@@ -36,6 +42,12 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.8.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.8.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.8.0-beta.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Runtime RazorLight templates — do not compile them as MVC views. -->
+    <RazorCompile Remove="Templates/**/*.cshtml" />
+    <RazorGenerate Remove="Templates/**/*.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
