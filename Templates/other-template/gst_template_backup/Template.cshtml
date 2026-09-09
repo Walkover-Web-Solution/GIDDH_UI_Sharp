@@ -286,7 +286,7 @@
                     <td style="width: 50%">
                         @if (HasKey(Model?.companyIdentities, "data") && !string.IsNullOrEmpty(Model?.companyIdentities?.data?.ToString()))
                         {
-                            @foreach (var identity in Model?.companyIdentities?.data?.ToString().Split(","))
+                            @foreach (var identity in AsString(Get(Model?.companyIdentities, "data")).Split(',', StringSplitOptions.RemoveEmptyEntries))
                             {
                                 @if (!string.IsNullOrEmpty(identity))
                                 {
