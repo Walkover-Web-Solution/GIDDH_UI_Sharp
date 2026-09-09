@@ -1,11 +1,21 @@
 using RazorLight;
-using System.Text.Json;
 
 namespace GiddhTemplate.Services
 {
     public class GenericRazorTemplateService
     {
         private readonly RazorLightEngine _engine;
+
+        // Imported into every generic template so a template can use the safe helpers
+        // (Has / Get / Str / Dec / Int / Bool / Items ...) without declaring anything itself.
+        private static readonly string[] TemplateUsings =
+        {
+            "@using System",
+            "@using System.Linq",
+            "@using System.Collections.Generic",
+            "@using GiddhTemplate.Services",
+            "@using static GiddhTemplate.Services.TemplateHelpers"
+        };
 
         public GenericRazorTemplateService()
         {
@@ -15,6 +25,8 @@ namespace GiddhTemplate.Services
                 .UseMemoryCachingProvider()
                 .Build();
         }
+
+        private const string CacheVersion = "safe-v2";
 
         public async Task<string> RenderTemplateAsync<T>(string templatePath, T model)
         {
@@ -27,17 +39,14 @@ namespace GiddhTemplate.Services
 
             try
             {
-                // For JsonElement, convert to a dynamic-compatible object
-                object modelToRender = model;
-                if (model is JsonElement jsonElement)
-                {
-                    modelToRender = ConvertJsonElementToDynamic(jsonElement);
-                }
+                // Payloads are schema-less: render against a model where a missing key or an
+                // unexpected type resolves to a neutral value instead of throwing.
+                object safeModel = SafePayload.From(model);
 
                 return await _engine.CompileRenderStringAsync(
-                    templatePath,
-                    templateContent,
-                    modelToRender
+                    $"{templatePath}::{CacheVersion}",
+                    AddTemplateUsings(templateContent),
+                    safeModel
                 );
             }
             catch (Exception ex)
@@ -47,40 +56,15 @@ namespace GiddhTemplate.Services
             }
         }
 
-        private dynamic ConvertJsonElementToDynamic(JsonElement element)
+        private static string AddTemplateUsings(string templateContent)
         {
-            return element.ValueKind switch
-            {
-                JsonValueKind.Object => ConvertJsonElementToExpandoObject(element),
-                JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonElementToDynamic).ToList(),
-                JsonValueKind.String => element.GetString(),
-                JsonValueKind.Number => element.TryGetInt32(out var intVal) ? intVal : element.GetDouble(),
-                JsonValueKind.True => true,
-                JsonValueKind.False => false,
-                JsonValueKind.Null => null,
-                _ => element.GetRawText()
-            };
-        }
+            var preamble = string.Join(
+                Environment.NewLine,
+                TemplateUsings.Where(directive => !templateContent.Contains(directive, StringComparison.Ordinal)));
 
-        private dynamic ConvertJsonElementToExpandoObject(JsonElement element)
-        {
-            var expando = new System.Dynamic.ExpandoObject();
-            var dict = (IDictionary<string, object>)expando;
-
-            if (element.ValueKind == JsonValueKind.Object)
-            {
-                foreach (var property in element.EnumerateObject())
-                {
-                    // Recursively convert nested objects to ExpandoObject
-                    object value = property.Value.ValueKind == JsonValueKind.Object
-                        ? ConvertJsonElementToExpandoObject(property.Value)
-                        : ConvertJsonElementToDynamic(property.Value);
-                    
-                    dict[property.Name] = value;
-                }
-            }
-
-            return expando;
+            return string.IsNullOrEmpty(preamble)
+                ? templateContent
+                : $"{preamble}{Environment.NewLine}{templateContent}";
         }
     }
 }

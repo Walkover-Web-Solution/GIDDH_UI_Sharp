@@ -173,7 +173,7 @@
                         <p><b>Billing Address</b></p>
                         @if (HasKey(Model, "customerBillingAddress"))
                         {
-                            @foreach (var bAddress in Model?.customerBillingAddress)
+                            @foreach (var bAddress in Items(Model, "customerBillingAddress"))
                             {
                                 <p>@bAddress</p>
                             }
@@ -192,9 +192,9 @@
 
                     <td style="vertical-align: top;">
                         <p><b>Shipping Address</b></p>
-                        @if (HasKey(Model, "customerShippingAddress") && Model?.customerShippingAddress?.Count > 0)
+                        @if (HasKey(Model, "customerShippingAddress") && CountOf(Model, "customerShippingAddress") > 0)
                         {
-                            @foreach (var sAddress in Model?.customerShippingAddress)
+                            @foreach (var sAddress in Items(Model, "customerShippingAddress"))
                             {
                                 <p>@sAddress</p>
                             }
@@ -221,7 +221,7 @@
         int tableCount = 0;
         if (HasKey(Model, "gstEntries") && Model?.gstEntries != null)
         {
-            foreach (var entryss in Model?.gstEntries)
+            foreach (var entryss in Items(Model, "gstEntries"))
             {
                 tableCount++;
     }
@@ -231,7 +231,7 @@
     @if (HasKey(Model, "gstEntries") && Model?.gstEntries != null)
     {
         int tableCountLoop = 0;
-        @foreach (var entryss in Model.gstEntries)
+        @foreach (var entryss in Items(Model, "gstEntries"))
         {
             tableCountLoop++;
             <div class="entryDiv" style="width:100% !important;" >
@@ -273,7 +273,7 @@
                             <th>Taxable <br />Value (Rs)</th>
                             @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
                             {
-                                @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                @foreach (var taxWithTotal in Items(Model, "taxesWithTotal"))
                                 {
                                     <th>@(HasKey(taxWithTotal, "name") ? taxWithTotal?.name : "")</th>
                                 }
@@ -285,11 +285,11 @@
                     <tbody>
                         @if (entryss != null)
                         {
-                            @foreach (var entry in entryss)
+                            @foreach (var entry in Items(entryss))
                             {
                                 @if (HasKey(entry, "transactions") && entry?.transactions != null)
                                 {
-                                    @foreach (var tr in entry?.transactions)
+                                    @foreach (var tr in Items(entry, "transactions"))
                                     {
                                         serial++; decimal distTotal = 0; string category = "other"; decimal txTotal = 0;
                                         <tr>
@@ -329,7 +329,7 @@
                                                     <td></td>
                                                 }
                                             }
-                                            @if (HasKey(Model, "showDiscount") && Model?.showDiscount == true && (HasKey(entry, "discounts") && (entry?.discounts == null || entry?.discounts.Count < 1)))
+                                            @if (HasKey(Model, "showDiscount") && Model?.showDiscount == true && (HasKey(entry, "discounts") && (entry?.discounts == null || CountOf(entry, "discounts") < 1)))
                                             {
                                                 <td></td>
                                             }
@@ -337,11 +337,11 @@
                                                 distTotal = 0;
                                                 if (HasKey(entry, "discounts"))
                                                 {
-                                                    foreach (var discount in entry?.discounts)
+                                                    foreach (var discount in Items(entry, "discounts"))
                                                     {
                                                         if (HasKey(tr, "category") && tr?.category != category)
                                                         {
-                                                            distTotal = distTotal + (decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0);
+                                                            distTotal = distTotal + Dec(discount, "amount");
                                                         }
                                                     }
                                                 }
@@ -350,7 +350,7 @@
                                             {
                                                 @if (HasKey(tr, "category") && tr?.category != category)
                                                 {
-                                                    <td>@((HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) + distTotal)</td>
+                                                    <td>@(Dec(tr, "amount") + distTotal)</td>
                                                 }
                                                 else
                                                 {
@@ -358,20 +358,20 @@
                                                 }
                                                 @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
                                                 {
-                                                    @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                                    @foreach (var taxWithTotal in Items(Model, "taxesWithTotal"))
                                                     {
                                                         int foundTax = 0;
                                                         decimal tempTax = 0;
                                                         decimal taxRate = 0;
                                                         if (HasKey(entry, "taxes") && entry?.taxes != null)
                                                         {
-                                                            foreach (var tax in entry?.taxes)
+                                                            foreach (var tax in Items(entry, "taxes"))
                                                             {
                                                                 if (HasKey(taxWithTotal, "uniqueName") && HasKey(tax, "accountUniqueName") && taxWithTotal?.uniqueName == tax?.accountUniqueName)
                                                                 {
                                                                     foundTax = 1;
-                                                                    tempTax = (decimal)(HasKey(tax, "amount") ? tax?.amount ?? 0 : 0);
-                                                                    taxRate = (decimal)(HasKey(tax, "rate") ? tax?.rate ?? 0 : 0);
+                                                                    tempTax = Dec(tax, "amount");
+                                                                    taxRate = Dec(tax, "rate");
                                                                     txTotal = txTotal + tempTax;
                                                                 }
                                                             }
@@ -389,7 +389,7 @@
                                             }
                                             @if (HasKey(tr, "category") && tr?.category != category)
                                             {
-                                                txTotal = (tr?.amount ?? 0) + txTotal + distTotal;
+                                                txTotal = Dec(tr, "amount") + txTotal + distTotal;
                                                 <td>@txTotal</td>
                                             }
                                             else
@@ -441,7 +441,7 @@
                                 <th>@(HasKey(Model, "taxableAmount") ? Model?.taxableAmount : "")</th>
                                 @if (HasKey(Model, "taxesWithTotal") && Model?.taxesWithTotal != null)
                                 {
-                                    @foreach (var taxWithTotal in Model?.taxesWithTotal)
+                                    @foreach (var taxWithTotal in Items(Model, "taxesWithTotal"))
                                     {
                                         <th>@(HasKey(taxWithTotal, "total") ? taxWithTotal?.total : "")</th>
                                     }
@@ -499,10 +499,10 @@
                         <td>
                             <p><b></b></p>
                             <br />
-                            @if (HasKey(Model, "terms") && Model?.terms != null && Model?.terms.Count > 0)
+                            @if (HasKey(Model, "terms") && Model?.terms != null && CountOf(Model, "terms") > 0)
                             {
                                 <p><b>Notes</b></p>
-                                @foreach (var term in Model?.terms)
+                                @foreach (var term in Items(Model, "terms"))
                                 {
                                     <p>@term</p>
                                 }
@@ -529,7 +529,7 @@
                 <p><b>@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</b></p>
                 @if (HasKey(Model, "companyGstAddress") && Model?.companyGstAddress != null)
                 {
-                    @foreach (var address in Model?.companyGstAddress)
+                    @foreach (var address in Items(Model, "companyGstAddress"))
                     {
                         <p>@address</p>
                     }

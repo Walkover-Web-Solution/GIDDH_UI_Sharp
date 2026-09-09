@@ -135,7 +135,7 @@
                                 <p class="font-11">From,</p>
                                 @if (HasKey(Model, "sources") && Model?.sources != null)
                                 {
-                                    @foreach (var address in Model?.sources)
+                                    @foreach (var address in Items(Model, "sources"))
                                     {
                                         @if (address != null)
                                         {
@@ -152,7 +152,7 @@
                                 <p class="font-11">To,</p>
                                 @if (HasKey(Model, "destinations") && Model?.destinations != null)
                                 {
-                                    @foreach (var address in Model?.destinations)
+                                    @foreach (var address in Items(Model, "destinations"))
                                     {
                                         @if (address != null)
                                         {
@@ -171,7 +171,7 @@
                             {
                                 @if (HasKey(Model, "sources") && Model?.sources != null)
                                 {
-                                    @foreach (var address in Model?.sources)
+                                    @foreach (var address in Items(Model, "sources"))
                                     {
                                         @if (HasKey(address?.warehouse, "taxNumber") && address?.warehouse?.taxNumber != null && HasKey(Model?.label, "gstin") && !string.IsNullOrEmpty(Model?.label?.gstin?.ToString()))
                                         {
@@ -187,7 +187,7 @@
                             {
                                 @if (HasKey(Model, "destinations") && Model?.destinations != null)
                                 {
-                                    @foreach (var address in Model?.destinations)
+                                    @foreach (var address in Items(Model, "destinations"))
                                     {
                                         @if (HasKey(address?.warehouse, "taxNumber") && address?.warehouse?.taxNumber != null && HasKey(Model?.label, "gstin") && !string.IsNullOrEmpty(Model?.label?.gstin?.ToString()))
                                         {
@@ -288,7 +288,7 @@
                     <tbody>
                         @if (HasKey(Model, "products") && Model?.products != null)
                         {
-                            @foreach (var tr in Model?.products)
+                            @foreach (var tr in Items(Model, "products"))
                             {
                                 serial++;
                                 <tr>

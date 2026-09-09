@@ -43,7 +43,7 @@
             </tr>
             @if (HasKey(Model, "stocks") && Model?.stocks != null)
             {
-                @foreach (var stock in Model?.stocks)
+                @foreach (var stock in Items(Model, "stocks"))
                 {
                     <tr>
                         <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999;">@(HasKey(stock, "name") ? stock?.name : "")</td>

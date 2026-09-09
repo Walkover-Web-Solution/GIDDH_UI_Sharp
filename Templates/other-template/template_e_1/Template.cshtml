@@ -109,7 +109,7 @@
             <tbody>
                 @if (HasKey(Model, "items") && Model?.items != null)
                 {
-                    @foreach (var item in Model?.items)
+                    @foreach (var item in Items(Model, "items"))
                     {
                         <tr>
                             <td>@(HasKey(item, "description") ? item?.description : "")</td>

@@ -146,7 +146,7 @@
                             }
                             @if (HasKey(Model, "billingAddress") && Model?.billingAddress != null)
                             {
-                                @foreach (var address in Model?.billingAddress)
+                                @foreach (var address in Items(Model, "billingAddress"))
                                 {
                                     @if (!string.IsNullOrEmpty(address?.ToString()))
                                     {
@@ -211,15 +211,15 @@
                         }
                         @if (HasKey(Model, "entries") && Model?.entries != null)
                         {
-                            @foreach (var entryss in Model?.entries)
+                            @foreach (var entryss in Items(Model, "entries"))
                             {
                                 @if (entryss != null)
                                 {
-                                    @foreach (var entry in entryss)
+                                    @foreach (var entry in Items(entryss))
                                     {
                                         @if (HasKey(entry, "transactions") && entry?.transactions != null)
                                         {
-                                            @foreach (var tr in entry?.transactions)
+                                            @foreach (var tr in Items(entry, "transactions"))
                                             {
                                                 serial++;
                                                 <tr>
@@ -314,11 +314,11 @@
                         <td class="text-right no-wrap">
                             @if (HasKey(Model, "entries") && Model?.entries != null)
                             {
-                                @foreach (var entryss in Model?.entries)
+                                @foreach (var entryss in Items(Model, "entries"))
                                 {
                                     @if (entryss != null)
                                     {
-                                        @foreach (var entry in entryss)
+                                        @foreach (var entry in Items(entryss))
                                         {
                                             @if (HasKey(Model?.label, "discount") && !string.IsNullOrEmpty(Model?.label?.discount?.ToString()))
                                             {

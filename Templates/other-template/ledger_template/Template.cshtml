@@ -44,7 +44,7 @@
                         }
                         @if (HasKey(Model, "companyandaccountdata") && Model?.companyandaccountdata != null)
                         {
-                            @foreach (var companydata in Model?.companyandaccountdata)
+                            @foreach (var companydata in Items(Model, "companyandaccountdata"))
                             {
                                 count++;
                                 @companydata<br/>
@@ -72,12 +72,12 @@
 
             @if (HasKey(Model, "ledgerEntries") && Model?.ledgerEntries != null)
             {
-                @foreach (var sublist in Model?.ledgerEntries)
+                @foreach (var sublist in Items(Model, "ledgerEntries"))
                 {
                     <tr>
                         @if (sublist != null)
                         {
-                            @foreach (var ledger in sublist)
+                            @foreach (var ledger in Items(sublist))
                             {
                                 <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;"><div style="padding: 5px">@ledger</div></td>
                             }
