@@ -50,7 +50,7 @@
          * {
          border: 0;
          color: #262626;
-         font-family: @(HasKey(Model, "font") && AsBool(Model?.font) ? "'Open Sans', sans-serif" : "'Lato', sans-serif");
+         font-family: @(Model?.font == true ? "'Open Sans', sans-serif" : "'Lato', sans-serif");
          font-style: inherit;
          font-weight: lighter;
          line-height: inherit;
@@ -757,7 +757,7 @@
                                              {
                                                 <p>@tr?.accountName</p>
                                              }
-                                             @if (HasKey(tr, "description") && ShouldShowDescription(tr?.description, tr?.stockDetails?.name, tr?.accountName))
+                                             @if (HasKey(tr, "description") && tr?.description != tr?.stockDetails?.name && tr?.description != tr?.accountName && !string.IsNullOrEmpty(tr?.description?.ToString()))
                                              {
                                                 <p>@tr?.description</p>
                                              }
@@ -812,7 +812,7 @@
                                        {
                                           @foreach (var discount in entry?.discounts)
                                           {
-                                             @if (HasKey(tr, "category") && NotSame(tr?.category, category))
+                                             @if (HasKey(tr, "category") && tr?.category != category)
                                              {
                                                 <td class="text-right">@((decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0) * -1)</td>
                                                 distTotal = distTotal + (decimal)(HasKey(discount, "amount") ? discount?.amount ?? 0 : 0);
@@ -825,7 +825,7 @@
                                        }
                                        @if (HasKey(Model?.label, "taxableValue") && !string.IsNullOrEmpty(Model?.label?.taxableValue?.ToString()))
                                        {
-                                          @if (HasKey(tr, "category") && NotSame(tr?.category, category))
+                                          @if (HasKey(tr, "category") && tr?.category != category)
                                           {
                                              <td class="text-right">@((HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) - distTotal)</td>
                                           }
@@ -847,7 +847,7 @@
                                                 {
                                                    foreach (var tax in entry?.taxes)
                                                    {
-                                                      if (HasKey(taxWithTotal, "uniqueName") && HasKey(tax, "accountUniqueName") && Same(taxWithTotal?.uniqueName, tax?.accountUniqueName))
+                                                      if (HasKey(taxWithTotal, "uniqueName") && HasKey(tax, "accountUniqueName") && taxWithTotal?.uniqueName == tax?.accountUniqueName)
                                                       {
                                                          foundTax = 1;
                                                          tempTax = (decimal)(HasKey(tax, "amount") ? tax?.amount ?? 0 : 0);
@@ -856,7 +856,7 @@
                                                       }
                                                    }
                                                 }
-                                                @if (foundTax == 1 && HasKey(tr, "category") && NotSame(tr?.category, category))
+                                                @if (foundTax == 1 && HasKey(tr, "category") && tr?.category != category)
                                                 {
                                                    <td class="text-right">
                                                       @tempTax
@@ -873,7 +873,7 @@
                                        }
                                        @if (HasKey(Model?.label, "total") && !string.IsNullOrEmpty(Model?.label?.total?.ToString()))
                                        {
-                                          @if (HasKey(tr, "category") && NotSame(tr?.category, category))
+                                          @if (HasKey(tr, "category") && tr?.category != category)
                                           {
                                              txTotal = (HasKey(tr, "amount") ? tr?.amount ?? 0 : 0) + txTotal - distTotal;
                                              <td colspan="2" class="text-right">@txTotal</td>
@@ -889,7 +889,7 @@
                            }
                         }
                      </tbody>
-                     @if (tableCount == Count(Get(Model, "entries")))
+                     @if (tableCount == (Model?.entries?.Count ?? 0))
                      {
                         <tfoot>
                            <tr class="font-normal">
@@ -996,7 +996,7 @@
                         </tfoot>
                      }
                   </table>
-                  @if (tableCount != Count(Get(Model, "entries")))
+                  @if (tableCount != (Model?.entries?.Count ?? 0))
                   {
                      <div style="float:right; margin:20px; font-size: 14px; ">
                         <strong>Continued...</strong>
@@ -1004,7 +1004,7 @@
                   }
                </article>
             </div>
-            @if (tableCount == Count(Get(Model, "entries")))
+            @if (tableCount == (Model?.entries?.Count ?? 0))
             {
                <div style="width: 100%; display: block; float: none; overflow: hidden;">
                   <table class="balance" style="">
@@ -1073,7 +1073,7 @@
                            </td>
                         </tr>
                      }
-                     @if (HasKey(Model, "paidAmount") && AsDouble(Model?.paidAmount) > 0)
+                     @if (HasKey(Model, "paidAmount") && (Model?.paidAmount ?? 0) > 0)
                      {
                         <tr>
                            <th>
@@ -1088,7 +1088,7 @@
                               Due Amount
                            </th>
                            <td>
-                              @(HasKey(Model, "balance") ? Model?.balance : "")
+                              @Model?.balance
                            </td>
                         </tr>
                      }
@@ -1122,7 +1122,7 @@
                   <tbody>
                      <tr>
                         <td style="text-align:left; padding-left: 15px; width: 37%;">
-                           @if (tableCount == Count(Get(Model, "entries")))
+                           @if (tableCount == (Model?.entries?.Count ?? 0))
                            {
                               <div>
                                  @if (HasKey(Model, "message1") && !string.IsNullOrEmpty(Model?.message1?.ToString()))
@@ -1197,7 +1197,7 @@
                   </p>
                </footer>
             </div>
-            @if (tableCount != Count(Get(Model, "entries")))
+            @if (tableCount != (Model?.entries?.Count ?? 0))
             {
                <div class="page"></div>
             }

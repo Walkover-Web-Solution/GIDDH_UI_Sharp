@@ -298,7 +298,7 @@
                                             {
                                                 <span style="display: block;"><span>@tr?.name</span>@if (HasKey(tr, "showVariant") && tr?.showVariant == true && HasKey(tr, "variant") && HasKey(tr?.variant, "name") && tr?.variant?.name != null){<span>-</span><span>@tr?.variant?.name</span>}</span>
                                             }
-                                            @if (HasKey(tr, "description") && ShouldShowDescription(tr?.description, tr?.name))
+                                            @if (HasKey(tr, "description") && tr?.description != null)
                                             {
                                                 <span style="display: block;" class="text-light">@tr?.description</span>
                                             }

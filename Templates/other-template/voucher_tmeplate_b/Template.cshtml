@@ -69,7 +69,7 @@
     }
     @if (HasKey(Model, "entries"))
     {
-        @foreach (var entryss in AsList(Get(Model, "entries")))
+        @foreach (var entryss in Model.entries)
         {
             tableCount++;
             <div class="">
@@ -125,7 +125,7 @@
                                             <p><strong>@Model?.label?.billingAddress:</strong></p>
                                             @if (HasKey(Model, "billingAddress"))
                                             {
-                                                @foreach (var address in AsList(Get(Model, "billingAddress")))
+                                                @foreach (var address in Model?.billingAddress)
                                                 {
                                                     @if (address != null && !string.IsNullOrEmpty(address?.ToString()))
                                                     {
@@ -205,7 +205,7 @@
                         <tbody>
                             @if (HasKey(entryss, "transactions"))
                             {
-                                @foreach (var tr in AsList(Get(entryss, "transactions")))
+                                @foreach (var tr in entryss?.transactions)
                                 {
                                     serial++;
                                     <tr>
@@ -219,7 +219,7 @@
                                             {
                                                 <p>@tr?.accountName</p>
                                             }
-                                            @if (HasKey(tr, "description") && ShouldShowDescription(tr?.description, tr?.stockDetails?.name, tr?.accountName))
+                                            @if (HasKey(tr, "description") && tr?.description?.ToString() != tr?.stockDetails?.name?.ToString() && tr?.description?.ToString() != tr?.accountName?.ToString())
                                             {
                                                 <p>@tr?.description</p>
                                             }
@@ -242,7 +242,7 @@
                                 }
                             }
                         </tbody>
-                        @if (tableCount == Count(Get(Model, "entries")))
+                        @if (tableCount == Model?.entries?.Count)
                         {
                             <tfoot>
                                 @if (HasKey(Model?.label, "taxableAmount"))
@@ -272,14 +272,14 @@
                         }
                     </table>
 
-                    @if (tableCount != Count(Get(Model, "entries")))
+                    @if (tableCount != Model?.entries?.Count)
                     {
                         <div style="float:right; margin:20px; font-size: 16px; "><strong>Continued...</strong></div>
                     }
                 </div>
 
                 <div id="Template-footer" style="position:fixed;">
-                    @if (tableCount == Count(Get(Model, "entries")))
+                    @if (tableCount == Model?.entries?.Count)
                     {
                         <table class="subfooter pdRL3">
                             <tbody>
@@ -314,7 +314,7 @@
                     </footer>
                 </div>
             </div>
-            @if (tableCount != Count(Get(Model, "entries")))
+            @if (tableCount != Model?.entries?.Count)
             {
                 <div class="page"></div>
             }
