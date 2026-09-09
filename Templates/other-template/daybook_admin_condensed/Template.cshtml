@@ -73,7 +73,7 @@
 
                 @if (HasKey(Model, "entries") && Model?.entries != null)
                 {
-                    @foreach (var entry in Model?.entries)
+                    @foreach (var entry in Items(Model, "entries"))
                     {
                         <tr>
                             <td style="padding: 2px 4px 2px 4px; border: 1px solid #999999; border-collapse: collapse; font-family:Arial, Helvetica, sans-serif;width:12%; ">@(HasKey(entry, "entryDate") ? entry?.entryDate : "")</td>

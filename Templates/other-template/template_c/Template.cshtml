@@ -46,7 +46,7 @@
     }
     else
     {
-        <h1>@if (HasKey(Model, "taxes") && Model?.taxes != null && Model?.taxes.Count > 0) { <text>Tax </text> }Invoice</h1>
+        <h1>@if (HasKey(Model, "taxes") && Model?.taxes != null && CountOf(Model, "taxes") > 0) { <text>Tax </text> }Invoice</h1>
     }
     <div style="background-color:#ddd; height:.5pt; width:100%; margin: 10px 0;"></div>
 
@@ -104,7 +104,7 @@
                     <p style="font-weight:bold;">@(HasKey(Model?.company, "name") ? Model?.company?.name : "")</p>
                     @if (HasKey(Model?.company, "data") && Model?.company?.data != null)
                     {
-                        @foreach (var companyData in Model?.company?.data)
+                        @foreach (var companyData in Items(Model, "company.data"))
                         {
                             <p>@companyData</p>
                         }
@@ -119,7 +119,7 @@
                     }
                     @if (HasKey(Model?.account, "data") && Model?.account?.data != null)
                     {
-                        @foreach (var accountData in Model?.account?.data)
+                        @foreach (var accountData in Items(Model, "account.data"))
                         {
                             <p>@accountData</p>
                         }
@@ -150,11 +150,11 @@
                     int serial = 0;
                     if (HasKey(Model, "entries") && Model?.entries != null)
                     {
-                        foreach (var entry in Model?.entries)
+                        foreach (var entry in Items(Model, "entries"))
                         {
                             if (HasKey(entry, "transactions") && entry?.transactions != null)
                             {
-                                foreach (var transaction in entry?.transactions)
+                                foreach (var transaction in Items(entry, "transactions"))
                                 {
                                     serial++;
                                     <tr>
@@ -182,9 +182,9 @@
                     <td style="text-align:right; padding:16px 5px 5px;">Sub Total :</td>
                     <td style="text-align:right; padding:16px 5px 5px;">@(HasKey(Model, "subTotal") ? Model?.subTotal : "")</td>
                 </tr>
-                @if (HasKey(Model, "taxes") && Model?.taxes != null && Model?.taxes.Count > 0)
+                @if (HasKey(Model, "taxes") && Model?.taxes != null && CountOf(Model, "taxes") > 0)
                 {
-                    foreach (var tax in Model?.taxes)
+                    foreach (var tax in Items(Model, "taxes"))
                     {
                         <tr>
                             <td style="text-align:right; padding:5px;"></td>
@@ -193,9 +193,9 @@
                         </tr>
                     }
                 }
-                @if (HasKey(Model, "commonDiscountEntries") && Model?.commonDiscountEntries != null && Model?.commonDiscountEntries.Count > 0)
+                @if (HasKey(Model, "commonDiscountEntries") && Model?.commonDiscountEntries != null && CountOf(Model, "commonDiscountEntries") > 0)
                 {
-                    foreach (var discount in Model?.commonDiscountEntries)
+                    foreach (var discount in Items(Model, "commonDiscountEntries"))
                     {
                         <tr>
                             <td style="text-align:right; padding:5px;"></td>
@@ -240,7 +240,7 @@
                     <td style="width: 50%">
                         @if (HasKey(Model?.companyIdentities, "data") && Model?.companyIdentities?.data != null)
                         {
-                            @foreach (var identity in Model?.companyIdentities?.data.Split(","))
+                            @foreach (var identity in Split(Model, "companyIdentities.data"))
                             {
                                 <p>@identity</p>
                             }
@@ -268,12 +268,12 @@
             <div style="height:10px; width:100%"></div>
         </div>
     }
-    @if (HasKey(Model, "terms") && Model?.terms != null && Model?.terms.Count > 0)
+    @if (HasKey(Model, "terms") && Model?.terms != null && CountOf(Model, "terms") > 0)
     {
         <div id="terms" style="padding:10px 0; overflow:hidden">
             <div id="tc" style="width:100%">
                 <p style="font-weight:bold;">Terms and Conditions:</p>
-                @foreach (var term in Model?.terms)
+                @foreach (var term in Items(Model, "terms"))
                 {
                     <p>@term</p>
                 }
