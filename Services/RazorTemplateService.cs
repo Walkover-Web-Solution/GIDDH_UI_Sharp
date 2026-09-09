@@ -2,6 +2,10 @@ using RazorLight;
 
 namespace GiddhTemplate.Services
 {
+    /// <summary>
+    /// Razor renderer for typed invoice PDFs (TemplateA, Tally, Thermal) via <see cref="PdfService"/>.
+    /// Dynamic other-template PDFs use <see cref="GenericRazorTemplateService"/>.
+    /// </summary>
     public class RazorTemplateService
     {
         private readonly RazorLightEngine _engine;
