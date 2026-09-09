@@ -178,17 +178,6 @@ namespace GiddhTemplate.Services.GenericTemplate
             return string.Equals(AsString(value), expected, StringComparison.OrdinalIgnoreCase);
         }
 
-        /// <summary>Safe equality for template comparisons when either side may be missing or a different type.</summary>
-        public static bool Same(object? left, object? right) =>
-            string.Equals(AsString(left), AsString(right), StringComparison.Ordinal);
-
-        /// <summary>Safe inequality for template comparisons when either side may be missing or a different type.</summary>
-        public static bool NotSame(object? left, object? right) => !Same(left, right);
-
-        /// <summary>Show description only when it is non-empty and differs from item/account names.</summary>
-        public static bool ShouldShowDescription(object? description, object? primaryName, object? secondaryName = null) =>
-            IsNotEmpty(description) && NotSame(description, primaryName) && NotSame(description, secondaryName);
-
         private static bool TryGetJsonProperty(JsonElement element, string propertyName, out JsonElement value)
         {
             foreach (var property in element.EnumerateObject())
