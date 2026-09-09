@@ -40,7 +40,7 @@
 </style>
 </head>
 <div style=" margin:0 ;width:auto ;font-size: 10pt">
-    @if (HasKey(Model, "type") && EqualsIgnoreCase(Model?.type, "proforma"))
+    @if (HasKey(Model, "type") && Model?.type?.Equals("proforma") == true)
     {
         <h1>Proforma</h1>
     }
@@ -55,7 +55,7 @@
         <table style="width: 100%" border="0">
             <tr>
                 <td style="width: 50%; text-align:right">
-                    @if (HasKey(Model, "type") && EqualsIgnoreCase(Model?.type, "proforma"))
+                    @if (HasKey(Model, "type") && Model?.type?.Equals("proforma") == true)
                     {
                         @if (HasKey(Model, "proformaDate") && Model?.proformaDate != null)
                         {
@@ -234,7 +234,7 @@
                     <td style="width: 50%">
                         @if (HasKey(Model?.companyIdentities, "data") && Model?.companyIdentities?.data != null)
                         {
-                            @foreach (var identity in AsString(Get(Model?.companyIdentities, "data")).Split(',', StringSplitOptions.RemoveEmptyEntries))
+                            @foreach (var identity in Model?.companyIdentities?.data.Split(","))
                             {
                                 <p>@identity</p>
                             }

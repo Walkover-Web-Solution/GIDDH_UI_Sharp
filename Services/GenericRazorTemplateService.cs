@@ -12,7 +12,7 @@ namespace GiddhTemplate.Services
     public class GenericRazorTemplateService
     {
         private const string OtherTemplateFolderSegment = "other-template";
-        private const string TemplateCacheKeySuffix = "#generic-template-v3";
+        private const string TemplateCacheKeySuffix = "#generic-template-v2";
 
         private const string TemplateHelperImports =
             "@using System.Collections.Generic\n" +
