@@ -1,0 +1,67 @@
+{
+  "templateType": "purchase_bill_email_template",
+  "customerName": "Customer Name",
+  "totalItems": 5,
+  "grandTotal": 15000,
+  "hasStocks": true,
+  "hasDiscount": true,
+  "hasTaxes": true,
+  "hasRoundOff": true,
+  "hasTcs": false,
+  "hasTds": false,
+  "entries": [
+    {
+      "stock": {
+        "name": "Product A",
+        "quantity": 10,
+        "rate": {
+          "amountForAccount": 500
+        },
+        "stockUnit": {
+          "code": "pcs"
+        }
+      },
+      "accountName": "Sales Account",
+      "description": "High quality item",
+      "entryDate": "01-06-2026",
+      "amtBfrDiscount": 5000,
+      "hasDiscount": true,
+      "distTotal": 500,
+      "taxableAmt": 4500,
+      "hasTaxes": true,
+      "taxesTotal": 810,
+      "grandTotal": 5310
+    },
+    {
+      "stock": {
+        "name": "Product B",
+        "quantity": 5,
+        "rate": {
+          "amountForAccount": 600
+        },
+        "stockUnit": {
+          "code": "pcs"
+        }
+      },
+      "accountName": "Sales Account",
+      "description": "Premium quality",
+      "entryDate": "01-06-2026",
+      "amtBfrDiscount": 3000,
+      "hasDiscount": true,
+      "distTotal": 300,
+      "taxableAmt": 2700,
+      "hasTaxes": true,
+      "taxesTotal": 486,
+      "grandTotal": 3186
+    }
+  ],
+  "amtBfrDiscount": 8000,
+  "distTotal": 800,
+  "taxableAmt": 7200,
+  "taxesTotal": 1296,
+  "roundOff": 0.25,
+  "tcsTotal": 0,
+  "tdsTotal": 0,
+  "senderName": "Authorized Person",
+  "companyName": "ABC Pvt Ltd"
+}
