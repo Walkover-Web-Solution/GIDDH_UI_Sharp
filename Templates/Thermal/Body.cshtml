@@ -255,7 +255,7 @@
                                         @foreach (var tax in Model.GstTaxesTotal)
                                         {
                                             <tr>
-                                                <td width="60%">@tax?.TaxType@(tax?.TaxPercent)%</td>
+                                                <td width="60%">@(tax?.AccountName ?? tax?.TaxType) (@tax?.TaxPercent%)</td>
                                                 <td class="text-right p-0" width="40%">@tax?.Amount?.AmountForAccount</td>
                                             </tr>
                                         }
