@@ -152,9 +152,17 @@ public class Program
 
             var app = builder.Build();
 
-            // Pre-warm browser on startup
-            var pdfService = app.Services.GetRequiredService<PdfService>();
-            await pdfService.GetBrowserAsync();
+            // Pre-warm browser on startup. A launch failure must not stop Kestrel:
+            // the browser is created again on the first PDF request.
+            try
+            {
+                var pdfService = app.Services.GetRequiredService<PdfService>();
+                await pdfService.GetBrowserAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Browser pre-warm failed. Service will start and retry on the first PDF request.");
+            }
 
             // Register browser disposal on shutdown
             var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
