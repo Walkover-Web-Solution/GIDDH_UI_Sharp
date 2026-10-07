@@ -86,7 +86,6 @@ namespace GiddhTemplate.Services
                                 "--disable-crash-reporter",
                                 "--disable-hang-monitor",
                                 "--renderer-process-limit=1",
-                                "--single-process",
                                 "--js-flags=--max-old-space-size=96 --max-semi-space-size=1 --max-heap-size=96",
                                 "--memory-pressure-off",
                                 "--disk-cache-size=0",
