@@ -193,6 +193,8 @@ namespace GiddhTemplate.Services
 
         public async Task<string> LoadFontCSSAsync(string fontFamily)
         {
+            fontFamily = ResolveFontFamily(fontFamily);
+
             if (fontFamily == "Open Sans" && string.IsNullOrEmpty(_openSansFontCSS))
             {
                 string fontPath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Fonts", "OpenSans");
@@ -289,6 +291,31 @@ namespace GiddhTemplate.Services
             return sanitized.ToString().Trim('_');
         }
 
+        private static int ResolveFontSizePx(int? value, int fallback)
+        {
+            if (value is > 0 and <= 72)
+                return value.Value;
+            return fallback;
+        }
+
+        private static string ResolveFontFamily(string? family)
+        {
+            if (string.IsNullOrWhiteSpace(family))
+                return "Inter";
+
+            var normalized = family.Trim();
+            if (normalized.Equals("open sans", StringComparison.OrdinalIgnoreCase))
+                return "Open Sans";
+            if (normalized.Equals("lato", StringComparison.OrdinalIgnoreCase))
+                return "Lato";
+            if (normalized.Equals("roboto", StringComparison.OrdinalIgnoreCase))
+                return "Roboto";
+            if (normalized.Equals("inter", StringComparison.OrdinalIgnoreCase))
+                return "Inter";
+
+            return normalized;
+        }
+
         private async Task<string> CreatePdfDocumentAsync(
             string header,
             string body,
@@ -304,26 +331,32 @@ namespace GiddhTemplate.Services
             
             var themeCSS = new StringBuilder();
 
-            themeCSS.Append(await LoadFontCSSAsync(request?.Theme?.Font?.Family ?? string.Empty));
+            var fontFamily = ResolveFontFamily(request?.Theme?.Font?.Family);
+            var fontSizeDefaultRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeDefault, 14);
+            var fontSizeMediumRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeMedium, 12);
+            var fontSizeSmallRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeSmall, 10);
 
+            var fontSizeDefault = Math.Max(fontSizeDefaultRaw - decreaseFontSize, 1);
+            var fontSizeMedium = Math.Max(fontSizeMediumRaw - decreaseFontSize, 1);
+            var fontSizeSmall = Math.Max(fontSizeSmallRaw - decreaseFontSize, 1);
+            var fontSizeLarge = fontSizeDefaultRaw;
 
-            themeCSS.Append("html, body {");
+            themeCSS.Append(await LoadFontCSSAsync(fontFamily));
 
-            var fontFamily = request?.Theme?.Font?.Family switch
-            {
-                "Open Sans" => "Open Sans",
-                "Lato"      => "Lato",
-                "Roboto"    => "Roboto",
-                _           => "Inter"
-            };
+            Console.WriteLine(
+                $"[PdfService] Theme fonts: family={fontFamily}, default={fontSizeDefault}px (raw {fontSizeDefaultRaw}), large={fontSizeLarge}px, medium={fontSizeMedium}px, small={fontSizeSmall}px");
 
+            // Applied last in <style> so theme wins; explicit font-size (not only CSS variables).
+            themeCSS.Append(":root, html, body {");
             themeCSS.Append($"--font-family: \"{fontFamily}\";");
-            themeCSS.Append($"--font-size-default: {request?.Theme?.Font?.FontSizeDefault - decreaseFontSize}px;");
-            themeCSS.Append($"--font-size-large: {request?.Theme?.Font?.FontSizeDefault}px;");
-            themeCSS.Append($"--font-size-small: {request?.Theme?.Font?.FontSizeSmall - decreaseFontSize}px;");
-            themeCSS.Append($"--font-size-medium: {request?.Theme?.Font?.FontSizeMedium - decreaseFontSize}px;");
+            themeCSS.Append($"--font-size-default: {fontSizeDefault}px;");
+            themeCSS.Append($"--font-size-large: {fontSizeLarge}px;");
+            themeCSS.Append($"--font-size-medium: {fontSizeMedium}px;");
+            themeCSS.Append($"--font-size-small: {fontSizeSmall}px;");
             themeCSS.Append($"--color-primary: {request?.Theme?.PrimaryColor};");
             themeCSS.Append($"--color-secondary: {request?.Theme?.SecondaryColor};");
+            themeCSS.Append($"font-family: \"{fontFamily}\";");
+            themeCSS.Append($"font-size: {fontSizeDefault}px;");
             themeCSS.Append("}");
 
             var allStylesBuilder = new StringBuilder();

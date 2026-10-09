@@ -153,12 +153,16 @@ table tr td {
   font-weight: var(--font-weight-200, 200);
   border: 1px solid currentColor;
   text-align: left;
-  padding: 6px 4px;
+  padding: calc(var(--font-size-default, 14px) * 0.4)
+    calc(var(--font-size-default, 14px) * 0.28);
   word-break: break-word;
+  overflow-wrap: anywhere;
+  vertical-align: top;
 }
 
 table.table-row-height tr td {
-  height: 50px;
+  min-height: calc(var(--font-size-default, 14px) * 3.5);
+  height: auto;
 }
 
 .vertical-align-top {

@@ -208,12 +208,8 @@
                                                                                                     {
                                                                                                         <table>
                                                                                                             <tr>
-                                                                                                                <td class="border-none p-0" width="120px">
-                                                                                                                    @GetLabel("CompanyTaxNumber")
-                                                                                                                </td>
-                                                                                                                <td class="border-none p-0">
-                                                                                                                    :
-                                                                                                                    @Model?.Company?.TaxNumber
+                                                                                                                <td class="border-none p-0 label-value-line">
+                                                                                                                    @GetLabel("CompanyTaxNumber"): @Model?.Company?.TaxNumber
                                                                                                                 </td>
                                                                                                             </tr>
                                                                                                         </table>
@@ -289,8 +285,9 @@
                                                                                     <td colspan="2" class="border-none p-0">
                                                                                         <table>
                                                                                             <tr>
-                                                                                                <td width="120px" class="border-none">@GetLabel("DisplayPlaceOfSupply")</td>
-                                                                                                <td class="border-none">: @Model?.PlaceOfSupply</td>
+                                                                                                <td class="border-none label-value-line">
+                                                                                                    @GetLabel("DisplayPlaceOfSupply"): @Model?.PlaceOfSupply
+                                                                                                </td>
                                                                                             </tr>
                                                                                         </table>
                                                                                     </td>
