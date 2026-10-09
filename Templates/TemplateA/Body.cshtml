@@ -96,7 +96,7 @@
                                                 <tr>
                                                     @if (Model?.Settings?.ShowCompanyAddress?.Display == true)
                                                     {
-                                                        <td class="p-0" width="50%">
+                                                        <td class="p-0 vertical-align-top" width="50%">
                                                             <table>
                                                                 <tbody>
                                                                     <tr>
@@ -179,12 +179,12 @@
                                                                 <strong>@Lbl(Model?.Settings?.AttentionTo)</strong>
                                                                 @if (Model?.Settings?.AttentionTo?.Display == true)
                                                                 {
-                                                                    <p class="no-wrap">@Model?.AttentionTo</p>
+                                                                    <p class="word-break">@Model?.AttentionTo</p>
                                                                 }
 
                                                                 @if (Model?.Settings?.CustomerEmail?.Display == true)
                                                                 {
-                                                                    <p class="no-wrap">@Model?.CustomerDetails?.Email</p>
+                                                                    <p class="word-break">@Model?.CustomerDetails?.Email</p>
                                                                 }
 
                                                                 @if (Model?.Settings?.CustomerContactNumber?.Display == true)
