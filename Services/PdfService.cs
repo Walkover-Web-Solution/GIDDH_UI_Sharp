@@ -28,6 +28,8 @@ namespace GiddhTemplate.Services
         private static int _pdfGenerationCount = 0;
         private const int _browserRecycleAfter = 10;
 
+        private readonly int decreaseFontSize = 2;
+
         public PdfService(RazorTemplateService razorTemplateService)
         {
             _razorTemplateService = razorTemplateService;
@@ -330,20 +332,25 @@ namespace GiddhTemplate.Services
             var themeCSS = new StringBuilder();
 
             var fontFamily = ResolveFontFamily(request?.Theme?.Font?.Family);
-            var fontSizeDefault = ResolveFontSizePx(request?.Theme?.Font?.FontSizeDefault, 14);
-            var fontSizeMedium = ResolveFontSizePx(request?.Theme?.Font?.FontSizeMedium, 12);
-            var fontSizeSmall = ResolveFontSizePx(request?.Theme?.Font?.FontSizeSmall, 10);
+            var fontSizeDefaultRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeDefault, 14);
+            var fontSizeMediumRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeMedium, 12);
+            var fontSizeSmallRaw = ResolveFontSizePx(request?.Theme?.Font?.FontSizeSmall, 10);
+
+            var fontSizeDefault = Math.Max(fontSizeDefaultRaw - decreaseFontSize, 1);
+            var fontSizeMedium = Math.Max(fontSizeMediumRaw - decreaseFontSize, 1);
+            var fontSizeSmall = Math.Max(fontSizeSmallRaw - decreaseFontSize, 1);
+            var fontSizeLarge = fontSizeDefaultRaw;
 
             themeCSS.Append(await LoadFontCSSAsync(fontFamily));
 
             Console.WriteLine(
-                $"[PdfService] Theme fonts: family={fontFamily}, default={fontSizeDefault}px, medium={fontSizeMedium}px, small={fontSizeSmall}px");
+                $"[PdfService] Theme fonts: family={fontFamily}, default={fontSizeDefault}px (raw {fontSizeDefaultRaw}), large={fontSizeLarge}px, medium={fontSizeMedium}px, small={fontSizeSmall}px");
 
             // Applied last in <style> so theme wins; explicit font-size (not only CSS variables).
             themeCSS.Append(":root, html, body {");
             themeCSS.Append($"--font-family: \"{fontFamily}\";");
             themeCSS.Append($"--font-size-default: {fontSizeDefault}px;");
-            themeCSS.Append($"--font-size-large: {fontSizeDefault}px;");
+            themeCSS.Append($"--font-size-large: {fontSizeLarge}px;");
             themeCSS.Append($"--font-size-medium: {fontSizeMedium}px;");
             themeCSS.Append($"--font-size-small: {fontSizeSmall}px;");
             themeCSS.Append($"--color-primary: {request?.Theme?.PrimaryColor};");
