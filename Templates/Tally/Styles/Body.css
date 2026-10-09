@@ -30,15 +30,8 @@ main table.remove-left-right-border tr td:last-child {
   white-space: normal;
 }
 
-/* Company header GSTIN only — label and value on one line, wrap when needed */
-.company-gstin-line {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  vertical-align: top;
-}
-
-/* Voucher block: Place of supply — full width, label not squeezed into 120px */
-.place-of-supply-line {
+/* Label + value in one cell (GSTIN, place of supply, etc.) */
+.label-value-line {
   overflow-wrap: anywhere;
   word-break: break-word;
   vertical-align: top;
