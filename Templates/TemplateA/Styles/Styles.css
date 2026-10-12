@@ -356,6 +356,10 @@ table tr th {
   object-position: center;
 }
 
+.message-text {
+  font-size: min(var(--font-size-default, 14px), 16px) !important;
+}
+
 /* Print Media CSS */
 @media print {
   table {
