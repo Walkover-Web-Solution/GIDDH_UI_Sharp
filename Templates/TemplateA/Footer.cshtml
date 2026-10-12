@@ -43,7 +43,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre")
+                                                @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre message-text")
                                             </td>
                                         </tr>
                                     }
@@ -52,7 +52,7 @@
                                 {
                                     <tr>
                                         <td>
-                                            <p class="text-wrap-pre">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
+                                            <p class="text-wrap-pre message-text">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
                                         </td>
                                     </tr>
                                 }

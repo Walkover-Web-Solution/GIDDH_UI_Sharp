@@ -328,6 +328,10 @@ table.table-row-height tr td {
   align-items: flex-end;
 }
 
+.message-text {
+  font-size: min(var(--font-size-default, 14px), 16px) !important;
+}
+
 /* Print Media CSS */
 @media print {
   table {
