@@ -96,7 +96,7 @@
                                                 <tr>
                                                     @if (Model?.Settings?.ShowCompanyAddress?.Display == true)
                                                     {
-                                                        <td class="p-0" width="50%">
+                                                        <td class="p-0 vertical-align-top" width="50%">
                                                             <table>
                                                                 <tbody>
                                                                     <tr>
@@ -179,12 +179,12 @@
                                                                 <strong>@Lbl(Model?.Settings?.AttentionTo)</strong>
                                                                 @if (Model?.Settings?.AttentionTo?.Display == true)
                                                                 {
-                                                                    <p class="no-wrap">@Model?.AttentionTo</p>
+                                                                    <p class="word-break">@Model?.AttentionTo</p>
                                                                 }
 
                                                                 @if (Model?.Settings?.CustomerEmail?.Display == true)
                                                                 {
-                                                                    <p class="no-wrap">@Model?.CustomerDetails?.Email</p>
+                                                                    <p class="word-break">@Model?.CustomerDetails?.Email</p>
                                                                 }
 
                                                                 @if (Model?.Settings?.CustomerContactNumber?.Display == true)
@@ -1088,7 +1088,7 @@
                                                                     @if (!string.IsNullOrEmpty(Model?.Message1) || !string.IsNullOrEmpty(Model?.SecondaryMessage1))
                                                                     {
                                                                         <tr>
-                                                                            <td>
+                                                                            <td class="message-text">
                                                                                 @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre")
                                                                             </td>
                                                                         </tr>
@@ -1098,7 +1098,7 @@
                                                                 {
                                                                     <tr>
                                                                         <td>
-                                                                            <p class="text-wrap-pre">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
+                                                                            <p class="text-wrap-pre message-text">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
                                                                         </td>
                                                                     </tr>
                                                                 }

@@ -24,7 +24,7 @@ table.entry-summary tr td {
 }
 
 .line-height-10 {
-  line-height: 10px;
+  line-height: calc(var(--font-size-default, 14px) * 1.35);
 }
 
 .scaled-line-height {
@@ -46,15 +46,33 @@ table.entry-summary tr td {
 
 .entry-table thead tr th,
 .entry-table tfoot tr td {
-  padding: 7px 3px;
+  padding: calc(var(--font-size-default, 14px) * 0.45)
+    calc(var(--font-size-default, 14px) * 0.25);
+  vertical-align: top;
+  line-height: 1.25;
+  white-space: normal;
 }
 
 .grid-view {
   --grid-column: 3;
   display: grid;
-  grid-template-columns: repeat(var(--grid-column), 1fr);
-  grid-row-gap: 10px;
+  grid-template-columns: repeat(var(--grid-column), minmax(0, 1fr));
+  grid-row-gap: calc(var(--font-size-default, 14px) * 0.75);
+  column-gap: calc(var(--font-size-default, 14px) * 0.5);
   align-items: start;
+}
+
+.grid-view .grid-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.grid-view .grid-item p,
+.grid-view .grid-item address,
+.grid-view .grid-item strong {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .grid-view.grid-columns-4 {

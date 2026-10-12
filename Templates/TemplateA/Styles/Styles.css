@@ -162,8 +162,14 @@ table tr th,
 table tr td {
   border: none;
   text-align: left;
-  padding: 2px;
+  padding: calc(var(--font-size-default, 14px) * 0.2)
+    calc(var(--font-size-default, 14px) * 0.15);
   word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+table tr th {
+  vertical-align: top;
 }
 
 .vertical-align-top {
@@ -348,6 +354,10 @@ table tr td {
   aspect-ratio: 1 / 1;
   object-fit: cover;
   object-position: center;
+}
+
+.message-text {
+  font-size: min(var(--font-size-default, 14px), 16px) !important;
 }
 
 /* Print Media CSS */

@@ -16,3 +16,23 @@ main table.remove-left-right-border tr td:last-child {
 .entry-table tbody tr td > * {
   line-height: calc(var(--font-size-default, 14px) * 1.25);
 }
+
+.entry-table thead tr th,
+.entry-table tfoot tr td {
+  vertical-align: top;
+  line-height: 1.25;
+  white-space: normal;
+  padding: calc(var(--font-size-default, 14px) * 0.45)
+    calc(var(--font-size-default, 14px) * 0.3);
+}
+
+.entry-table thead tr th.no-wrap {
+  white-space: normal;
+}
+
+/* Label + value in one cell (GSTIN, place of supply, etc.) */
+.label-value-line {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
