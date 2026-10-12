@@ -1088,7 +1088,7 @@
                                                                     @if (!string.IsNullOrEmpty(Model?.Message1) || !string.IsNullOrEmpty(Model?.SecondaryMessage1))
                                                                     {
                                                                         <tr>
-                                                                            <td>
+                                                                            <td class="message-text">
                                                                                 @LblValue(Model?.Message1, Model?.SecondaryMessage1, "text-wrap-pre")
                                                                             </td>
                                                                         </tr>
@@ -1098,7 +1098,7 @@
                                                                 {
                                                                     <tr>
                                                                         <td>
-                                                                            <p class="text-wrap-pre">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
+                                                                            <p class="text-wrap-pre message-text">@(!string.IsNullOrEmpty(@Model?.Message2) ? @Model?.Message2 : "")</p>
                                                                         </td>
                                                                     </tr>
                                                                 }
