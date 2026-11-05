@@ -323,11 +323,11 @@
                                 </td>
                             </tr>
                             }
-                            @if (GetDisplayStatus("Message1"))
+                            @if (GetDisplayStatus("Message1") &&
+                                (!string.IsNullOrEmpty(Model?.Message1) || !string.IsNullOrEmpty(Model?.SecondaryMessage1)))
                             {
                                 <tr>
                                     <td class="pd-0 pd-t2 vertical-align-bottom" colspan="100%">
-                                        <p>@GetLabel("Message1")</p>
                                         @LblValue(Model?.Message1, Model?.SecondaryMessage1, "margin-0 text-wrap-pre")
                                     </td>
                                 </tr>

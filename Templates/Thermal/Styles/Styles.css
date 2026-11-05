@@ -275,6 +275,16 @@ table tr td {
   }
 }
 
+.margin-0 {
+  margin: 0;
+}
+
+.text-wrap-pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 @page { 
   @bottom-center {
      content: "(" counter(page) ")"; /* counter(page) for current page  | counter(pages) for Total Page */
