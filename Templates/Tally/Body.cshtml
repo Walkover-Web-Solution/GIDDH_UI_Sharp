@@ -577,7 +577,7 @@
                                                             }
                                                             @if (GetDisplayStatus("Unit"))
                                                             {
-                                                            <th class="text-center">@GetHeaderLabel("Unit")</th>
+                                                                <th class="text-center">@GetHeaderLabel("Unit")</th>
                                                             }
 
                                                             @if (GetDisplayStatus("Discount"))
@@ -724,14 +724,16 @@
                                                                         }
                                                                     </td>
                                                                 }
-
-                                                                <td class="py-0 border-none border-right text-center">
-                                                                    @if (Entry?.Stock != null && Entry.Stock.StockUnit != null &&
-                                                                !string.IsNullOrEmpty(Entry.Stock.StockUnit.Code))
-                                                                    {
-                                                                        <span>@Entry.Stock.StockUnit.Code</span>
-                                                                    }
-                                                                </td>
+                                                                @if (GetDisplayStatus("Unit"))
+                                                                {
+                                                                    <td class="py-0 border-none border-right text-center">
+                                                                        @if (Entry?.Stock != null && Entry.Stock.StockUnit != null &&
+                                                                    !string.IsNullOrEmpty(Entry.Stock.StockUnit.Code))
+                                                                        {
+                                                                            <span>@Entry.Stock.StockUnit.Code</span>
+                                                                        }
+                                                                    </td>
+                                                                }
 
                                                                 @if (GetDisplayStatus("Discount"))
                                                                 {
@@ -800,8 +802,10 @@
                                                                 <td class="border-none border-right"></td>
                                                             }
 
-                                                            <td class="border-none border-right"></td>
-
+                                                            @if (GetDisplayStatus("Unit"))
+                                                            {
+                                                                <td class="border-none border-right"></td>
+                                                            }
                                                             @if (GetDisplayStatus("Discount"))
                                                             {
                                                                 <td class="border-none border-right"></td>
@@ -847,7 +851,10 @@
                                                                         <td class="border-none border-right"></td>
                                                                     }
 
-                                                                    <td class="border-none border-right"></td>
+                                                                    @if (GetDisplayStatus("Unit"))
+                                                                    {
+                                                                        <td class="border-none border-right"></td>
+                                                                    }
 
                                                                     @if (GetDisplayStatus("Discount"))
                                                                     {
@@ -895,7 +902,10 @@
                                                                     <td class="border-none border-right"></td>
                                                                 }
 
-                                                                <td class="border-none border-right"></td>
+                                                                @if (GetDisplayStatus("Unit"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
 
                                                                 @if (GetDisplayStatus("Discount"))
                                                                 {
@@ -940,7 +950,10 @@
                                                                     <td class="border-none border-right"></td>
                                                                 }
 
-                                                                <td class="border-none border-right"></td>
+                                                                @if (GetDisplayStatus("Unit"))
+                                                                {
+                                                                    <td class="border-none border-right"></td>
+                                                                }
 
                                                                 @if (GetDisplayStatus("Discount"))
                                                                 {
@@ -985,7 +998,10 @@
                                                                 <td class="border-none border-right"></td>
                                                             }
 
-                                                            <td class="border-none border-right"></td>
+                                                            @if (GetDisplayStatus("Unit"))
+                                                            {
+                                                                <td class="border-none border-right"></td>
+                                                            }
 
                                                             @if (GetDisplayStatus("Discount"))
                                                             {
@@ -1030,7 +1046,10 @@
                                                                 <td></td>
                                                             }
 
-                                                            <td></td>
+                                                            @if (GetDisplayStatus("Unit"))
+                                                            {
+                                                                <td></td>
+                                                            }
 
                                                             @if (GetDisplayStatus("Discount"))
                                                             {
