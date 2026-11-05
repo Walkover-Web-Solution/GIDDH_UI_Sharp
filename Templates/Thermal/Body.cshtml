@@ -44,6 +44,11 @@
     {
         return Model?.IsMultipleCurrency == true && Model?.DisplayBaseCurrency == true;
     }
+    /* Markup for a value sent in both languages, one paragraph per language. */
+    public RazorLight.Text.IRawString LblValue(string? primary, string? secondary, string? cssClass = null)
+    {
+        return LabelRenderer.HtmlBlocks(primary, secondary, Model?.LabelDisplay, "p", cssClass);
+    }
 }
 <main>
     <table class="thermal-invoice-table vertical-align-top">
@@ -323,6 +328,7 @@
                                 <tr>
                                     <td class="pd-0 pd-t2 vertical-align-bottom" colspan="100%">
                                         <p>@GetLabel("Message1")</p>
+                                        @LblValue(Model?.Message1, Model?.SecondaryMessage1, "margin-0 text-wrap-pre")
                                     </td>
                                 </tr>
                             }
