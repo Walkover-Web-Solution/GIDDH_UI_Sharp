@@ -232,10 +232,15 @@
                     <table>
                         <tr>
                             <td class="vertical-align-top p-0" width="50%">
-                                @if (GetDisplayStatus("TotalQuantity"))
-                                {
-                                    @GetLabel("TotalQuantity") <span>@Model?.Entries?.Sum(e => e?.Stock?.Quantity ?? 0).ToString("N0")</span>
-                                }
+                                @{
+                               var totalQuantity = Model?.Entries?
+                                   .Where(e => e?.Stock != null)
+                                   .Sum(e => e.Stock.Quantity) ?? 0;
+                             }
+                              @if (GetDisplayStatus("TotalQuantity") && totalQuantity > 0)
+                             {
+                               @GetLabel("TotalQuantity") <span>@totalQuantity</span>
+                              }
                             </td>
                             <td class="vertical-align-top p-0" width="50%">
                                 <table>
