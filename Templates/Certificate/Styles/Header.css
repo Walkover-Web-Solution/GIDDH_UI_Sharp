@@ -1,0 +1,39 @@
+.top-tab {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26%;
+    height: 16%;
+    background: linear-gradient(145deg, #0d2342, #183b68);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(16, 43, 80, 0.1);
+}
+.top-tab img { width: 70%; height: auto; display: block; }
+.validity {
+    position: absolute;
+    top: 7.5%;
+    right: 6.5%;
+    z-index: 2;
+    text-align: right;
+    line-height: 1.25;
+}
+.validity .caption {
+    display: block;
+    font-size: clamp(8px, 0.85vw, 11px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7a8799;
+    margin-bottom: 4px;
+}
+.validity strong {
+    display: block;
+    font-size: clamp(11px, 1.15vw, 15px);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--navy);
+}

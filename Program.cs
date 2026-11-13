@@ -145,6 +145,7 @@ public class Program
             builder.Services.AddSingleton<PdfService>();
             builder.Services.AddSingleton<GenericPdfService>();
             builder.Services.AddScoped<AccountStatementPdfService>();
+            builder.Services.AddScoped<CertificatePdfService>();
             builder.Services.AddHostedService<MemoryReservationService>();
             builder.Services.AddHostedService<PdfCleanupService>();
             builder.Services.AddControllers();
