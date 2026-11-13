@@ -1,0 +1,21 @@
+@model GiddhTemplate.Models.CertificateRequest
+@using System
+@{
+    // Brand assets ship with the template (fixed, not company-uploaded). Chrome blocks
+    // file:// <img> loads on a page set via SetContentAsync (no real page origin), so
+    // they are inlined as base64 data URIs instead.
+    var assetsDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Templates", "Certificate", "assets");
+    string AssetDataUri(string fileName, string mimeType)
+    {
+        var bytes = System.IO.File.ReadAllBytes(System.IO.Path.Combine(assetsDir, fileName));
+        return $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+    }
+}
+<div class="top-tab" aria-label="GIDDH logo">
+    <img src="@AssetDataUri("Giddh-White.svg", "image/svg+xml")" alt="GIDDH" width="127" height="25" />
+</div>
+
+<div class="validity" aria-label="Certificate expiry date">
+    <span class="caption">Valid Until</span>
+    <strong>@Model.validUntilDisplay</strong>
+</div>
