@@ -1,3 +1,5 @@
+> **Superseded (2026-11-17)** by docs/FLOWS.md. Kept for history; parts of it no longer match the code. Do not update it.
+
 # PDF Generation Guide
 
 This guide provides step-by-step instructions for generating PDFs using the GiddhTemplate project.

@@ -1,3 +1,5 @@
+> **Superseded (2026-11-17)** by docs/DEVELOPMENT.md. Kept for history; parts of it no longer match the code. Do not update it.
+
 # First Time Setup Guide
 
 This guide provides step-by-step instructions for setting up the GiddhTemplate project for the first time.

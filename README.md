@@ -1,5 +1,8 @@
 # GiddhTemplate - PDF Generation Service
 
+> **Start at [AGENTS.md](AGENTS.md)** for agents and engineers. The docs in [docs/](docs/) (VISION, ARCHITECTURE, FLOWS, CONTRACTS, DESIGN, DEVELOPMENT, DECISIONS, OPEN_QUESTIONS) are current. The guides linked below and `COMPLETE_DOCUMENTATION.md` are superseded and partly wrong.
+
+
 A .NET 8.0 web application for generating PDF documents from HTML templates using PuppeteerSharp and Razor templating engine.
 
 ## 🚀 Quick Start
