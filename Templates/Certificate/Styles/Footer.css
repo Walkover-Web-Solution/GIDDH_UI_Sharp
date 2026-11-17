@@ -1,0 +1,72 @@
+.footer {
+    position: absolute;
+    left: 9%;
+    right: 9%;
+    bottom: 7%;
+    display: grid;
+    grid-template-columns: 1fr 0.85fr 1fr;
+    align-items: end;
+    gap: 4%;
+}
+.date { text-align: center; padding-bottom: 2%; }
+.date strong {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(15px, 1.8vw, 26px);
+    font-weight: 400;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #45678e;
+}
+.caption {
+    display: block;
+    font-size: clamp(9px, 0.95vw, 14px);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #45678e;
+    margin-top: 9px;
+}
+.seal {
+    width: 148px;
+    height: 148px;
+    min-width: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto -4px;
+    overflow: visible;
+    align-self: end;
+}
+.seal img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+}
+.issuer { text-align: center; }
+.signature {
+    height: clamp(35px, 5vw, 70px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 1px solid #45678e;
+    margin-bottom: 8px;
+}
+.signature img {
+    height: clamp(22px, 3vw, 36px);
+    width: auto;
+    margin-bottom: 6px;
+}
+.issuer strong {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(12px, 1.35vw, 19px);
+    font-weight: 400;
+}
+.issuer small {
+    display: block;
+    font-size: clamp(9px, 0.95vw, 14px);
+    color: #45678e;
+    letter-spacing: 0.08em;
+    margin-top: 5px;
+}
