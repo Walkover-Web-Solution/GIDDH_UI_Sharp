@@ -1,3 +1,5 @@
+> **Superseded (2026-11-17)** by AGENTS.md and docs/DEVELOPMENT.md. Kept for history; parts of it no longer match the code. Do not update it.
+
 # Giddh Template Service - Developer Guide
 
 ## Overview
