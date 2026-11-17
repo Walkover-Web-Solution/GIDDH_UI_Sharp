@@ -1,0 +1,29 @@
+@model GiddhTemplate.Models.CertificateRequest
+@using System
+@{
+    // Brand assets ship with the template (fixed, not company-uploaded). Chrome blocks
+    // file:// <img> loads on a page set via SetContentAsync (no real page origin), so
+    // they are inlined as base64 data URIs instead.
+    var assetsDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Templates", "Certificate", "assets");
+    string AssetDataUri(string fileName, string mimeType)
+    {
+        var bytes = System.IO.File.ReadAllBytes(System.IO.Path.Combine(assetsDir, fileName));
+        return $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+    }
+}
+<footer class="footer">
+    <div class="date">
+        <strong>@Model.completedAtDisplay</strong>
+        <span class="caption">Date Issued</span>
+    </div>
+    <div class="seal" aria-label="GIDDH seal">
+        <img src="@AssetDataUri("seal.png", "image/png")" alt="GIDDH Certified seal" width="148" height="148" />
+    </div>
+    <div class="issuer">
+        <div class="signature">
+            <img src="@AssetDataUri("Giddh-Blue.svg", "image/svg+xml")" alt="GIDDH" width="100" height="20" />
+        </div>
+        <strong>GIDDH Certification Team</strong>
+        <small>WALKOVER WEB SOLUTIONS PVT. LTD.</small>
+    </div>
+</footer>
