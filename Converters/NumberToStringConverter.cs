@@ -3,22 +3,41 @@ using System.Text.Json.Serialization;
 
 namespace GiddhTemplate.Converters
 {
-    public class NumberToStringConverter : JsonConverter<string?>
+    public class NumberToStringConverter : JsonConverter<string>
     {
         public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonTokenType.Number)
-                return System.Text.Encoding.UTF8.GetString(reader.ValueSpan);
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return reader.GetString();
+            }
 
-            return reader.GetString();
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (reader.TryGetDecimal(out var value))
+                {
+                    return value.ToString();
+                }
+
+                if (reader.TryGetInt64(out var longValue))
+                {
+                    return longValue.ToString();
+                }
+
+                return reader.GetDouble().ToString();
+            }
+
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                return null;
+            }
+
+            throw new JsonException($"Unable to convert token type '{reader.TokenType}' to string.");
         }
 
-        public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
         {
-            if (value is null)
-                writer.WriteNullValue();
-            else
-                writer.WriteStringValue(value);
+            writer.WriteStringValue(value);
         }
     }
 }
