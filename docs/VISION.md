@@ -1,149 +1,84 @@
 ---
 covers: ["*"]
-verified_at: ba2323b
-verified_on: 2026-11-23
+verified_at: d462f69
+verified_on: 2026-11-17
 ---
-
 # Product Vision & Strategic Direction
 
-**Giddh Template Service** (repository `GIDDH_UI_Sharp`, project name `GiddhTemplate`) is a backend PDF rendering service for the **Giddh** accounting product (Walkover Web Solution). It turns structured JSON from Giddh into print-ready PDFs using Razor HTML templates and headless Chrome (PuppeteerSharp). It is not the Giddh web application; it exists so vouchers, statements, ledgers, thermal receipts, and related documents render consistently for Indian accounting workflows (including GST- and Tally-oriented layouts).
+GiddhTemplate (repo GIDDH_UI_Sharp) is the PDF rendering service behind Giddh, Walkover's accounting product. The Giddh backend sends it a voucher, invoice or statement as JSON. The service fills a Razor template and prints it to PDF with headless Chrome, so every customer-facing document Giddh produces looks consistent and correct. It has no UI and no data store of its own.
 
 ## Authoritative Sources & Status
 
-**Sources used (read at `verified_at`):**
+| Source | What it gives |
+|---|---|
+| The owner's answers, 2026-11-17 | Callers (the Giddh backend only) and the ship flow: **approved** |
+| `README.md`, `COMPLETE_DOCUMENTATION.md` | Purpose ("PDF Generation Service for Giddh Application"), template families, theming. Partly stale; superseded by this doc set |
+| `MEMORY_CRISIS_RCA_AND_FIXES.md` | The production incident that shaped the Chrome and memory design (see [DECISIONS.md](DECISIONS.md)) |
+| `GiddhTemplate.csproj`, `Program.cs`, `Controllers/` | What is actually built |
+| Git history (813 commits, 2025-01-24 to 2026-11-13) | Most recent work is template styling and fidelity, plus memory and observability hardening |
 
-| Source | Role |
-|--------|------|
-| `README.md` | Product summary, stack, primary API, template families |
-| `COMPLETE_DOCUMENTATION.md`, `DEVELOPER_GUIDE.md`, `docs/*.md` | Workflows, payload capture from Giddh, ops and architecture |
-| `Program.cs`, `Controllers/`, `Services/` | Runtime behavior, endpoints, observability |
-| `Templates/` | Supported document types and presentation |
-| `MEMORY_CRISIS_RCA_AND_FIXES.md`, `docs/Other/DISK_STREAMING_IMPLEMENTATION.md` | Reliability and resource constraints |
-| Recent `git log` (e.g. certificate feature, Chrome pinning, template styling) | In-flight product additions |
+- **Approved direction:** what the owner confirmed (below) and the purpose stated in `README.md`.
+- **Current implementation:** described in [ARCHITECTURE.md](ARCHITECTURE.md), [FLOWS.md](FLOWS.md) and [CONTRACTS.md](CONTRACTS.md).
+- **Proposals:** there is no roadmap in the repo. Treat git history as a change log, not a plan.
+- **Unknowns:** see [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md).
 
-**No `AGENTS.md` or root `VISION.md` was present when this draft was written.**
+### Approved Direction
 
-### Approved direction
+Confirmed by the owner, 2026-11-17:
+- **The only caller is the Giddh backend,** server to server. No browser or frontend calls this service directly.
+- **Ship flow:** a PR into `master` deploys to the **test** Elastic Beanstalk environment; `master` is then merged into `production`, which deploys to **prod**.
 
-- Serve **Giddh** as a dedicated **PDF generation microservice**: HTTP API in, PDF bytes (streamed) out.
-- Support **multiple document templates** (invoice/voucher families, Tally, thermal, ledgers, reports, email-oriented layouts, certificates) driven by **JSON payloads** aligned with Giddh data.
-- Deploy as a **production-grade API** on constrained infrastructure (documented AWS Elastic Beanstalk / `.ebextensions`, bundled Chrome), with **structured logging**, **OpenTelemetry**, **Prometheus**, and **Slack error alerts**.
-- Preserve **high visual fidelity** by rendering HTML/CSS via Chrome rather than abandoning template richness.
-
-### Current implementation
-
-- **.NET 8** ASP.NET Core service (`GiddhTemplate.csproj`, `Program.cs`).
-- **Endpoints (non-exhaustive):** `GET /` health string; `POST /api/v1/pdf` (typed `Root` invoice/voucher payload); `POST /api/v1/genericpdf` (dynamic `templateType` with large `other-template` catalog); `POST /api/v1/account-statement`; `POST /api/v1/certificate`; `GET api/diagnostics/*` for memory/GC/health.
-- **Rendering pipeline:** RazorLight templates under `Templates/` → PuppeteerSharp PDF → **temp files on disk** streamed with `FileOptions.DeleteOnClose` (see `PdfController`, `GenericPdfController`).
-- **Concurrency model:** Shared Chrome browser with restart/cleanup hosted services (`ChromeRestartService`, `PdfCleanupService`, `MemoryReservationService`); generic path serializes PDF generation (semaphore) for low-RAM safety.
-- **Observability:** Serilog (console, file, Loki sink in packages), OTLP traces, Prometheus scrape endpoint.
-- **Integration pattern (documented):** Developers capture JSON from Giddh (`books.giddh.com` / `test.giddh.com`) via `download-file` flows; JWT auth is described at the **Giddh API** layer, not enforced in this service’s codebase.
-- **Tests:** `GiddhTemplate.Tests` (limited; e.g. safe payload tests).
-
-### Proposals & roadmaps
-
-- **Memory/chrome stability work** documented in `MEMORY_CRISIS_RCA_AND_FIXES.md` (browser lifecycle, GC/heap tuning, deployment follow-up). Treat as operational roadmap unless owners mark it complete.
-- **Certificate PDFs** appear from recent commits (`CertificateController`); product positioning not stated in README.
-- **Ongoing template work** (GST variants, ledger views, styling) visible in `Templates/other-template/` and merge history—implementation-led expansion without a written roadmap file.
-
-### Unknowns & ambiguities
-
-See **`docs/OPEN_QUESTIONS.md`**. Do not infer answers from code alone (e.g. anonymous API access may be environmental/network trust, not an intentional public API).
-
----
+Stated in the repo:
+- This is the PDF generation service for the Giddh application (`README.md`, `COMPLETE_DOCUMENTATION.md`).
+- It renders three main template families (TemplateA, Tally, Thermal) plus account statements and a generic named-template path. The catalogue is in [DESIGN.md](DESIGN.md).
 
 ## Target Audience & Ideal Customer Profile (ICP)
 
-### Primary persona
-
-- **Giddh backend or platform engineer** (or integrator on the Giddh stack): sends JSON produced by Giddh voucher/statement flows to this service and returns PDFs to end users inside Giddh.
-- **Workflow:** Configure template + payload → `POST` API → stream PDF to user download/preview in Giddh.
-- **Technical level:** Comfortable with REST, JSON schema shaped like `Root` / template-specific payloads, Chrome/Puppeteer ops on Linux servers.
-
-### Secondary personas
-
-- **Giddh template/CSS author:** edits Razor and CSS under `Templates/` for branding, GST fields, and layout flags driven by payload `settings`.
-- **SRE / DevOps (Walkover):** owns EB deploys, Chrome pinning (`deps/`), memory/diagnostics, Slack/Loki/Grafana wiring via environment variables (`DEVELOPER_GUIDE.md`).
-- **QA / support:** reproduces PDF issues using payloads from test.giddh.com and `sample-payloads/` (per `docs/pdf-generation.md`).
-- **Auditors / compliance stakeholders (indirect):** depend on accurate tax and ledger presentation in generated PDFs; they do not call this API directly.
-
----
+- **Direct consumer:** the Giddh backend, which builds the payload and stores or returns the PDF (confirmed by the owner, 2026-11-17).
+- **People who see the output:** Giddh customers, meaning businesses and their own customers who receive invoices, vouchers, purchase orders and statements. Only the PDF matters to them; how it is made does not. This is inferred from the document types the templates render.
+- **People who change this repo:** Giddh engineers. In practice most changes are template layout, styling and fonts (inferred from git history).
 
 ## Problems Solved & Value Proposition
 
-| Customer problem | How this product solves it | What sets it apart |
-|------------------|---------------------------|-------------------|
-| Giddh users need downloadable/printable invoices, receipts, and statements that match on-screen data | Server-side render of Giddh JSON into PDF via templates tuned for Giddh voucher types | Purpose-built for Giddh payload shapes and Indian accounting layouts (GST, Tally, thermal) |
-| Branding and layout vary by company and template | Razor + CSS theming (fonts, colors, margins, conditional columns via settings) | Same engine serves many template families without shipping a desktop print stack to users |
-| PDF preview must match complex HTML (tables, multilingual labels, QR/signatures per docs) | Headless Chrome PDF export | Fidelity trade-off accepted vs. lightweight PDF libraries |
-| Main app must stay responsive under PDF load | Dedicated microservice isolates CPU/RAM-heavy Chrome work | Clear boundary: Giddh app orchestrates; this service renders |
-| Production incidents must be visible quickly | Structured logs, traces, Prometheus, Slack on failures | Ops-oriented defaults in `Program.cs` |
-
----
+| Customer Problem | How We Solve It | Unique Value / Differentiator |
+|---|---|---|
+| Giddh needs pixel-accurate, print-ready accounting documents | Razor templates rendered by real Chrome and printed to PDF | The HTML and CSS look the same in a browser and in the PDF |
+| Different businesses want different document styles | Template families and per-request theme options (fonts, colours, margins) | One service covers A4 invoices, Tally-style layouts and thermal receipts |
+| Backend payloads are large and not always complete | `Services/SafeDynamic.cs`, `Services/SafeList.cs` and `Services/SafeValue.cs` tolerate missing or wrong-typed fields | A bad field degrades one value, not the whole document |
+| Rendering at volume exhausted memory in production | Chrome lifecycle management, memory reservation and cleanup services | It survives long uptimes on small instances (see the incident in [DECISIONS.md](DECISIONS.md)) |
 
 ## Core Principles & Design Philosophy
 
-1. **Template fidelity over minimal footprint** — Use HTML/CSS + Chrome for output that matches business documents. *Trade-off:* higher RAM/CPU and operational complexity than library-based PDFs.
+These are inferred from the code and history. An owner has not approved them.
 
-2. **Payload-driven rendering, not business logic** — Accept structured JSON; compute presentation in templates/services, not full accounting rules. *Trade-off:* tight coupling to Giddh payload evolution; schema drift breaks templates.
-
-3. **Survive small instances** — Prefer disk streaming, bounded concurrency, browser restart, and cleanup over holding large buffers or unbounded parallelism. *Trade-off:* lower peak throughput and possible queueing/timeouts under load.
-
-4. **Observable failures** — Log with trace correlation; alert humans on generation errors (Slack). *Trade-off:* noise if thresholds are wrong; requires webhook and log pipeline configuration.
-
-5. **Templates as product surface** — New document types should land as versioned Razor/CSS assets with explicit `templateType` (or typed models), not one-off hardcoded PDF code. *Trade-off:* growing `Templates/other-template` maintenance burden.
-
-6. **Stateless document generation** — Generate on demand; do not position this service as document storage. *Trade-off:* callers must retain vouchers; no “list my PDFs” from this API alone.
-
----
+1. **The backend decides and this service draws.** Totals, taxes and every business number arrive computed in the payload. A template formats values; it does not recalculate them. *Trade-off:* changing a number means changing the backend.
+2. **Never fail a document over one bad field.** Read payload data through the safe wrappers. *Trade-off:* a missing value prints blank instead of raising an error, so watch the logs.
+3. **Output fidelity is the product.** Most commits are visual fixes. Check any template change by rendering a sample payload and looking at the PDF.
+4. **Stay alive on small instances.** Chrome is long-lived but restarted on a schedule, and memory is reserved and monitored. Don't add work that holds large buffers or browser pages.
+5. **Observable by default.** Unhandled errors go to the logs (Loki) and Slack, and metrics go to Prometheus.
 
 ## Strategic Priorities & Success Measures
 
-**Stated priorities (from docs and implementation emphasis):**
-
-- Reliable PDF generation for Giddh production traffic on **Linux + bundled Chrome**.
-- **Memory-stable** long-running instances (post–memory-crisis fixes and streaming architecture).
-- **Template coverage** for Giddh document types (invoices, ledgers, thermal, Tally, reports, certificates in code).
-
-**Success metrics:** Not stated in repository sources. Operational signals exist (Prometheus, diagnostics memory endpoint, slow-request logging &gt; 5s in `Program.cs`) but not product SLOs—see open questions.
-
----
+> [!TODO]
+> No priorities or success metrics are written down. History suggests the focus is template fidelity and runtime stability. Measures such as error rate, p95 render time and memory headroom would need an owner to set them (see [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md)).
 
 ## Boundaries & Non-Goals
 
-**Deliberate scope limits (stated or strongly implied):**
+- **Not a public API.** Only the Giddh backend calls it. Never add browser-facing endpoints, CORS for frontends, or end-user auth flows without an owner decision.
+- **Not a calculation engine.** No tax, totals or currency-conversion logic belongs here beyond formatting what the payload carries.
+- **Not a data store.** It keeps no records. Generated files are temporary and cleaned up.
+- **Not a general-purpose HTML-to-PDF service** for other Walkover products, unless the owner says otherwise.
 
-- **Not** the Giddh web UI, user login, or `books.giddh.com` application (`README.md` links Giddh as a separate related project).
-- **Not** a general-purpose PDF SaaS for arbitrary HTML uploads; inputs are **Giddh-shaped JSON** and known templates.
-- **Not** system of record for accounting data, payments, or e-invoicing government submission—rendering only.
-- **Not** a long-term document archive; temporary files and delete-on-close streaming are the norm.
-
-**Anti-patterns (break the vision):**
-
-- Adding **accounting/tax calculation** that should live in Giddh core APIs.
-- **Bypassing templates** with large procedural PDF drawing for standard vouchers (fragments the theming model).
-- **Unbounded concurrency** of Chrome renders on memory-constrained EB instances.
-- **Fabricating mock Giddh APIs** in this repo instead of documenting real contracts in `docs/CONTRACTS.md`.
-- Treating **anonymous diagnostics/GC endpoints** as safe on the public internet without an owner decision.
-
----
+**Anti-patterns:**
+- Reading payload fields without the safe wrappers.
+- Hard-coding one customer's data or layout into a shared template.
+- Holding Chrome pages open, or loading whole files into memory, without cleanup.
+- Weakening the restart, memory or cleanup services to "fix" latency.
 
 ## How Future Agents Must Evaluate Requests
 
-1. **Compare the request** to *Approved direction*, *ICP*, *Core principles*, and *Boundaries* above—not to the request’s own marketing language.
-
-2. **Improve unclear requests** before coding: identify which endpoint family (`/pdf`, `/genericpdf`, account-statement, certificate) and which template/payload contract applies.
-
-3. **Explain conflicts** plainly: if a request would turn this into a public multi-tenant PDF platform, duplicate Giddh business logic, or ignore memory/Chrome constraints, recommend declining or scoping down.
-
-4. **Deliberate direction changes** require an explicit owner decision and an update to this file in the same change set (brief addition, do not dilute boundaries to appease a request).
-
-5. **Backend dependencies:** If a feature needs capabilities from Giddh API or another service that are not implemented here, describe the contract in **`docs/CONTRACTS.md`** (create or extend). Do not add fake endpoints or pretend integrations exist.
-
-6. **Separate evidence types:** Label whether behavior is *approved*, *implemented today*, *proposed*, or *unknown*; add unknowns to `docs/OPEN_QUESTIONS.md` when owners must decide.
-
-7. **Regressions on reliability:** Changes that increase RAM per request or Chrome parallelism demand scrutiny against disk-streaming and concurrency patterns documented in `docs/Other/DISK_STREAMING_IMPLEMENTATION.md` and memory guides.
-
----
-
-*Draft vision document. An owner must review and approve before merge; this file gates which follow-up requests agents should implement.*
+1. **Align with approved direction:** compare the request to the callers, boundaries and principles above.
+2. **Improve unclear requests:** for a template change, ask for or pick a sample payload and the exact document type, template and voucher type it affects before editing.
+3. **Flag conflicts:** if a request needs calculation, persistence or a new public caller, explain the conflict and recommend that the backend do it instead.
+4. **Explicit direction changes:** when the owner deliberately widens scope (for example a new caller), update this file in the same change.
+5. **No fabricated integrations:** if a feature needs data the backend doesn't send, write the payload contract it needs in [CONTRACTS.md](CONTRACTS.md). Never invent fields in sample payloads to make a template look finished.
