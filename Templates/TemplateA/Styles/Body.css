@@ -1,3 +1,10 @@
+/* Label + value in one cell (IRN, ACK, GSTIN, etc.) */
+.label-value-line {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
+
 hr {
   border-style: solid;
   border-color: currentColor;

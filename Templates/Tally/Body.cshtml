@@ -113,24 +113,25 @@
                                                                 @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.IrnNumber))
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceIdentifier")</td>
-                                                                        <td class="border-none p-0">: @Model?.EInvoiceDetails?.IrnNumber</td>
+                                                                        <td class="border-none p-0 label-value-line">
+                                                                            @GetLabel("ShowElectronicInvoiceIdentifier"): @Model?.EInvoiceDetails?.IrnNumber
+                                                                        </td>
                                                                     </tr>
                                                                 }
                                                                 @if (Model?.EInvoiceDetails?.AcknowledgementNumber != null)
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceReference")</td>
-                                                                        <td class="border-none p-0">:
-                                                                            @Model?.EInvoiceDetails?.AcknowledgementNumber</td>
+                                                                        <td class="border-none p-0 label-value-line">
+                                                                            @GetLabel("ShowElectronicInvoiceReference"): @Model?.EInvoiceDetails?.AcknowledgementNumber
+                                                                        </td>
                                                                     </tr>
                                                                 }
                                                                 @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
                                                                 {
                                                                     <tr>
-                                                                        <td class="border-none p-0" width="100px">@GetLabel("ShowElectronicInvoiceDate")</td>
-                                                                        <td class="border-none p-0">:
-                                                                            @Model?.EInvoiceDetails?.AcknowledgementDate</td>
+                                                                        <td class="border-none p-0 label-value-line">
+                                                                            @GetLabel("ShowElectronicInvoiceDate"): @Model?.EInvoiceDetails?.AcknowledgementDate
+                                                                        </td>
                                                                     </tr>
                                                                 }
                                                             </tbody>
