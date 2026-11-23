@@ -59,28 +59,27 @@
                                                 {
                                                     eInvoiceDetailsVisible = true;
                                                     <tr>
-                                                        <td class="px-0" colspan="100%">
+                                                        <td class="px-0 label-value-line" colspan="100%">
                                                             @Lbl(Model?.Settings?.ShowElectronicInvoiceIdentifier): @Model?.EInvoiceDetails?.IrnNumber
                                                         </td>
                                                     </tr>
                                                 }
-                                                @if (Model?.EInvoiceDetails?.AcknowledgementNumber != null || !string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
+                                                @if (Model?.EInvoiceDetails?.AcknowledgementNumber != null)
                                                 {
+                                                    eInvoiceDetailsVisible = true;
                                                     <tr>
-                                                        @if (Model?.EInvoiceDetails?.AcknowledgementNumber != null)
-                                                        {
-                                                            eInvoiceDetailsVisible = true;
-                                                            <td class="px-0">
-                                                                @Lbl(Model?.Settings?.ShowElectronicInvoiceReference): @Model?.EInvoiceDetails?.AcknowledgementNumber
-                                                            </td>
-                                                        }
-                                                        @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
-                                                        {
-                                                            eInvoiceDetailsVisible = true;
-                                                            <td class="px-0 text-right">
-                                                                @Lbl(Model?.Settings?.ShowElectronicInvoiceDate): @Model?.EInvoiceDetails?.AcknowledgementDate
-                                                            </td>
-                                                        }
+                                                        <td class="px-0 label-value-line" colspan="100%">
+                                                            @Lbl(Model?.Settings?.ShowElectronicInvoiceReference): @Model?.EInvoiceDetails?.AcknowledgementNumber
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (!string.IsNullOrEmpty(Model?.EInvoiceDetails?.AcknowledgementDate))
+                                                {
+                                                    eInvoiceDetailsVisible = true;
+                                                    <tr>
+                                                        <td class="px-0 label-value-line" colspan="100%">
+                                                            @Lbl(Model?.Settings?.ShowElectronicInvoiceDate): @Model?.EInvoiceDetails?.AcknowledgementDate
+                                                        </td>
                                                     </tr>
                                                 }
                                                 @if (eInvoiceDetailsVisible) {
