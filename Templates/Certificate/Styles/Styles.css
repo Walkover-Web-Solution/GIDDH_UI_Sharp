@@ -1,0 +1,16 @@
+:root {
+    --navy: #102b50;
+    --blue: #2878e8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+    background: #e9edf3;
+    color: var(--navy);
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 28px;
+}
+@page { size: A4 landscape; margin: 8mm; }
+@media print {
+    html, body { height: 100%; background: #fff; padding: 0; }
+}
